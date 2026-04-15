@@ -5,5 +5,7 @@
   "minAppVersion": "1.5.0",
   "description": "Reading hub for Obsidian: sync highlights from WeRead (微信读书), structured capture with type tagging, chapter navigation, AI classification, knowledge linking, and Markdown export.",
   "author": "Oscar Shao",
+  "authorUrl": "https://github.com/Os",
+  "fundingUrl": "https://github.com/sponsors/Os",
   "isDesktopOnly": true
 }
