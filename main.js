@@ -34,7 +34,13 @@ var DEFAULT_SETTINGS = {
   booksBasePath: "Books",
   atomicHighlights: false,
   linkerMaxFiles: 400,
-  linkerIgnorePrefixes: ".obsidian\n.trash\n"
+  linkerIgnorePrefixes: ".obsidian\n.trash\n",
+  llmClassifier: {
+    enabled: false,
+    model: "qwen2.5",
+    endpoint: "http://localhost:11434/api/generate",
+    apiKey: ""
+  }
 };
 var ReadFlowSettingTab = class extends import_obsidian.PluginSettingTab {
   constructor(app, plugin) {
@@ -93,6 +99,51 @@ var ReadFlowSettingTab = class extends import_obsidian.PluginSettingTab {
       });
       ta.inputEl.rows = 3;
       ta.inputEl.style.width = "100%";
+    });
+    containerEl.createEl("h3", { text: "AI \u5206\u7C7B\u5668\uFF08LLM\uFF09", cls: "readflow-settings-section-title" });
+    new import_obsidian.Setting(containerEl).setName("\u542F\u7528 LLM \u5206\u7C7B").setDesc("\u5F00\u542F\u540E\uFF0C\u65B0\u540C\u6B65\u7684\u6458\u5F55\u5C06\u901A\u8FC7 LLM \u63A8\u9001\u7C7B\u578B\uFF08\u89C2\u89C2\u70B9/\u65B9\u6CD5/\u4F8B\u5B50/\u7ED3\u8BBA/\u7591\u95EE\uFF09").addToggle((tg) => {
+      var _a;
+      const llm = (_a = this.plugin.settings.llmClassifier) != null ? _a : {};
+      tg.setValue(!!llm.enabled).onChange(async (v) => {
+        this.plugin.settings.llmClassifier = { ...llm, enabled: v };
+        await this.plugin.saveSettings();
+      });
+    });
+    new import_obsidian.Setting(containerEl).setName("LLM \u6A21\u578B").setDesc("\u4F8B\u5982 qwen2.5\u3001gpt-4o-mini\u3001deepseek-chat").addText((t) => {
+      var _a;
+      const llm = (_a = this.plugin.settings.llmClassifier) != null ? _a : {};
+      t.setValue(llm.model || "qwen2.5").onChange(async (v) => {
+        this.plugin.settings.llmClassifier = { ...llm, model: v };
+        await this.plugin.saveSettings();
+      });
+    });
+    new import_obsidian.Setting(containerEl).setName("API \u7AEF\u70B9").setDesc("Ollama \u6216\u5176\u4ED6 LLM API \u5730\u5740\uFF0C\u4F8B\u5982 http://localhost:11434/api/generate").addText((t) => {
+      var _a;
+      const llm = (_a = this.plugin.settings.llmClassifier) != null ? _a : {};
+      t.setValue(llm.endpoint || "").onChange(async (v) => {
+        this.plugin.settings.llmClassifier = { ...llm, endpoint: v };
+        await this.plugin.saveSettings();
+      });
+    });
+    new import_obsidian.Setting(containerEl).setName("API Key\uFF08\u53EF\u9009\uFF09").setDesc("\u5982\u6709\u8BF4\u660E\u8981\u6C42").addText((t) => {
+      var _a;
+      t.inputEl.type = "password";
+      const llm = (_a = this.plugin.settings.llmClassifier) != null ? _a : {};
+      t.setValue(llm.apiKey || "").onChange(async (v) => {
+        this.plugin.settings.llmClassifier = { ...llm, apiKey: v };
+        await this.plugin.saveSettings();
+      });
+    });
+    const testBtn = containerEl.createEl("button", { text: "\u6D4B\u8BD5 LLM \u8FDE\u63A5", type: "button", cls: "readflow-btn readflow-btn--secondary" });
+    testBtn.addEventListener("click", async () => {
+      var _a;
+      try {
+        const llm = (_a = this.plugin.settings.llmClassifier) != null ? _a : {};
+        const resp = await this.plugin.testLlm(llm);
+        new Notice(resp.ok ? "\u2705 LLM \u8FDE\u63A5\u6B63\u5E38" : `\u274C \u8FDE\u63A5\u5931\u8D25: ${resp.error}`);
+      } catch (e) {
+        new Notice(`\u6D4B\u8BD5\u5F02\u5E38: ${e instanceof Error ? e.message : e}`);
+      }
     });
   }
 };
@@ -655,6 +706,75 @@ async function syncAllBooksWithNotes(cookieRef, getExisting, forceFull = false, 
     synced: targets.length,
     skipped
   };
+}
+async function pushNoteToWeread(cookieRef, highlight) {
+  if (!highlight.bookId || !highlight.note) {
+    return { ok: false, reason: "missing_fields" };
+  }
+  const bookId = highlight.bookId.replace(/^weread-/, "");
+  if (!highlight.wereadReviewId) {
+    if (highlight.sourceType === "weread") {
+      return {
+        ok: false,
+        reason: "weread_reviewId_missing",
+        detail: "\u8BE5\u6458\u5F55\u6765\u81EA\u5FAE\u4FE1\u8BFB\u4E66\uFF0C\u8BF7\u5148\u91CD\u65B0\u540C\u6B65\u83B7\u53D6 reviewId \u540E\u518D\u63A8\u9001",
+        retryable: false
+      };
+    }
+    try {
+      const createBody = {
+        bookId,
+        chapterUid: highlight.chapterUid || 0,
+        type: 1,
+        content: highlight.note,
+        synckey: 0
+      };
+      if (highlight.wereadRange) createBody.range = highlight.wereadRange;
+      const resp = await requestJson(`${BASE}/web/review/create`, {
+        method: "POST",
+        headers: buildJsonPostHeaders(cookieRef.value),
+        body: JSON.stringify(createBody)
+      }, cookieRef);
+      if (hasBlockingError(resp)) return { ok: false, reason: "create_api_error", detail: resp };
+      return { ok: true, reviewId: resp && typeof resp === "object" && "reviewId" in resp ? String(resp.reviewId) : void 0, created: true };
+    } catch (e) {
+      const status = e && typeof e === "object" && "status" in e ? e.status : void 0;
+      return { ok: false, reason: `network_${status != null ? status : "unknown"}`, detail: String(e), retryable: false };
+    }
+  }
+  const body = {
+    bookId,
+    chapterUid: highlight.chapterUid || 0,
+    type: 1,
+    content: highlight.note,
+    synckey: 0,
+    reviewId: highlight.wereadReviewId
+  };
+  if (highlight.wereadRange) body.range = highlight.wereadRange;
+  const primaryUrl = `${BASE}/web/review/update`;
+  const fallbackUrl = `${IWEREAD_BASE}/web/review/update`;
+  const MAX_RETRIES = 2;
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    if (attempt > 0) {
+      await new Promise((r) => setTimeout(r, Math.min(500 * Math.pow(2, attempt - 1), 4e3)));
+    }
+    const url = attempt === MAX_RETRIES ? fallbackUrl : primaryUrl;
+    try {
+      const resp = await requestJson(url, {
+        method: "POST",
+        headers: buildJsonPostHeaders(cookieRef.value),
+        body: JSON.stringify(body)
+      }, cookieRef);
+      if (hasBlockingError(resp)) return { ok: false, reason: "api_error", detail: resp };
+      const newReviewId = resp && typeof resp === "object" && "reviewId" in resp ? String(resp.reviewId) : void 0;
+      return { ok: true, reviewId: newReviewId };
+    } catch (e) {
+      const status = e && typeof e === "object" && "status" in e ? e.status : void 0;
+      if (attempt < MAX_RETRIES && (status === 404 || status === 502 || status === 503 || status === 504)) continue;
+      return { ok: false, reason: `network_${status != null ? status : "unknown"}`, detail: String(e), retryable: false };
+    }
+  }
+  return { ok: false, reason: "unreachable" };
 }
 
 // src/processor/linker.ts
@@ -3448,7 +3568,7 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
   constructor(app, manifest) {
     super(app, manifest);
     this.settings = { ...DEFAULT_SETTINGS };
-    this.diskData = { version: 1, books: {} };
+    this.diskData = { version: 1, books: {}, knowledgeCards: [] };
     this.wereadLogin = null;
     this.syncStatusEl = null;
     this.selectionCaptureEl = null;
@@ -3543,7 +3663,8 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
     this.diskData = {
       version: 1,
       books: { ...(_c = raw.books) != null ? _c : {} },
-      lastSyncAt: raw.lastSyncAt
+      lastSyncAt: raw.lastSyncAt,
+      knowledgeCards: []
     };
   }
   async persistDisk() {
@@ -3620,6 +3741,18 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
       }
       this.diskData.lastSyncAt = Date.now();
       await this.persistDisk();
+      if (this.settings.llmClassifier.enabled) {
+        for (const book of books) {
+          for (const h of book.highlights) {
+            if (!h.highlightType && h.sourceType === "weread") {
+              const type = await this.classifyHighlightWithLlm(h, book.title);
+              if (type) h.highlightType = type;
+            }
+          }
+          this.diskData.books[book.bookId] = book;
+        }
+        await this.persistDisk();
+      }
       let written = 0;
       let failed = 0;
       for (const b of books) {
@@ -3631,6 +3764,7 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
           console.error("[ReadFlow] \u843D\u76D8\u5931\u8D25", b.title, e);
         }
       }
+      void this.linker.rebuildIndexAsync();
       progress.hide();
       const base = this.settings.booksBasePath || "Books";
       if (result.scanned === 0) {
@@ -3800,5 +3934,123 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
     return books.find((book) => {
       return book.title === file.basename || book.title === parentName;
     });
+  }
+  // ── 批量推送到微信读书 ──────────────────────────────────────────
+  async pushHighlightNote(bookId, highlight) {
+    const cookie = this.settings.wereadCookie.trim();
+    if (!cookie) return { ok: false, reason: "\u672A\u914D\u7F6E\u5FAE\u4FE1\u8BFB\u4E66 Cookie" };
+    if (!highlight.note || !highlight.wereadRange && !highlight.wereadReviewId) {
+      return { ok: false, reason: "\u7F3A\u5C11\u60F3\u6CD5\u6216\u5B9A\u4F4D\u4FE1\u606F" };
+    }
+    const cookieRef = { value: cookie };
+    const result = await pushNoteToWeread(cookieRef, highlight);
+    if (cookieRef.value !== this.settings.wereadCookie) {
+      this.settings.wereadCookie = cookieRef.value;
+    }
+    if (result.ok && result.reviewId) {
+      const cached = this.diskData.books[bookId];
+      if (cached) {
+        this.diskData.books[bookId] = {
+          ...cached,
+          highlights: cached.highlights.map(
+            (h) => h.id === highlight.id ? { ...h, wereadReviewId: result.reviewId } : h
+          )
+        };
+        await this.persistDisk();
+      }
+    }
+    return result;
+  }
+  async pushBatchNotes(bookId) {
+    const cookie = this.settings.wereadCookie.trim();
+    if (!cookie) {
+      new import_obsidian7.Notice("\u8BF7\u5148\u914D\u7F6E\u5FAE\u4FE1\u8BFB\u4E66 Cookie");
+      return { pushed: 0, failed: 0, skipped: 0 };
+    }
+    const cached = this.diskData.books[bookId];
+    if (!cached) return { pushed: 0, failed: 0, skipped: 0 };
+    const pushable = cached.highlights.filter(
+      (h) => h.sourceType === "weread" && h.note && (h.wereadRange || h.wereadReviewId)
+    );
+    if (pushable.length === 0) {
+      new import_obsidian7.Notice("\u6CA1\u6709\u53EF\u63A8\u9001\u7684\u60F3\u6CD5");
+      return { pushed: 0, failed: 0, skipped: 0 };
+    }
+    const cookieRef = { value: cookie };
+    const progress = new import_obsidian7.Notice(`\u63A8\u9001\u4E2D 0/${pushable.length}\u2026`, 18e4);
+    let pushed = 0;
+    let failed = 0;
+    for (let i = 0; i < pushable.length; i++) {
+      progress.setMessage(`\u63A8\u9001\u4E2D ${i + 1}/${pushable.length}\u2026`);
+      const res = await pushNoteToWeread(cookieRef, pushable[i]);
+      if (res.ok) {
+        pushed++;
+        if (res.reviewId) {
+          cached.highlights = cached.highlights.map(
+            (x) => x.id === pushable[i].id ? { ...x, wereadReviewId: res.reviewId } : x
+          );
+        }
+      } else {
+        failed++;
+        console.warn("[ReadFlow] push failed for", pushable[i].id, res);
+      }
+      if (i < pushable.length - 1) {
+        await new Promise((r) => setTimeout(r, 800 + Math.random() * 400));
+      }
+    }
+    if (cookieRef.value !== this.settings.wereadCookie) {
+      this.settings.wereadCookie = cookieRef.value;
+    }
+    this.diskData.books[bookId] = cached;
+    await this.persistDisk();
+    progress.hide();
+    new import_obsidian7.Notice(`\u63A8\u9001\u5B8C\u6210\uFF1A\u6210\u529F ${pushed}\uFF0C\u5931\u8D25 ${failed}\uFF0C\u5171 ${pushable.length} \u6761`);
+    return { pushed, failed, skipped: cached.highlights.length - pushable.length };
+  }
+  // ── LLM ────────────────────────────────────────────────────────
+  async testLlm(llm) {
+    const { enabled, model, endpoint } = llm;
+    if (!enabled || !endpoint) return { ok: false, error: "\u672A\u914D\u7F6E LLM \u7AEF\u70B9" };
+    try {
+      const resp = await this.app.requestUrl({
+        url: endpoint,
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ model, prompt: "\u56DE\u7B54: ok", stream: false })
+      });
+      return { ok: true };
+    } catch (e) {
+      return { ok: false, error: e instanceof Error ? e.message : String(e) };
+    }
+  }
+  async classifyHighlightWithLlm(highlight, bookTitle) {
+    var _a, _b, _c, _d;
+    const llm = (_a = this.settings.llmClassifier) != null ? _a : {};
+    if (!llm.enabled || !llm.endpoint) return null;
+    const prompt = `\u6839\u636E\u4EE5\u4E0B\u9605\u8BFB\u6458\u5F55\uFF0C\u5224\u65AD\u5176\u7C7B\u578B\uFF0C\u53EA\u80FD\u56DE\u7B54\u4E00\u4E2A\u8BCD\uFF1Aidea\uFF08\u89C2\u70B9\uFF09\u3001method\uFF08\u65B9\u6CD5\uFF09\u3001example\uFF08\u4F8B\u5B50\uFF09\u3001conclusion\uFF08\u7ED3\u8BBA\uFF09\u6216 question\uFF08\u7591\u95EE\uFF09\u3002
+
+\u4E66\u7C4D\uFF1A\u300A${bookTitle}\u300B
+\u6458\u5F55\uFF1A${highlight.content.slice(0, 500)}
+${highlight.note ? `\u7B14\u8BB0\uFF1A${highlight.note.slice(0, 200)}` : ""}
+
+\u7C7B\u578B\uFF1A`;
+    try {
+      const resp = await this.app.requestUrl({
+        url: llm.endpoint,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...llm.apiKey ? { Authorization: `Bearer ${llm.apiKey}` } : {}
+        },
+        body: JSON.stringify({ model: llm.model, prompt, stream: false })
+      });
+      const json = resp.json;
+      const raw = ((_d = (_c = (_b = json.response) != null ? _b : json.text) != null ? _c : json.content) != null ? _d : "").trim();
+      const match = raw.match(/^\s*(idea|method|example|conclusion|question)\s*[`'"「]/i);
+      return match ? match[1].toLowerCase() : null;
+    } catch (e) {
+      console.warn("[ReadFlow] LLM classify failed", e);
+      return null;
+    }
   }
 };
