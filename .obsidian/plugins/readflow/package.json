@@ -1,0 +1,17 @@
+{
+  "name": "readflow-plugin",
+  "private": true,
+  "version": "0.3.1",
+  "description": "Build tooling for the ReadFlow Obsidian plugin",
+  "scripts": {
+    "build": "node esbuild.config.mjs",
+    "check:release": "python3 check_release.py",
+    "export:standalone": "python3 export_standalone.py",
+    "prepare:release-assets": "python3 prepare_release_assets.py"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "esbuild": "^0.25.4",
+    "typescript": "^6.0.2"
+  }
+}
