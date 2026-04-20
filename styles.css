@@ -552,6 +552,48 @@
 	color: var(--rf-text);
 }
 
+.readflow-status-flow {
+	margin-top: var(--rf-space-4);
+}
+
+.readflow-status-flow .readflow-section-label {
+	margin-bottom: var(--rf-space-2);
+}
+
+.readflow-status-row {
+	display: flex;
+	align-items: center;
+	gap: var(--rf-space-2);
+	margin-bottom: 4px;
+}
+
+.readflow-status-label {
+	font-size: 11px;
+	color: var(--rf-text-muted);
+	min-width: 56px;
+}
+
+.readflow-status-bar-bg {
+	flex: 1;
+	height: 6px;
+	background: var(--rf-border);
+	border-radius: 3px;
+	overflow: hidden;
+}
+
+.readflow-status-bar-fill {
+	height: 100%;
+	border-radius: 3px;
+	transition: width 0.3s ease;
+}
+
+.readflow-status-count {
+	font-size: 11px;
+	color: var(--rf-text-muted);
+	min-width: 48px;
+	text-align: right;
+}
+
 .readflow-meta-list {
 	display: flex;
 	flex-direction: column;
@@ -1736,9 +1778,15 @@
 	background: var(--rf-surface);
 }
 
+.readflow-mm-wrap {
+	min-height: 260px;
+	width: 100%;
+}
+
 .readflow-graph-wrap {
 	position: relative;
 	width: 100%;
+	min-height: 260px;
 	margin-top: var(--rf-space-2);
 	border-radius: var(--rf-radius-md);
 	overflow: hidden;
@@ -1753,6 +1801,12 @@
 	cursor: grab;
 }
 
+.readflow-mm-canvas {
+	display: block;
+	width: 100%;
+	height: 260px;
+}
+
 .readflow-graph-canvas:active {
 	cursor: grabbing;
 }
@@ -1763,4 +1817,278 @@
 	.readflow-card {
 		transition: none;
 	}
+}
+
+/* Weread Preview Modal */
+.readflow-preview-modal {
+	max-width: 560px;
+}
+
+.rf-preview-header {
+	padding: 24px 24px 16px;
+	border-bottom: 1px solid var(--rf-border);
+}
+
+.rf-preview-book-title {
+	font-size: 1.1em;
+	font-weight: 600;
+	color: var(--rf-text);
+	margin: 0 0 4px;
+}
+
+.rf-preview-chapter {
+	font-size: 0.85em;
+	color: var(--rf-text-muted);
+	margin: 0;
+}
+
+.rf-preview-divider {
+	height: 1px;
+	background: var(--rf-border);
+	margin: 0;
+}
+
+.rf-preview-hl-block {
+	padding: 20px 24px;
+}
+
+.rf-preview-quote {
+	margin: 0 0 12px;
+	padding: 10px 16px;
+	border-left: 3px solid var(--rf-accent);
+	background: var(--rf-surface-raised);
+	border-radius: 0 var(--rf-radius-md) var(--rf-radius-md) 0;
+	font-size: 0.95em;
+	line-height: 1.6;
+	color: var(--rf-text);
+	font-style: italic;
+}
+
+.rf-preview-note,
+.rf-preview-context {
+	margin-top: 12px;
+}
+
+.rf-preview-note-label,
+.rf-preview-context-label {
+	display: block;
+	font-size: 0.75em;
+	font-weight: 600;
+	color: var(--rf-text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	margin-bottom: 4px;
+}
+
+.rf-preview-note-text,
+.rf-preview-context-text {
+	margin: 0;
+	font-size: 0.9em;
+	color: var(--rf-text);
+	line-height: 1.5;
+}
+
+.rf-preview-footer {
+	padding: 8px 24px 20px;
+	border-top: 1px solid var(--rf-border);
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.rf-preview-open-btn {
+	width: 100%;
+}
+
+/* ============================================
+   Reading Progress View
+   ============================================ */
+
+.readflow-reading-progress {
+	height: 100%;
+	overflow-y: auto;
+	padding: 16px;
+	background: var(--rf-canvas);
+}
+
+.readflow-rp-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 20px;
+}
+
+.readflow-rp-stats {
+	display: flex;
+	gap: 12px;
+}
+
+.readflow-rp-stat-card {
+	background: var(--rf-surface);
+	border: 1px solid var(--rf-border);
+	border-radius: var(--rf-radius-md);
+	padding: 12px 20px;
+	text-align: center;
+	min-width: 80px;
+}
+
+.readflow-rp-stat-value {
+	font-size: 1.5em;
+	font-weight: 700;
+	color: var(--rf-primary);
+}
+
+.readflow-rp-stat-label {
+	font-size: 0.75em;
+	color: var(--rf-text-muted);
+	margin-top: 4px;
+}
+
+.readflow-rp-actions {
+	display: flex;
+	gap: 8px;
+}
+
+.readflow-rp-action-btn {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 8px 12px;
+	background: var(--rf-primary);
+	color: white;
+	border-radius: var(--rf-radius-sm);
+	cursor: pointer;
+	font-size: 0.85em;
+	transition: background 0.2s ease;
+}
+
+.readflow-rp-action-btn:hover {
+	background: var(--rf-primary-hover);
+}
+
+.readflow-rp-icon {
+	font-size: 1em;
+}
+
+.readflow-rp-list-section {
+	margin-top: 16px;
+}
+
+.readflow-rp-list-section h3 {
+	font-size: 1em;
+	font-weight: 600;
+	color: var(--rf-text);
+	margin: 0 0 12px;
+	padding-bottom: 8px;
+	border-bottom: 1px solid var(--rf-border);
+}
+
+.readflow-rp-list {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.readflow-rp-item {
+	background: var(--rf-surface);
+	border: 1px solid var(--rf-border);
+	border-radius: var(--rf-radius-md);
+	padding: 12px;
+	cursor: pointer;
+	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.readflow-rp-item:hover {
+	border-color: var(--rf-primary);
+	box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+}
+
+.readflow-rp-title {
+	font-weight: 600;
+	color: var(--rf-text);
+	margin-bottom: 4px;
+}
+
+.readflow-rp-author {
+	font-size: 0.85em;
+	color: var(--rf-text-muted);
+	margin-bottom: 8px;
+}
+
+.readflow-rp-progress-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: 6px;
+}
+
+.readflow-rp-progress-bar {
+	flex: 1;
+	height: 6px;
+	background: var(--rf-secondary-surface);
+	border-radius: 3px;
+	overflow: hidden;
+}
+
+.readflow-rp-progress-fill {
+	height: 100%;
+	background: var(--rf-primary);
+	border-radius: 3px;
+	transition: width 0.3s ease;
+}
+
+.readflow-rp-progress-text {
+	font-size: 0.85em;
+	font-weight: 600;
+	color: var(--rf-primary);
+	min-width: 40px;
+	text-align: right;
+}
+
+.readflow-rp-meta {
+	font-size: 0.75em;
+	color: var(--rf-text-muted);
+}
+
+.readflow-rp-empty-state {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+	text-align: center;
+	color: var(--rf-text-muted);
+}
+
+.readflow-rp-empty-state h3 {
+	color: var(--rf-text);
+	margin-bottom: 8px;
+}
+
+.readflow-rp-footer {
+	margin-top: 20px;
+	padding-top: 12px;
+	border-top: 1px solid var(--rf-border);
+	font-size: 0.75em;
+	color: var(--rf-text-muted);
+	text-align: center;
+}
+
+/* Dark mode support */
+.theme-dark .readflow-reading-progress {
+	background: var(--rf-canvas);
+}
+
+.theme-dark .readflow-rp-stat-card,
+.theme-dark .readflow-rp-item {
+	background: var(--rf-surface);
+	border-color: var(--rf-border);
+}
+
+.theme-dark .readflow-rp-action-btn {
+	background: var(--rf-primary);
+}
+
+.theme-dark .readflow-rp-progress-fill {
+	background: var(--rf-primary);
 }
