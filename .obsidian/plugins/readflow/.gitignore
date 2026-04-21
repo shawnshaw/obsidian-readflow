@@ -8,9 +8,10 @@ main.js.backup_*
 main.js.today_broken
 *.rebuilt_*
 
-# Generated source files (intermediate build steps)
-src/
-!src/*.js
+# TypeScript source files — version controlled
+!src/
+src/**/*.js
+!src/main.js
 
 # IDE
 .idea/
