@@ -1,0 +1,64 @@
+name: Bug report
+description: Report a reproducible problem in ReadFlow
+title: "[Bug] "
+labels:
+  - bug
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      description: Describe the issue clearly and concisely.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Provide exact steps so the issue can be reproduced.
+      placeholder: |
+        1. Open ReadFlow
+        2. Click ...
+        3. Observe ...
+    validations:
+      required: true
+
+  - type: input
+    id: obsidian_version
+    attributes:
+      label: Obsidian version
+    validations:
+      required: true
+
+  - type: input
+    id: plugin_version
+    attributes:
+      label: ReadFlow version
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: macOS / Windows / Linux
+    validations:
+      required: true
+
+  - type: dropdown
+    id: clean_vault
+    attributes:
+      label: Does it reproduce in a clean vault?
+      options:
+        - "Yes"
+        - "No"
+        - "Not tested"
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Console logs or screenshots
+      description: Paste any relevant ReadFlow logs from the Obsidian developer console.
