@@ -18,6 +18,11 @@
 	--rf-text-muted: #94a3b8;
 	--rf-accent-green: #059669;
 	--rf-accent-soft: #d1fae5;
+	--rf-accent: #2563eb;
+	--rf-surface-raised: #ffffff;
+	--rf-hover-bg: #f1f5f9;
+	--rf-text-primary: #0f172a;
+	--rf-primary-bg: #dbeafe;
 	--rf-focus-ring: rgba(37, 99, 235, 0.35);
 	--rf-radius-sm: 6px;
 	--rf-radius-md: 8px;
@@ -29,6 +34,9 @@
 	--rf-space-6: 24px;
 	--rf-font: system-ui, "Inter", "PingFang SC", "Noto Sans SC", sans-serif;
 	--rf-shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.06);
+	--rf-shadow-detached: 0 20px 60px rgba(15, 23, 42, 0.22), 0 4px 16px rgba(15, 23, 42, 0.12);
+	--rf-shadow-detached-dark: 0 20px 60px rgba(0, 0, 0, 0.6), 0 4px 16px rgba(0, 0, 0, 0.4);
+	--rf-shadow-primary: 0 8px 24px rgba(37, 99, 235, 0.24);
 	--rf-ease: cubic-bezier(0.2, 0, 0, 1);
 	display: flex;
 	flex-direction: column;
@@ -77,7 +85,7 @@
 	font-size: 12px;
 	font-weight: 600;
 	line-height: 1;
-	box-shadow: 0 8px 24px rgba(37, 99, 235, 0.24);
+	box-shadow: var(--rf-shadow-primary);
 	cursor: pointer;
 	opacity: 0;
 	transform: translateY(4px) scale(0.98);
@@ -98,10 +106,10 @@
 /* —— Top bar —— */
 .readflow-topbar {
 	display: flex;
-	align-items: flex-start;
+	align-items: center;
 	justify-content: space-between;
-	gap: var(--rf-space-4);
-	padding: var(--rf-space-4) var(--rf-space-4) var(--rf-space-3);
+	gap: var(--rf-space-3);
+	padding: var(--rf-space-2) var(--rf-space-3);
 	background: var(--rf-surface);
 	border-bottom: 1px solid var(--rf-border);
 	flex-shrink: 0;
@@ -115,32 +123,80 @@
 .readflow-brand {
 	display: flex;
 	flex-direction: column;
-	gap: 2px;
+	gap: 1px;
 	min-width: 0;
 }
 
 .readflow-brand-title {
 	margin: 0;
-	font-size: 18px;
+	font-size: 14px;
 	font-weight: 650;
 	line-height: 1.2;
-	letter-spacing: -0.02em;
+	letter-spacing: -0.01em;
 	color: var(--rf-text);
 }
 
 .readflow-brand-sub {
 	margin: 0;
-	font-size: 12px;
+	font-size: 11px;
 	color: var(--rf-text-muted);
 	font-weight: 400;
 }
 
 .readflow-toolbar {
 	display: flex;
-	flex-wrap: wrap;
+	flex-wrap: nowrap;
 	align-items: center;
 	justify-content: flex-end;
-	gap: var(--rf-space-2);
+	gap: 4px;
+	overflow-x: auto;
+}
+
+.readflow-toolbar::-webkit-scrollbar {
+	height: 0;
+}
+
+.readflow-toolbar .readflow-btn,
+.readflow-toolbar .readflow-search-wrap {
+	flex-shrink: 0;
+}
+
+.readflow-search-wrap {
+	display: flex;
+	align-items: center;
+}
+
+.readflow-search-input {
+	height: 32px;
+	padding: 0 10px;
+	font-size: 12px;
+	font-family: inherit;
+	color: var(--rf-text);
+	background: var(--rf-secondary-surface);
+	border: 1px solid var(--rf-border);
+	border-radius: var(--rf-radius-md);
+	outline: none;
+	width: 160px;
+	transition: border-color 0.15s, width 0.2s;
+}
+
+.readflow-search-input:focus {
+	border-color: var(--rf-primary);
+	width: 220px;
+	box-shadow: 0 0 0 3px var(--rf-focus-ring);
+}
+
+.readflow-search-clear {
+	background: none;
+	border: none;
+	cursor: pointer;
+	color: var(--rf-text-muted);
+	padding: 2px 4px;
+	font-size: 12px;
+}
+
+.readflow-search-clear:hover {
+	color: var(--rf-text);
 }
 
 /* 顶栏最右侧：与主操作区略作分隔 */
@@ -213,6 +269,13 @@
 .readflow-btn--ghost:hover {
 	background: var(--rf-secondary-surface);
 	color: var(--rf-text);
+}
+
+.readflow-btn--icon {
+	min-width: 32px;
+	width: 32px;
+	padding: 0;
+	justify-content: center;
 }
 
 .readflow-btn--sm {
@@ -350,6 +413,123 @@
 	flex-shrink: 0;
 }
 
+.readflow-sidebar-tools-row {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	padding-top: 6px;
+	border-top: 1px solid var(--rf-border);
+	margin-top: 4px;
+}
+
+.readflow-sidebar-topic-section {
+	padding: 0 0 8px;
+	border-bottom: 1px solid var(--rf-border);
+	margin-bottom: 8px;
+}
+
+.readflow-sidebar-section-head {
+	padding: 4px 0;
+}
+
+.readflow-sidebar-section-toggle {
+	background: none;
+	border: none;
+	cursor: pointer;
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--rf-text-muted);
+	padding: 2px 0;
+	text-align: left;
+	width: 100%;
+}
+
+.readflow-sidebar-section-toggle:hover {
+	color: var(--rf-primary);
+}
+
+.readflow-sidebar-topic-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	padding: 4px 0;
+}
+
+.readflow-sidebar-lane-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	padding: 4px 0;
+}
+
+.readflow-sidebar-lane-pill {
+	font-size: 11px;
+	padding: 2px 8px;
+	border-radius: 12px;
+	border: 1px solid color-mix(in srgb, var(--lane-color, var(--rf-primary)) 30%, transparent);
+	background: color-mix(in srgb, var(--lane-color, var(--rf-primary)) 10%, transparent);
+	color: var(--lane-color, var(--rf-primary));
+	cursor: pointer;
+	transition: background 0.15s, border-color 0.15s;
+	white-space: nowrap;
+}
+
+.readflow-sidebar-lane-pill:hover {
+	background: color-mix(in srgb, var(--lane-color, var(--rf-primary)) 20%, transparent);
+}
+
+.readflow-sidebar-lane-pill--active {
+	background: var(--lane-color, var(--rf-primary));
+	color: white;
+}
+
+/* 侧边栏分类导航 */
+.readflow-sidebar-board-section {
+	padding: 0 0 8px;
+	border-bottom: 1px solid var(--rf-border);
+	margin-bottom: 8px;
+}
+
+.readflow-board-nav-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 5px 6px;
+	border-radius: var(--rf-radius-sm);
+	cursor: pointer;
+	font-size: 12px;
+	color: var(--rf-text-secondary);
+	transition: background 0.12s, color 0.12s;
+}
+
+.readflow-board-nav-item:hover {
+	background: var(--rf-hover-bg);
+	color: var(--rf-text-primary);
+}
+
+.readflow-board-nav-item--active {
+	background: var(--rf-primary-bg);
+	color: var(--rf-primary);
+	font-weight: 600;
+}
+
+.readflow-board-nav-label {
+	flex: 1;
+}
+
+.readflow-board-nav-count {
+	font-size: 11px;
+	color: var(--rf-text-muted);
+	background: var(--rf-secondary-surface);
+	padding: 1px 6px;
+	border-radius: 10px;
+}
+
+.readflow-board-nav-item--active .readflow-board-nav-count {
+	background: var(--rf-primary);
+	color: white;
+}
+
 .readflow-book-sort-group {
 	display: inline-flex;
 	align-items: center;
@@ -384,12 +564,8 @@
 	justify-content: center;
 	width: 100%;
 	height: 100%;
-}
-
-.readflow-book-sort-compound__icon svg {
-	width: 17px;
-	height: 17px;
-	stroke-width: 2;
+	font-size: 13px;
+	line-height: 1;
 }
 
 .readflow-book-sort-compound__dir {
@@ -680,28 +856,40 @@
 .readflow-workspace-header {
 	display: flex;
 	flex-wrap: wrap;
-	align-items: flex-start;
+	align-items: center;
 	justify-content: space-between;
-	gap: var(--rf-space-3);
+	gap: var(--rf-space-2);
 	padding: var(--rf-space-1) 0;
 }
 
 .readflow-workspace-title {
 	margin: 0;
-	font-size: 20px;
+	font-size: 14px;
 	font-weight: 650;
 	line-height: 1.2;
 	color: var(--rf-text);
 }
 
 .readflow-workspace-titleblock {
-	padding: 12px 16px;
-	border-bottom: 1px solid var(--rf-border);
+	padding: 5px 12px;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.readflow-workspace-title-row {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.readflow-workspace-title-row .readflow-card-meta {
+	margin-left: 0;
 }
 
 .readflow-workspace-subtitle {
-	margin: var(--rf-space-1) 0 0;
-	font-size: 12px;
+	margin: 0;
+	font-size: 11px;
 	color: var(--rf-text-muted);
 }
 
@@ -740,16 +928,20 @@
 }
 
 .readflow-content-grid {
-	display: grid;
-	grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.9fr);
-	gap: var(--rf-space-3);
+	display: flex;
+	flex-direction: row;
 	align-items: stretch;
 	flex: 1;
 	min-height: 0;
+	position: relative;
 }
 
 .readflow-content-grid--detached {
-	grid-template-columns: 1fr;
+	flex-direction: column;
+}
+
+.readflow-content-grid--detached .readflow-list-pane {
+	display: none;
 }
 
 /* Each pane scrolls independently */
@@ -757,7 +949,51 @@
 .readflow-knowledge-pane {
 	min-height: 0;
 	overflow-y: auto;
+	overflow-x: hidden;
 	padding-bottom: var(--rf-space-4);
+	flex-shrink: 0;
+}
+
+.readflow-list-pane {
+	flex: 1;
+	min-width: 240px;
+}
+
+.readflow-knowledge-pane {
+	width: 340px;
+	flex-shrink: 0;
+	border-left: 1px solid var(--rf-border);
+}
+
+/* Draggable splitter */
+.readflow-content-splitter {
+	width: 5px;
+	cursor: col-resize;
+	background: transparent;
+	flex-shrink: 0;
+	position: relative;
+	z-index: 1;
+	transition: background 0.15s;
+	user-select: none;
+}
+
+.readflow-content-splitter::after {
+	content: "";
+	position: absolute;
+	inset: 0 1px;
+	background: var(--rf-border);
+	opacity: 0;
+	transition: opacity 0.15s;
+}
+
+.readflow-content-splitter:hover::after,
+.readflow-content-splitter.is-dragging::after {
+	opacity: 1;
+	background: var(--rf-primary);
+}
+
+.readflow-content-splitter.is-dragging {
+	cursor: col-resize;
 }
 
 /* Collapsible sections: fixed height so content grid always gets space */
@@ -1273,6 +1509,50 @@
 	width: min(640px, calc(100vw - 32px));
 }
 
+/* —— Mindmap modal: larger, resizable —— */
+.readflow-mm-modal .modal {
+	min-width: 600px;
+	min-height: 400px;
+}
+
+.readflow-mm-modal .modal-content,
+.readflow-mm-modal-body {
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+	flex: 1;
+}
+
+.readflow-mm-modal-hint {
+	padding: 6px 16px;
+	border-bottom: 1px solid var(--rf-border);
+	flex-shrink: 0;
+}
+
+.readflow-mm-modal-body {
+	padding: 0;
+}
+
+.readflow-mm-wrap {
+	width: 100%;
+	height: 100%;
+}
+
+/* 知识面板内的脑图：约束尺寸，防止 canvas 溢出 */
+.readflow-mm-section .readflow-mm-wrap {
+	height: 240px;
+	overflow: hidden;
+}
+
+.readflow-mm-section .readflow-mm-canvas {
+	height: 240px !important;
+}
+
+.readflow-mm-canvas {
+	width: 100% !important;
+	height: 100% !important;
+}
+
 .readflow-capture-modal {
 	--rf-canvas: #f8fafc;
 	--rf-surface: #ffffff;
@@ -1287,6 +1567,11 @@
 	--rf-text-muted: #94a3b8;
 	--rf-accent-green: #059669;
 	--rf-accent-soft: #d1fae5;
+	--rf-accent: #2563eb;
+	--rf-surface-raised: #ffffff;
+	--rf-hover-bg: #f1f5f9;
+	--rf-text-primary: #0f172a;
+	--rf-primary-bg: #dbeafe;
 	--rf-focus-ring: rgba(37, 99, 235, 0.35);
 	--rf-radius-md: 8px;
 	--rf-radius-lg: 12px;
@@ -1528,19 +1813,19 @@
 }
 
 .readflow-settings button.mod-cta {
-	background-color: #2563eb !important;
-	color: #f8fafc !important;
+	background-color: var(--rf-primary) !important;
+	color: var(--rf-on-primary) !important;
 	border-radius: 8px;
 	font-weight: 500;
 }
 
 .readflow-settings button.mod-cta:hover {
-	background-color: #1d4ed8 !important;
+	background-color: var(--rf-primary-hover) !important;
 }
 
 .theme-dark .readflow-settings button.mod-cta {
-	background-color: #2563eb !important;
-	color: #f8fafc !important;
+	background-color: var(--rf-primary) !important;
+	color: var(--rf-on-primary) !important;
 }
 
 /* —— Detached list panel (floating) —— */
@@ -1559,8 +1844,7 @@
 	border-radius: var(--rf-radius-lg);
 	box-shadow:
 		0 0 0 1px color-mix(in srgb, var(--rf-primary) 20%, transparent),
-		0 20px 60px rgba(15, 23, 42, 0.22),
-		0 4px 16px rgba(15, 23, 42, 0.12);
+		var(--rf-shadow-detached);
 	z-index: 9000;
 	overflow: hidden;
 }
@@ -1569,8 +1853,7 @@
 	border-color: color-mix(in srgb, var(--rf-primary) 30%, var(--rf-border));
 	box-shadow:
 		0 0 0 1px color-mix(in srgb, var(--rf-primary) 25%, transparent),
-		0 20px 60px rgba(0, 0, 0, 0.6),
-		0 4px 16px rgba(0, 0, 0, 0.4);
+		var(--rf-shadow-detached-dark);
 }
 
 .readflow-detached-panel-header {
@@ -1602,10 +1885,14 @@
 
 /* Drag indicator */
 .readflow-detached-panel-header::before {
-	content: '⠿';
-	font-size: 14px;
-	color: var(--rf-text-muted);
-	letter-spacing: -1px;
+	content: '';
+	display: inline-block;
+	width: 14px;
+	height: 14px;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='9' cy='12' r='1'/%3E%3Ccircle cx='9' cy='5' r='1'/%3E%3Ccircle cx='9' cy='19' r='1'/%3E%3Ccircle cx='15' cy='12' r='1'/%3E%3Ccircle cx='15' cy='5' r='1'/%3E%3Ccircle cx='15' cy='19' r='1'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: 14px 14px;
 	flex-shrink: 0;
 	opacity: 0.6;
 }
@@ -1650,7 +1937,7 @@
 	min-width: 0;
 }
 
-.readflow-select {
+.readflow-select--compact {
 	background: var(--rf-surface);
 	border: 1px solid var(--rf-border);
 	border-radius: var(--rf-radius-sm);
@@ -1660,14 +1947,14 @@
 	cursor: pointer;
 }
 
-.readflow-select--sm {
-	font-size: 11px;
-	padding: 2px 5px;
-}
-
-.readflow-select:focus {
+.readflow-select--compact:focus {
 	outline: none;
 	border-color: var(--rf-primary);
+}
+
+.readflow-select--compact.readflow-select--sm {
+	font-size: 11px;
+	padding: 2px 5px;
 }
 
 /* Hint input wrap: preset select + optional custom text input */
@@ -1812,35 +2099,35 @@
 	max-width: 560px;
 }
 
-.rf-preview-header {
+.readflow-preview-header {
 	padding: 24px 24px 16px;
 	border-bottom: 1px solid var(--rf-border);
 }
 
-.rf-preview-book-title {
+.readflow-preview-book-title {
 	font-size: 1.1em;
 	font-weight: 600;
 	color: var(--rf-text);
 	margin: 0 0 4px;
 }
 
-.rf-preview-chapter {
+.readflow-preview-chapter {
 	font-size: 0.85em;
 	color: var(--rf-text-muted);
 	margin: 0;
 }
 
-.rf-preview-divider {
+.readflow-preview-divider {
 	height: 1px;
 	background: var(--rf-border);
 	margin: 0;
 }
 
-.rf-preview-hl-block {
+.readflow-preview-hl-block {
 	padding: 20px 24px;
 }
 
-.rf-preview-quote {
+.readflow-preview-quote {
 	margin: 0 0 12px;
 	padding: 10px 16px;
 	border-left: 3px solid var(--rf-accent);
@@ -1852,13 +2139,13 @@
 	font-style: italic;
 }
 
-.rf-preview-note,
-.rf-preview-context {
+.readflow-preview-note,
+.readflow-preview-context {
 	margin-top: 12px;
 }
 
-.rf-preview-note-label,
-.rf-preview-context-label {
+.readflow-preview-note-label,
+.readflow-preview-context-label {
 	display: block;
 	font-size: 0.75em;
 	font-weight: 600;
@@ -1868,15 +2155,15 @@
 	margin-bottom: 4px;
 }
 
-.rf-preview-note-text,
-.rf-preview-context-text {
+.readflow-preview-note-text,
+.readflow-preview-context-text {
 	margin: 0;
 	font-size: 0.9em;
 	color: var(--rf-text);
 	line-height: 1.5;
 }
 
-.rf-preview-footer {
+.readflow-preview-footer {
 	padding: 8px 24px 20px;
 	border-top: 1px solid var(--rf-border);
 	display: flex;
@@ -1884,6 +2171,103 @@
 	gap: 4px;
 }
 
-.rf-preview-open-btn {
+.readflow-preview-open-btn {
 	width: 100%;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   READFLOW UI — CSS ARCHITECTURE（Cobalt Mist SSOT）
+   ───────────────────────────────────────────────────────────────
+   Namespace : .readflow-panel-root
+   Icons     : SVG inline（RF_ICONS in main.ts）
+   Design    : [[Universal_UI_Tokens]] / [[Universal_UI_Components]]
+
+   1. TOKENS & VARIABLES
+   2. ROOT & RESET
+   3. SELECTION CAPTURE
+   4. TOP BAR
+   5. TOOLBAR & SEARCH
+   6. BUTTONS
+   7. SHELL & LAYOUT
+   8. SIDEBAR
+   9. BOARD NAVIGATION
+   10. WORKSPACE & CONTENT
+   11. CARDS & CHIPS
+   12. KNOWLEDGE PANEL
+   13. MINDMAP & GRAPH
+   14. BATCH BAR
+   15. MODALS
+   16. DETACHED PANEL
+   17. PREVIEW MODAL  ← 统一为 readflow-preview-*
+   18. SETTINGS OVERRIDES
+   19. STATUS & EMPTY STATES
+   20. UTILITIES（补缺失类）
+   ═══════════════════════════════════════════════════════════════ */
+
+/* 20. UTILITIES — 补缺失类 */
+
+.readflow-btn--accent {
+	background: var(--rf-accent-soft);
+	color: var(--rf-accent-green);
+	border-color: var(--rf-accent-green);
+}
+.readflow-btn--accent:hover {
+	background: var(--rf-accent-green);
+	color: #fff;
+}
+
+.readflow-btn--pushed {
+	background: var(--rf-primary-bg);
+	color: var(--rf-primary);
+	border-color: var(--rf-primary);
+}
+
+.readflow-chip--status-led {
+	border-left: 3px solid var(--rf-primary);
+	padding-left: var(--rf-space-2);
+}
+
+.readflow-batch-label-sm {
+	font-size: 11px;
+	color: var(--rf-text-muted);
+	font-weight: 500;
+}
+
+.readflow-sidebar-toggle-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 32px;
+	padding: 0 var(--rf-space-2);
+	background: transparent;
+	border: none;
+	border-radius: var(--rf-radius-sm);
+	color: var(--rf-text-secondary);
+	cursor: pointer;
+	transition: background-color 0.15s, color 0.15s;
+}
+.readflow-sidebar-toggle-btn:hover {
+	background: var(--rf-secondary-surface);
+	color: var(--rf-text);
+}
+.readflow-sidebar-toggle-btn:focus-visible {
+	outline: 2px solid var(--rf-focus-ring);
+	outline-offset: 2px;
+}
+
+.readflow-batch-sep {
+	display: inline-block;
+	width: 1px;
+	height: 16px;
+	background: var(--rf-border);
+	flex-shrink: 0;
+	align-self: center;
+}
+
+.readflow-mm-canvas--expanded {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
 }

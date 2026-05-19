@@ -97,9 +97,11 @@ Recommended screenshots for public release:
 
 ## Development
 
-- Source of truth: `src/main.js`
-- Generated bundle: `main.js`
-- Archived legacy slices: `src-legacy-20260415/`
+- **Canonical source**: `src/main.js` (minified CJS — this is the original source)
+- **Generated bundle**: `main.js` (run `npm run build` to regenerate)
+- **Clean TypeScript rewrites**: `src/main-plugin.ts` (in progress), `src/ui/WereadLoginWindow.ts`
+- **Generated TS scaffolding**: `src_ts/` (reverse-engineered modules from `src/main.js`)
+- **Legacy build artifacts**: `src_ts/` may be deleted once `src/main.js` is fully migrated
 
 Build locally:
 
