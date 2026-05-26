@@ -1624,7 +1624,7 @@ function buildMindMapTree(scopeBook) {
       if (!byType[tp]) byType[tp] = [];
       byType[tp].push(item);
     }
-    var ents = Object.entries(byType).sort(function (a, b) {
+    var ents = Object.entries(byType).sort(function(a, b) {
       return b[1].length - a[1].length;
     });
     for (var ei = 0; ei < ents.length; ei++) {
@@ -1662,7 +1662,7 @@ function buildMindMapTree(scopeBook) {
     }
     root.ch.push(tn);
   }
-  var uncat = scopeBook.highlights.filter(function (h2) {
+  var uncat = scopeBook.highlights.filter(function(h2) {
     return !(h2.topic || "").trim();
   });
   if (uncat.length > 0 && uncat.length <= 60) {
@@ -1760,7 +1760,8 @@ function mmNodeH(node) {
   if (node.ntype === "topic") return 30;
   return 26;
 }
-function renderMindMapCanvas(container, scopeBook, onCrystallize) {
+function renderMindMapCanvas(container, scopeBook, onCrystallize, opts) {
+  var expanded = opts && opts.expanded;
   var root = buildMindMapTree(scopeBook);
   if (root.ch.length === 0) {
     container.createEl("p", {
@@ -1772,7 +1773,7 @@ function renderMindMapCanvas(container, scopeBook, onCrystallize) {
   var wrap = container.createDiv("readflow-mm-wrap");
   var canvas = wrap.createEl("canvas", { cls: "readflow-mm-canvas" });
   var W = wrap.getBoundingClientRect().width > 0 ? wrap.getBoundingClientRect().width : container.getBoundingClientRect().width || 500;
-  let H = 260;
+  let H = expanded ? Math.max(400, wrap.getBoundingClientRect().height || container.getBoundingClientRect().height - 40, 260) : 260;
   canvas.width = W;
   canvas.height = H;
   var LX = 150, GAP = 32;
@@ -1781,16 +1782,16 @@ function renderMindMapCanvas(container, scopeBook, onCrystallize) {
   var allN = collectMMNodes(root, []);
   var allE = collectMMEdges(root, []);
   var scale = 1, tx = 0, ty = 0;
-  var hov = null, isPan = false, panOrig = { x: 0, y: 0 };
+  var hov = null, panActive = false, didPan = false, downPos = null, panOrig = { x: 0, y: 0 };
   if (totalH > H) {
     scale = Math.max(0.5, H / totalH * 0.9);
     tx = 10;
     ty = (H - totalH * scale) / 2;
   }
-  var isDark = function () {
+  var isDark = function() {
     return document.body.classList.contains("theme-dark");
   };
-  var drawRR = function (ctx, x2, y2, w, h, r) {
+  var drawRR = function(ctx, x2, y2, w, h, r) {
     ctx.beginPath();
     ctx.moveTo(x2 + r, y2);
     ctx.lineTo(x2 + w - r, y2);
@@ -1835,7 +1836,7 @@ function renderMindMapCanvas(container, scopeBook, onCrystallize) {
       var nx = n._x, ny = n._y - nh / 2;
       var col = mmNodeColor(n);
       var isH = n === hov;
-      var faded = hov && n !== hov && !allE.some(function (e2) {
+      var faded = hov && n !== hov && !allE.some(function(e2) {
         return e2.from === hov && e2.to === n || e2.to === hov && e2.from === n;
       });
       ctx.globalAlpha = faded ? 0.3 : 1;
@@ -1902,15 +1903,65 @@ function renderMindMapCanvas(container, scopeBook, onCrystallize) {
       }
     }
   }
-  requestAnimationFrame(function () {
+  function notifyScale() {
+    if (opts && opts.onScaleChange) opts.onScaleChange(scale);
+  }
+  function resetView() {
+    scale = 1;
+    tx = 0;
+    ty = 0;
+    if (totalH > H) {
+      scale = Math.max(0.5, H / totalH * 0.9);
+      tx = 10;
+      ty = (H - totalH * scale) / 2;
+    }
+    draw();
+    notifyScale();
+  }
+  function zoomAt(f, cx, cy) {
+    var rect = canvas.getBoundingClientRect();
+    var mx = cx != null ? cx - rect.left : rect.width / 2;
+    var my = cy != null ? cy - rect.top : rect.height / 2;
+    tx = mx - (mx - tx) * f;
+    ty = my - (my - ty) * f;
+    scale = Math.max(0.15, Math.min(scale * f, 6));
+    draw();
+    notifyScale();
+  }
+  function onWheel(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var raw = Math.abs(e.deltaY);
+    var step = raw > 80 ? 0.06 : raw > 30 ? 0.04 : 0.025;
+    var f = e.deltaY > 0 ? 1 - step : 1 + step;
+    zoomAt(f, e.clientX, e.clientY);
+  }
+  requestAnimationFrame(function() {
     var _cr2 = wrap.getBoundingClientRect();
+    var changed = false;
     if (_cr2.width > 0 && _cr2.width !== W) {
       W = _cr2.width;
       canvas.width = W;
-      draw();
-    } else {
-      draw();
+      changed = true;
     }
+    if (expanded && _cr2.height > 0 && _cr2.height !== H) {
+      H = _cr2.height;
+      canvas.height = H;
+      changed = true;
+    }
+    if (changed) {
+      totalH = mmSubH(root, GAP);
+      layoutMM(root, 30, 0, Math.max(totalH, H), LX, GAP);
+      allN = collectMMNodes(root, []);
+      allE = collectMMEdges(root, []);
+      if (totalH > H) {
+        scale = Math.max(0.5, H / totalH * 0.9);
+        tx = 10;
+        ty = (H - totalH * scale) / 2;
+      }
+    }
+    draw();
+    notifyScale();
   });
   function hitTest(mx, my) {
     for (var i = allN.length - 1; i >= 0; i--) {
@@ -1920,37 +1971,30 @@ function renderMindMapCanvas(container, scopeBook, onCrystallize) {
     }
     return null;
   }
-  canvas.addEventListener(
-    "wheel",
-    function (e) {
-      e.preventDefault();
-      var raw = Math.abs(e.deltaY);
-      var step = raw > 80 ? 0.06 : raw > 30 ? 0.04 : 0.025;
-      var f = e.deltaY > 0 ? 1 - step : 1 + step;
-      var rect = canvas.getBoundingClientRect();
-      var mx = e.clientX - rect.left, my = e.clientY - rect.top;
-      tx = mx - (mx - tx) * f;
-      ty = my - (my - ty) * f;
-      scale = Math.max(0.15, Math.min(scale * f, 6));
-      draw();
-    },
-    { passive: false }
-  );
-  canvas.addEventListener("mousedown", function (e) {
+  canvas.addEventListener("wheel", onWheel, { passive: false });
+  if (expanded) wrap.addEventListener("wheel", onWheel, { passive: false });
+  canvas.addEventListener("mousedown", function(e) {
     if (e.button === 0) {
-      isPan = true;
+      downPos = { x: e.clientX, y: e.clientY };
       panOrig = { x: e.clientX - tx, y: e.clientY - ty };
     }
   });
-  canvas.addEventListener("mousemove", function (e) {
+  canvas.addEventListener("mousemove", function(e) {
     var rect = canvas.getBoundingClientRect();
     var mx = (e.clientX - rect.left - tx) / scale;
     var my = (e.clientY - rect.top - ty) / scale;
-    if (isPan) {
-      tx = e.clientX - panOrig.x;
-      ty = e.clientY - panOrig.y;
-      draw();
-      return;
+    if (downPos) {
+      var dx = e.clientX - downPos.x, dy = e.clientY - downPos.y;
+      if (!panActive && dx * dx + dy * dy > 16) {
+        panActive = true;
+        didPan = true;
+      }
+      if (panActive) {
+        tx = e.clientX - panOrig.x;
+        ty = e.clientY - panOrig.y;
+        draw();
+        return;
+      }
     }
     var found = hitTest(mx, my);
     if (found !== hov) {
@@ -1959,8 +2003,11 @@ function renderMindMapCanvas(container, scopeBook, onCrystallize) {
       draw();
     }
   });
-  canvas.addEventListener("click", function (e) {
-    if (isPan) return;
+  canvas.addEventListener("click", function(e) {
+    if (didPan) {
+      didPan = false;
+      return;
+    }
     var rect = canvas.getBoundingClientRect();
     var mx = (e.clientX - rect.left - tx) / scale;
     var my = (e.clientY - rect.top - ty) / scale;
@@ -1974,49 +2021,56 @@ function renderMindMapCanvas(container, scopeBook, onCrystallize) {
       draw();
     }
   });
-  canvas.addEventListener("mouseup", function () {
-    isPan = false;
+  canvas.addEventListener("mouseup", function() {
+    panActive = false;
+    downPos = null;
   });
-  canvas.addEventListener("mouseleave", function () {
-    isPan = false;
+  canvas.addEventListener("mouseleave", function() {
+    panActive = false;
+    downPos = null;
     hov = null;
     draw();
   });
-  canvas.addEventListener("dblclick", function () {
-    scale = 1;
-    tx = 0;
-    ty = 0;
-    if (totalH > H) {
-      scale = Math.max(0.5, H / totalH * 0.9);
-      tx = 10;
-      ty = (H - totalH * scale) / 2;
+  canvas.addEventListener("dblclick", resetView);
+  var controls = {
+    zoomIn: function() {
+      zoomAt(1.18);
+    },
+    zoomOut: function() {
+      zoomAt(1 / 1.18);
+    },
+    resetView,
+    getScale: function() {
+      return scale;
     }
-    draw();
-  });
-  var ro = new ResizeObserver(function () {
+  };
+  wrap.readflowMmControls = controls;
+  var ro = new ResizeObserver(function() {
     var nw = wrap.getBoundingClientRect().width;
-    var nh = wrap.getBoundingClientRect().height;
     var changed = false;
     if (nw > 0 && nw !== W) {
       W = nw;
       canvas.width = W;
       changed = true;
     }
-    if (nh > 0 && nh !== H) {
-      H = nh;
-      canvas.height = H;
-      changed = true;
+    if (expanded) {
+      var nh = wrap.getBoundingClientRect().height;
+      if (nh > 0 && nh !== H) {
+        H = nh;
+        canvas.height = H;
+        changed = true;
+      }
     }
     if (changed) {
       totalH = mmSubH(root, GAP);
       layoutMM(root, 30, 0, Math.max(totalH, H), LX, GAP);
       allN = collectMMNodes(root, []);
       allE = collectMMEdges(root, []);
-      if (totalH > H) {
+      if (expanded && totalH > H) {
         scale = Math.max(0.5, H / totalH * 0.9);
         tx = 10;
         ty = (H - totalH * scale) / 2;
-      } else {
+      } else if (expanded) {
         scale = 1;
         tx = 0;
         ty = 0;
@@ -2025,6 +2079,7 @@ function renderMindMapCanvas(container, scopeBook, onCrystallize) {
     }
   });
   ro.observe(wrap);
+  return controls;
 }
 function generateKnowledgeCard(book, highlightIds, title, insight) {
   var card = {
@@ -2045,7 +2100,7 @@ function buildKnowledgeExportMd(card, book) {
   var sources = [];
   if (book) {
     for (var i = 0; i < card.sourceHighlightIds.length; i++) {
-      var h = book.highlights.find(function (x) {
+      var h = book.highlights.find(function(x) {
         return x.id === card.sourceHighlightIds[i];
       });
       if (h) sources.push(h);
@@ -2057,7 +2112,7 @@ function buildKnowledgeExportMd(card, book) {
     'source: "' + (card.bookTitle || "").replace(/"/g, "'") + '"',
     "created: " + new Date(card.createdAt).toISOString().slice(0, 10),
     "importance: " + card.importance,
-    "tags: [" + card.tags.map(function (t) {
+    "tags: [" + card.tags.map(function(t) {
       return '"' + t + '"';
     }).join(", ") + "]",
     "---",
@@ -3587,6 +3642,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     });
     const knowledgePane = contentGrid.createDiv("readflow-knowledge-pane");
     knowledgePane.style.width = `${this.knowledgePaneWidth}px`;
+    knowledgePane.createDiv("readflow-knowledge-scroll");
   }
   renderTopicManager(container, book, tree) {
     const topics = this.buildTopicStats(book);
@@ -4100,7 +4156,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     }
   }
   async renderKnowledgeInspector(book, visible) {
-    const pane = this.contentEl.querySelector(".readflow-knowledge-pane");
+    const pane = this.contentEl.querySelector(".readflow-knowledge-scroll");
     if (!(pane instanceof HTMLElement)) {
       return;
     }
@@ -4171,18 +4227,6 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
         });
       }
       this.shouldRestoreScroll = false;
-    }
-    const listPaneEl = this.contentEl.querySelector(".readflow-list-pane");
-    if (pane instanceof HTMLElement && listPaneEl instanceof HTMLElement) {
-      const targetH = listPaneEl.clientHeight;
-      if (targetH > 0) {
-        requestAnimationFrame(() => {
-          if (pane instanceof HTMLElement && pane.clientHeight !== targetH) {
-            pane.style.height = `${targetH}px`;
-            pane.style.overflowY = "auto";
-          }
-        });
-      }
     }
   }
   renderGraphSection(container, book, scopeBook) {
@@ -4718,19 +4762,43 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     contentEl.addClass("readflow-mm-modal-body");
     const hint = contentEl.createDiv("readflow-mm-modal-hint");
     hint.createEl("span", {
-      text: "\u70B9\u51FB\u5C55\u5F00\u6536\u8D77 \xB7 \u6EDA\u8F6E\u7F29\u653E \xB7 \u62D6\u62FD\u5E73\u79FB \xB7 \u53CC\u51FB\u91CD\u7F6E",
+      text: "\u70B9\u51FB\u5C55\u5F00\u6536\u8D77 \xB7 \u6EDA\u8F6E\u7F29\u653E \xB7 \u62D6\u62FD\u5E73\u79FB",
       cls: "readflow-muted"
     });
-    const fitBtn = hint.createEl("button", { text: "\u9002\u5E94\u7A97\u53E3", type: "button" });
+    const actions = hint.createDiv("readflow-mm-modal-actions");
+    const zoomOutBtn = actions.createEl("button", { text: "\u2212", type: "button" });
+    zoomOutBtn.classList.add("readflow-btn", "readflow-btn--ghost", "readflow-btn--sm", "readflow-mm-zoom-btn");
+    zoomOutBtn.title = "\u7F29\u5C0F";
+    const zoomLabel = actions.createEl("span", { text: "100%", cls: "readflow-mm-zoom-label" });
+    const zoomInBtn = actions.createEl("button", { text: "+", type: "button" });
+    zoomInBtn.classList.add("readflow-btn", "readflow-btn--ghost", "readflow-btn--sm", "readflow-mm-zoom-btn");
+    zoomInBtn.title = "\u653E\u5927";
+    const fitBtn = actions.createEl("button", { text: "\u9002\u5E94\u7A97\u53E3", type: "button" });
     fitBtn.classList.add("readflow-btn", "readflow-btn--ghost", "readflow-btn--sm");
-    requestAnimationFrame(function () {
+    const updateZoomLabel = (s) => zoomLabel.setText(Math.round(s * 100) + "%");
+    zoomOutBtn.addEventListener("click", () => {
+      var _a;
+      const wrap = contentEl.querySelector(".readflow-mm-wrap");
+      (_a = wrap == null ? void 0 : wrap.readflowMmControls) == null ? void 0 : _a.zoomOut();
+    });
+    zoomInBtn.addEventListener("click", () => {
+      var _a;
+      const wrap = contentEl.querySelector(".readflow-mm-wrap");
+      (_a = wrap == null ? void 0 : wrap.readflowMmControls) == null ? void 0 : _a.zoomIn();
+    });
+    fitBtn.addEventListener("click", () => {
+      var _a;
+      const wrap = contentEl.querySelector(".readflow-mm-wrap");
+      (_a = wrap == null ? void 0 : wrap.readflowMmControls) == null ? void 0 : _a.resetView();
+    });
+    requestAnimationFrame(function() {
       modal.open();
-      requestAnimationFrame(function () {
-        renderMindMapCanvas(contentEl, scopeBook, null);
-        const canvasEl = contentEl.querySelector(".readflow-mm-canvas");
-        if (canvasEl) canvasEl.classList.add("readflow-mm-canvas--expanded");
-        fitBtn.addEventListener("click", () => {
-          if (canvasEl) canvasEl.dispatchEvent(new MouseEvent("dblclick"));
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+          renderMindMapCanvas(contentEl, scopeBook, null, {
+            expanded: true,
+            onScaleChange: updateZoomLabel
+          });
         });
       });
     });

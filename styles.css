@@ -945,13 +945,21 @@
 }
 
 /* Each pane scrolls independently */
-.readflow-list-pane,
-.readflow-knowledge-pane {
+.readflow-list-pane {
 	min-height: 0;
 	overflow-y: auto;
 	overflow-x: hidden;
 	padding-bottom: var(--rf-space-4);
 	flex-shrink: 0;
+}
+
+.readflow-knowledge-pane {
+	min-height: 0;
+	flex-shrink: 0;
+	align-self: stretch;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
 }
 
 .readflow-list-pane {
@@ -961,8 +969,27 @@
 
 .readflow-knowledge-pane {
 	width: 340px;
-	flex-shrink: 0;
 	border-left: 1px solid var(--rf-border);
+}
+
+.readflow-knowledge-scroll {
+	flex: 1;
+	min-height: 0;
+	overflow-y: auto;
+	overflow-x: hidden;
+	padding: var(--rf-space-3);
+	padding-bottom: var(--rf-space-4);
+	display: flex;
+	flex-direction: column;
+	gap: var(--rf-space-3);
+	border: 1px solid var(--rf-border);
+	border-radius: var(--rf-radius-lg);
+	background: linear-gradient(180deg, color-mix(in srgb, var(--rf-primary) 3%, var(--rf-surface)) 0%, var(--rf-surface) 100%);
+}
+
+.readflow-knowledge-scroll > .readflow-section-inline-head,
+.readflow-knowledge-scroll > .readflow-knowledge-section {
+	flex-shrink: 0;
 }
 
 /* Draggable splitter */
@@ -1058,16 +1085,6 @@
 .readflow-list-pane,
 .readflow-knowledge-pane {
 	min-width: 0;
-}
-
-.readflow-knowledge-pane {
-	display: flex;
-	flex-direction: column;
-	gap: var(--rf-space-3);
-	padding: var(--rf-space-3);
-	border: 1px solid var(--rf-border);
-	border-radius: var(--rf-radius-lg);
-	background: linear-gradient(180deg, color-mix(in srgb, var(--rf-primary) 3%, var(--rf-surface)) 0%, var(--rf-surface) 100%);
 }
 
 .readflow-knowledge-section {
@@ -1511,8 +1528,12 @@
 
 /* —— Mindmap modal: larger, resizable —— */
 .readflow-mm-modal .modal {
+	width: min(92vw, 1100px);
+	height: min(82vh, 720px);
 	min-width: 600px;
 	min-height: 400px;
+	resize: both;
+	overflow: hidden;
 }
 
 .readflow-mm-modal .modal-content,
@@ -1523,25 +1544,70 @@
 	flex: 1;
 }
 
-.readflow-mm-modal-hint {
-	padding: 6px 16px;
-	border-bottom: 1px solid var(--rf-border);
-	flex-shrink: 0;
-}
-
 .readflow-mm-modal-body {
 	padding: 0;
 }
 
+.readflow-mm-modal-hint {
+	display: flex;
+	align-items: center;
+	gap: var(--rf-space-2);
+	padding: 6px 16px;
+	border-bottom: 1px solid var(--rf-border);
+	flex-shrink: 0;
+	flex-wrap: wrap;
+}
+
+.readflow-mm-modal-actions {
+	display: flex;
+	align-items: center;
+	gap: var(--rf-space-1);
+	margin-left: auto;
+	flex-shrink: 0;
+}
+
+.readflow-mm-zoom-btn {
+	min-width: 28px;
+	padding: 0 8px !important;
+	font-size: 16px;
+	font-weight: 600;
+	line-height: 1;
+}
+
+.readflow-mm-zoom-label {
+	min-width: 42px;
+	text-align: center;
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--rf-text-secondary);
+	font-variant-numeric: tabular-nums;
+}
+
+.readflow-mm-modal-body .readflow-mm-wrap {
+	flex: 1;
+	min-height: 0;
+	position: relative;
+	overflow: hidden;
+	height: 100%;
+	touch-action: none;
+	cursor: grab;
+}
+
+.readflow-mm-modal-body .readflow-mm-canvas {
+	display: block;
+	width: 100% !important;
+	height: 100% !important;
+}
+
 .readflow-mm-wrap {
 	width: 100%;
-	height: 100%;
 }
 
 /* 知识面板内的脑图：约束尺寸，防止 canvas 溢出 */
 .readflow-mm-section .readflow-mm-wrap {
 	height: 240px;
 	overflow: hidden;
+	flex-shrink: 0;
 }
 
 .readflow-mm-section .readflow-mm-canvas {
@@ -2265,9 +2331,7 @@
 }
 
 .readflow-mm-canvas--expanded {
-	width: 100%;
-	height: 100%;
-	position: absolute;
-	top: 0;
-	left: 0;
+	display: block;
+	width: 100% !important;
+	height: 100% !important;
 }

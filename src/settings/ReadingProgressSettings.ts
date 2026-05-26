@@ -11,7 +11,7 @@
  */
 
 import { App, Setting, Notice, ButtonComponent, PluginSettingTab } from "obsidian";
-import type ReadFlowPlugin from "../main";
+import type ReadFlowPlugin from "../main-plugin";
 
 export interface ReadingProgressSettings {
   enabled: boolean;
@@ -251,9 +251,11 @@ export class ReadingProgressSettingsTab extends PluginSettingTab {
       minute: "2-digit",
     });
     
-    const statusIcon = rpSettings.lastSyncResult === "success" ? "✓" : 
-                       rpSettings.lastSyncResult === "failed" ? "✗" : "•";
-    
-    this.lastSyncEl.setText(`上次同步: ${timeStr} ${statusIcon}`);
+    const SVG_CHECK = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-1px"><path d="M20 6 9 17l-5-5"/></svg>';
+    const SVG_CROSS = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-1px"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>';
+    const statusIcon = rpSettings.lastSyncResult === "success" ? SVG_CHECK :
+                       rpSettings.lastSyncResult === "failed" ? SVG_CROSS : "•";
+
+    this.lastSyncEl.innerHTML = `上次同步: ${timeStr} ${statusIcon}`;
   }
 }
