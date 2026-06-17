@@ -365,10 +365,8 @@ var ReadFlowSettingTab = class extends import_obsidian.PluginSettingTab {
           }),
       );
     const hbStats = this.plugin.heartbeatManager ? this.plugin.heartbeatManager.getStats() : {};
-    containerEl.createDiv("setting-item-description", {
-      text: `\u72B6\u6001: ${hbStats.state === "running" ? "\u2705 \u8FD0\u884C\u4E2D" : "\u23F8 \u5DF2\u505C\u6B62"}`,
-    });
-    containerEl.createDiv("setting-item-description", { text: `\u5DF2\u53D1\u9001: ${hbStats.totalSent || 0} \u6B21` });
+    containerEl.createDiv({ cls: "setting-item-description", text: `\u72B6\u6001: ${hbStats.state === "running" ? "\u2705 \u8FD0\u884C\u4E2D" : "\u23F8 \u5DF2\u505C\u6B62"}` });
+    containerEl.createDiv({ cls: "setting-item-description", text: `\u5DF2\u53D1\u9001: ${hbStats.totalSent || 0} \u6B21` });
 
     // \u6A21\u62DF\u9605\u8BFB\u8BBE\u7F6E
     containerEl.createEl("h3", { text: "\uD83D\uDD50 \u6A21\u62DF\u5728\u7EBF\u9605\u8BFB", cls: "readflow-settings-section-title" });
@@ -429,15 +427,9 @@ var ReadFlowSettingTab = class extends import_obsidian.PluginSettingTab {
           });
       });
     const srStats = this.plugin.simulatedReadingManager ? this.plugin.simulatedReadingManager.getStats() : {};
-    containerEl.createDiv("setting-item-description", {
-      text: `\u72B6\u6001: ${srStats.state === "running" ? "\u2705 \u8FD0\u884C\u4E2D" : "\u23F8 \u5DF2\u505C\u6B62"}`,
-    });
-    containerEl.createDiv("setting-item-description", {
-      text: `\u4ECA\u65E5\u5DF2\u8BFB: ${srStats.todayMinutes || 0} / ${this.plugin.settings.simulatedReadingDailyMinutes || 90} \u5206\u949F`,
-    });
-    containerEl.createDiv("setting-item-description", {
-      text: `\u5F53\u524D\u4E66\u7C4D: ${srStats.currentBookTitle || "\u65E0"}`,
-    });
+    containerEl.createDiv({ cls: "setting-item-description", text: `\u72B6\u6001: ${srStats.state === "running" ? "\u2705 \u8FD0\u884C\u4E2D" : "\u23F8 \u5DF2\u505C\u6B62"}` });
+    containerEl.createDiv({ cls: "setting-item-description", text: `\u4ECA\u65E5\u5DF2\u8BFB: ${srStats.todayMinutes || 0} / ${this.plugin.settings.simulatedReadingDailyMinutes || 90} \u5206\u949F` });
+    containerEl.createDiv({ cls: "setting-item-description", text: `\u5F53\u524D\u4E66\u7C4D: ${srStats.currentBookTitle || "\u65E0"}` });
   }
 };
 
@@ -578,7 +570,13 @@ class SimulatedReadingManager {
     this.stats = { totalSent: 0, consecutiveFailures: 0, lastSent: null, todayMinutes: 0, currentBookTitle: "" };
     this.currentBook = null;
     this.bookIndex = 0;
-    this.todayDate = this.getDateKey();
+    // Restore persisted stats
+    const persisted = plugin.diskData.simulatedReadingStats || {};
+    const todayKey = this.getDateKey();
+    if (persisted.todayDate === todayKey && typeof persisted.todayMinutes === "number") {
+      this.stats.todayMinutes = persisted.todayMinutes;
+    }
+    this.todayDate = todayKey;
     this.listeners = new Set();
   }
   getDateKey() {
@@ -683,6 +681,12 @@ class SimulatedReadingManager {
       this.stats.lastSent = Date.now();
       const intervalSec = this.plugin.settings.simulatedReadingInterval || 60;
       this.stats.todayMinutes += intervalSec / 60;
+      // Persist today's minutes to disk
+      this.plugin.diskData.simulatedReadingStats = {
+        todayDate: this.todayDate,
+        todayMinutes: this.stats.todayMinutes,
+      };
+      void this.plugin.persistDisk();
       // Pick next book occasionally (every ~30 minutes or when progress reaches 100)
       if (this.stats.todayMinutes % 30 < (intervalSec / 60)) {
         await this.pickNextBook();
@@ -8941,6 +8945,7 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
       books: { ...((_c = raw.books) != null ? _c : {}) },
       lastSyncAt: raw.lastSyncAt,
       knowledgeCards: [...((_d = raw.knowledgeCards) != null ? _d : [])],
+      simulatedReadingStats: raw.simulatedReadingStats || { todayMinutes: 0, todayDate: "" },
     };
     var migrated = false;
     for (var bid in this.diskData.books) {
@@ -9075,6 +9080,11 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
       // 如果是桌面端，同步 cookie（有些 API 会更新 wr_skey）
       if (cookieRef.value !== this.settings.wereadCookie) {
         this.settings.wereadCookie = cookieRef.value;
+      }
+
+      // 若模拟阅读正在运行，重新从更新后的书单中选书
+      if (this.settings.simulatedReadingEnabled && this.simulatedReadingManager && this.simulatedReadingManager.state === "running") {
+        await this.simulatedReadingManager.pickNextBook();
       }
 
       console.log("[ReadFlow] 心跳数据同步完成", this.heartbeatBooks.length, "本有进度");
