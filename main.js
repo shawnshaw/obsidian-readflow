@@ -46,7 +46,13 @@ var DEFAULT_SETTINGS = {
     model: "qwen2.5",
     endpoint: "http://localhost:11434/api/generate",
     apiKey: ""
-  }
+  },
+  heartbeatEnabled: false,
+  heartbeatInterval: 30,
+  simulatedReadingEnabled: false,
+  simulatedReadingDailyMinutes: 90,
+  simulatedReadingBookMode: "rotate",
+  simulatedReadingInterval: 60
 };
 function getMdImportPaths(settings) {
   const paths = /* @__PURE__ */ new Set();
@@ -282,6 +288,47 @@ var ReadFlowSettingTab = class extends import_obsidian.PluginSettingTab {
       text: `\u72B6\u6001: ${hbStats.state === "running" ? "\u2705 \u8FD0\u884C\u4E2D" : "\u23F8 \u5DF2\u505C\u6B62"}`
     });
     containerEl.createDiv("setting-item-description", { text: `\u5DF2\u53D1\u9001: ${hbStats.totalSent || 0} \u6B21` });
+    containerEl.createEl("h3", { text: "\u{1F550} \u6A21\u62DF\u5728\u7EBF\u9605\u8BFB", cls: "readflow-settings-section-title" });
+    new import_obsidian.Setting(containerEl).setName("\u542F\u7528\u6A21\u62DF\u9605\u8BFB").setDesc("\u5F00\u542F\u540E\u81EA\u52A8\u4ECE\u6709\u8FDB\u5EA6\u7684\u4E66\u4E2D\u9009\u62E9\u4E00\u672C\uFF0C\u5B9A\u65F6\u53D1\u9001\u9605\u8BFB\u5FC3\u8DF3\uFF0C\u7D2F\u79EF\u6BCF\u65E5\u9605\u8BFB\u65F6\u957F\u3002\u65E0\u9700\u4EBA\u5DE5\u5E72\u9884\u3002").addToggle((tg) => {
+      tg.setValue(!!this.plugin.settings.simulatedReadingEnabled).onChange(async (v) => {
+        this.plugin.settings.simulatedReadingEnabled = v;
+        await this.plugin.saveSettings();
+        if (v) this.plugin.simulatedReadingManager.start();
+        else this.plugin.simulatedReadingManager.stop();
+      });
+    });
+    new import_obsidian.Setting(containerEl).setName("\u6BCF\u65E5\u76EE\u6807\u65F6\u957F").setDesc("\u6BCF\u5929\u81EA\u52A8\u7D2F\u8BA1\u9605\u8BFB\u591A\u5C11\u5206\u949F\u540E\u81EA\u52A8\u505C\u6B62").addDropdown((dd) => {
+      dd.addOption("30", "30 \u5206\u949F").addOption("60", "1 \u5C0F\u65F6").addOption("90", "1.5 \u5C0F\u65F6").addOption("120", "2 \u5C0F\u65F6").setValue(String(this.plugin.settings.simulatedReadingDailyMinutes || 90)).onChange(async (v) => {
+        this.plugin.settings.simulatedReadingDailyMinutes = parseInt(v, 10);
+        await this.plugin.saveSettings();
+      });
+    });
+    new import_obsidian.Setting(containerEl).setName("\u5FC3\u8DF3\u95F4\u9694").setDesc("\u591A\u4E45\u53D1\u9001\u4E00\u6B21\u9605\u8BFB\u4F4D\u7F6E\u66F4\u65B0").addDropdown((dd) => {
+      dd.addOption("30", "30 \u79D2").addOption("60", "1 \u5206\u949F").addOption("120", "2 \u5206\u949F").addOption("300", "5 \u5206\u949F").setValue(String(this.plugin.settings.simulatedReadingInterval || 60)).onChange(async (v) => {
+        this.plugin.settings.simulatedReadingInterval = parseInt(v, 10);
+        await this.plugin.saveSettings();
+        if (this.plugin.settings.simulatedReadingEnabled) {
+          this.plugin.simulatedReadingManager.stop();
+          this.plugin.simulatedReadingManager.start();
+        }
+      });
+    });
+    new import_obsidian.Setting(containerEl).setName("\u9009\u4E66\u6A21\u5F0F").setDesc("rotate=\u6309\u987A\u5E8F\u8F6E\u6362; random=\u968F\u673A; fixed=\u56FA\u5B9A\u6700\u8FD1\u9605\u8BFB\u7684\u4E66").addDropdown((dd) => {
+      dd.addOption("rotate", "\u987A\u5E8F\u8F6E\u6362").addOption("random", "\u968F\u673A\u9009\u62E9").addOption("fixed", "\u56FA\u5B9A\u6700\u8FD1").setValue(this.plugin.settings.simulatedReadingBookMode || "rotate").onChange(async (v) => {
+        this.plugin.settings.simulatedReadingBookMode = v;
+        await this.plugin.saveSettings();
+      });
+    });
+    const srStats = this.plugin.simulatedReadingManager ? this.plugin.simulatedReadingManager.getStats() : {};
+    containerEl.createDiv("setting-item-description", {
+      text: `\u72B6\u6001: ${srStats.state === "running" ? "\u2705 \u8FD0\u884C\u4E2D" : "\u23F8 \u5DF2\u505C\u6B62"}`
+    });
+    containerEl.createDiv("setting-item-description", {
+      text: `\u4ECA\u65E5\u5DF2\u8BFB: ${srStats.todayMinutes || 0} / ${this.plugin.settings.simulatedReadingDailyMinutes || 90} \u5206\u949F`
+    });
+    containerEl.createDiv("setting-item-description", {
+      text: `\u5F53\u524D\u4E66\u7C4D: ${srStats.currentBookTitle || "\u65E0"}`
+    });
   }
 };
 var HeartbeatManager = class {
@@ -405,6 +452,127 @@ var AutoSyncManager = class {
     } finally {
       this.running = false;
     }
+  }
+};
+var SimulatedReadingManager = class {
+  constructor(plugin) {
+    this.plugin = plugin;
+    this.state = "idle";
+    this.timer = null;
+    this.stats = { totalSent: 0, consecutiveFailures: 0, lastSent: null, todayMinutes: 0, currentBookTitle: "" };
+    this.currentBook = null;
+    this.bookIndex = 0;
+    this.todayDate = this.getDateKey();
+    this.listeners = /* @__PURE__ */ new Set();
+  }
+  getDateKey() {
+    return (/* @__PURE__ */ new Date()).toISOString().slice(0, 10);
+  }
+  getStats() {
+    return { ...this.stats, state: this.state, currentBook: this.currentBook };
+  }
+  addListener(cb) {
+    this.listeners.add(cb);
+    return () => this.listeners.delete(cb);
+  }
+  notify() {
+    for (const cb of this.listeners) cb(this.getStats());
+  }
+  async start() {
+    this.stop();
+    if (!this.plugin.settings.simulatedReadingEnabled) return;
+    const intervalSeconds = this.plugin.settings.simulatedReadingInterval || 60;
+    this.state = "running";
+    const nowKey = this.getDateKey();
+    if (nowKey !== this.todayDate) {
+      this.todayDate = nowKey;
+      this.stats.todayMinutes = 0;
+    }
+    await this.pickNextBook();
+    this.timer = setInterval(() => this.tick(), intervalSeconds * 1e3);
+    this.notify();
+    console.log("[ReadFlow] \u6A21\u62DF\u9605\u8BFB\u5DF2\u542F\u52A8\uFF0C\u95F4\u9694", intervalSeconds, "\u79D2");
+  }
+  stop() {
+    if (this.timer) {
+      clearInterval(this.timer);
+      this.timer = null;
+    }
+    this.state = "idle";
+    this.currentBook = null;
+    this.stats.currentBookTitle = "";
+    this.notify();
+    console.log("[ReadFlow] \u6A21\u62DF\u9605\u8BFB\u5DF2\u505C\u6B62");
+  }
+  async pickNextBook() {
+    const books = this.plugin.heartbeatBooks || [];
+    if (!books.length) {
+      this.currentBook = null;
+      this.stats.currentBookTitle = "\u65E0\u53EF\u9009\u4E66\u7C4D\uFF08\u8BF7\u5148\u540C\u6B65\u67E5\u8BE2\uFF09";
+      this.notify();
+      return;
+    }
+    const mode = this.plugin.settings.simulatedReadingBookMode || "rotate";
+    let target = null;
+    if (mode === "fixed") {
+      target = books[0];
+    } else if (mode === "random") {
+      target = books[Math.floor(Math.random() * books.length)];
+    } else {
+      target = books[this.bookIndex % books.length];
+      this.bookIndex++;
+    }
+    this.currentBook = target;
+    this.stats.currentBookTitle = target.title || "\u672A\u77E5";
+    this.notify();
+    console.log("[ReadFlow] \u6A21\u62DF\u9605\u8BFB\u5DF2\u9009\u4E66:", target.title, "bookId:", target.bookId);
+  }
+  async tick() {
+    const nowKey = this.getDateKey();
+    if (nowKey !== this.todayDate) {
+      this.todayDate = nowKey;
+      this.stats.todayMinutes = 0;
+      this.bookIndex = 0;
+    }
+    const dailyTarget = this.plugin.settings.simulatedReadingDailyMinutes || 90;
+    if (this.stats.todayMinutes >= dailyTarget) {
+      console.log("[ReadFlow] \u6A21\u62DF\u9605\u8BFB\u4ECA\u65E5\u76EE\u6807\u5DF2\u8FBE\u6210", this.stats.todayMinutes, "/", dailyTarget, "\u5206\u949F");
+      this.stop();
+      return;
+    }
+    if (!this.currentBook) {
+      await this.pickNextBook();
+      if (!this.currentBook) return;
+    }
+    const cookie = this.plugin.settings.wereadCookie;
+    if (!cookie) {
+      this.stop();
+      new import_obsidian.Notice("\u6A21\u62DF\u9605\u8BFB: Cookie \u672A\u914D\u7F6E\uFF0C\u5DF2\u505C\u6B62");
+      return;
+    }
+    const payload = {
+      bookId: this.currentBook.bookId,
+      chapterUid: 0,
+      readProgress: Math.min(100, Math.max(0, this.currentBook.readProgress || 0))
+    };
+    const result = await sendHeartbeat(cookie, payload);
+    if (result.ok) {
+      this.stats.totalSent++;
+      this.stats.consecutiveFailures = 0;
+      this.stats.lastSent = Date.now();
+      const intervalSec = this.plugin.settings.simulatedReadingInterval || 60;
+      this.stats.todayMinutes += intervalSec / 60;
+      if (this.stats.todayMinutes % 30 < intervalSec / 60) {
+        await this.pickNextBook();
+      }
+    } else {
+      this.stats.consecutiveFailures++;
+      if (result.error === "AUTH_FAILED") {
+        this.stop();
+        new import_obsidian.Notice("\u6A21\u62DF\u9605\u8BFB\u8BA4\u8BC1\u5931\u8D25\uFF0C\u5DF2\u505C\u6B62");
+      }
+    }
+    this.notify();
   }
 };
 var import_obsidian2 = require("obsidian");
@@ -1945,7 +2113,7 @@ function buildBookMindMapTree(scopeBook) {
   return root;
 }
 function sortDirArrow(dir) {
-  return dir === "asc" ? "\u2193" : "\u2191";
+  return dir === "asc" ? "\u2191" : "\u2193";
 }
 var MINDMAP_MODE_META = {
   structure: {
@@ -8195,15 +8363,20 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
     if (this.settings.autoSyncEnabled) {
       this.autoSyncManager.start();
     }
+    this.simulatedReadingManager = new SimulatedReadingManager(this);
+    if (this.settings.simulatedReadingEnabled) {
+      this.simulatedReadingManager.start();
+    }
   }
   onunload() {
-    var _a, _b, _c, _d;
+    var _a, _b, _c, _d, _e;
     (_a = this.wereadLogin) == null ? void 0 : _a.dispose();
     this.wereadLogin = null;
     (_b = this.selectionCaptureEl) == null ? void 0 : _b.remove();
     this.selectionCaptureEl = null;
     (_c = this.heartbeatManager) == null ? void 0 : _c.stop();
     (_d = this.autoSyncManager) == null ? void 0 : _d.stop();
+    (_e = this.simulatedReadingManager) == null ? void 0 : _e.stop();
     if (this._searchTimer) {
       clearTimeout(this._searchTimer);
       this._searchTimer = null;
