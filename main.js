@@ -1,10 +1,11 @@
 /*
- * ReadFlow — Obsidian Community Plugin
- * Version: 0.3.1
- * Author: Oscar Shao
- * Repository: https://github.com/Os/readflow
- * License: MIT
+ * ReadFlow v0.3.4
+ * GENERATED FILE — DO NOT EDIT. Edit src/main.js and run: npm run build
+ * Author: Oscar Shao | License: MIT
  */
+"use strict";
+
+// src/main.js
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
@@ -13,27 +14,23 @@ var __export = (target, all) => {
   for (var name in all) __defProp(target, name, { get: all[name], enumerable: true });
 };
 var __copyProps = (to, from, except, desc) => {
-  if ((from && typeof from === "object") || typeof from === "function") {
+  if (from && typeof from === "object" || typeof from === "function") {
     for (let key of __getOwnPropNames(from))
       if (!__hasOwnProp.call(to, key) && key !== except)
         __defProp(to, key, {
           get: () => from[key],
-          enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable,
+          enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
         });
   }
   return to;
 };
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-
-// src/main.ts
 var main_exports = {};
 __export(main_exports, {
-  default: () => ReadFlowPlugin,
+  default: () => ReadFlowPlugin
 });
 module.exports = __toCommonJS(main_exports);
 var import_obsidian7 = require("obsidian");
-
-// src/settings.ts
 var import_obsidian = require("obsidian");
 var DEFAULT_SETTINGS = {
   wereadCookie: "",
@@ -48,14 +45,14 @@ var DEFAULT_SETTINGS = {
     enabled: false,
     model: "qwen2.5",
     endpoint: "http://localhost:11434/api/generate",
-    apiKey: "",
+    apiKey: ""
   },
   heartbeatEnabled: false,
   heartbeatInterval: 30,
   simulatedReadingEnabled: false,
   simulatedReadingDailyMinutes: 90,
   simulatedReadingBookMode: "rotate",
-  simulatedReadingInterval: 60,
+  simulatedReadingInterval: 60
 };
 function getMdImportPaths(settings) {
   const paths = /* @__PURE__ */ new Set();
@@ -79,369 +76,261 @@ var ReadFlowSettingTab = class extends import_obsidian.PluginSettingTab {
     containerEl.addClass("readflow-settings");
     containerEl.createEl("h2", { text: "ReadFlow" });
     containerEl.createEl("p", {
-      text: "\u684C\u9762\u7AEF\u53EF\u70B9\u51FB\u300C\u6253\u5F00\u767B\u5F55\u7A97\u53E3\u300D\u81EA\u52A8\u4FDD\u5B58 Cookie\uFF08\u4E0E Weread \u63D2\u4EF6\u540C\u5C5E Electron \u5185\u5D4C\u6D4F\u89C8\u5668 + \u62E6\u622A\u8BF7\u6C42\uFF09\uFF1B\u79FB\u52A8\u7AEF\u8BF7\u624B\u52A8\u7C98\u8D34\u3002",
+      text: "\u684C\u9762\u7AEF\u53EF\u70B9\u51FB\u300C\u6253\u5F00\u767B\u5F55\u7A97\u53E3\u300D\u81EA\u52A8\u4FDD\u5B58 Cookie\uFF08\u4E0E Weread \u63D2\u4EF6\u540C\u5C5E Electron \u5185\u5D4C\u6D4F\u89C8\u5668 + \u62E6\u622A\u8BF7\u6C42\uFF09\uFF1B\u79FB\u52A8\u7AEF\u8BF7\u624B\u52A8\u7C98\u8D34\u3002"
     });
-    new import_obsidian.Setting(containerEl)
-      .setName("\u6253\u5F00 ReadFlow \u9762\u677F")
-      .setDesc(
-        "\u5728\u4E2D\u95F4\u4E3B\u533A\u57DF\u65B0\u5F00\u4E00\u4E2A\u6807\u7B7E\uFF08\u4E0E\u7B14\u8BB0\u6807\u7B7E\u5E76\u5217\uFF09\uFF0C\u4E0D\u518D\u4F7F\u7528\u5DE6\u4FA7\u529F\u80FD\u533A\u56FE\u6807\u3002\u4E5F\u53EF\u5728\u547D\u4EE4\u9762\u677F\u641C\u7D22\u300CReadFlow\u300D\u3002",
-      )
-      .addButton((btn) =>
-        btn
-          .setButtonText("\u6253\u5F00\u9762\u677F")
-          .setCta()
-          .onClick(() => {
-            void this.plugin.openPanel();
-          }),
-      );
-    new import_obsidian.Setting(containerEl)
-      .setName("\u684C\u9762\u7AEF\uFF1A\u6253\u5F00\u5FAE\u4FE1\u8BFB\u4E66\u767B\u5F55\u7A97\u53E3")
-      .setDesc(
-        "\u5F39\u51FA\u72EC\u7ACB\u7A97\u53E3\u626B\u7801\u767B\u5F55\uFF1B\u6210\u529F\u540E\u4F1A\u5199\u5165\u4E0B\u65B9 Cookie \u5E76\u4FDD\u5B58\u3002\u82E5\u5931\u8D25\u8BF7\u6539\u7528\u624B\u52A8\u7C98\u8D34\u3002",
-      )
-      .addButton((btn) =>
-        btn
-          .setButtonText("\u6253\u5F00\u767B\u5F55")
-          .setCta()
-          .onClick(() => {
-            this.plugin.openWereadLogin();
-          }),
-      );
-    new import_obsidian.Setting(containerEl)
-      .setName("\u5FAE\u4FE1\u8BFB\u4E66 Cookie")
-      .setDesc(
-        "\u7C98\u8D34\u5B8C\u6574 Cookie \u5B57\u7B26\u4E32\uFF08\u683C\u5F0F\uFF1Awr_vid=...\uFF1B wr_skey=...\uFF09\u3002\u624B\u52A8\u65B9\u5F0F\uFF1AChrome \u6253\u5F00 weread.qq.com \u2192 F12 \u2192 Application \u2192 Cookies \u2192 \u590D\u5236\u6240\u6709\u952E\u503C\u4E3A name=value \u5E76\u7528\u5206\u53F7\u8FDE\u63A5\u3002",
-      )
-      .addTextArea((ta) => {
-        ta.setValue(this.plugin.settings.wereadCookie).onChange(async (v) => {
-          this.plugin.settings.wereadCookie = v;
-          await this.plugin.saveSettings();
-        });
-        ta.inputEl.rows = 4;
-        ta.inputEl.style.width = "100%";
+    new import_obsidian.Setting(containerEl).setName("\u6253\u5F00 ReadFlow \u9762\u677F").setDesc(
+      "\u5728\u4E2D\u95F4\u4E3B\u533A\u57DF\u65B0\u5F00\u4E00\u4E2A\u6807\u7B7E\uFF08\u4E0E\u7B14\u8BB0\u6807\u7B7E\u5E76\u5217\uFF09\uFF0C\u4E0D\u518D\u4F7F\u7528\u5DE6\u4FA7\u529F\u80FD\u533A\u56FE\u6807\u3002\u4E5F\u53EF\u5728\u547D\u4EE4\u9762\u677F\u641C\u7D22\u300CReadFlow\u300D\u3002"
+    ).addButton(
+      (btn) => btn.setButtonText("\u6253\u5F00\u9762\u677F").setCta().onClick(() => {
+        void this.plugin.openPanel();
+      })
+    );
+    new import_obsidian.Setting(containerEl).setName("\u684C\u9762\u7AEF\uFF1A\u6253\u5F00\u5FAE\u4FE1\u8BFB\u4E66\u767B\u5F55\u7A97\u53E3").setDesc(
+      "\u5F39\u51FA\u72EC\u7ACB\u7A97\u53E3\u626B\u7801\u767B\u5F55\uFF1B\u6210\u529F\u540E\u4F1A\u5199\u5165\u4E0B\u65B9 Cookie \u5E76\u4FDD\u5B58\u3002\u82E5\u5931\u8D25\u8BF7\u6539\u7528\u624B\u52A8\u7C98\u8D34\u3002"
+    ).addButton(
+      (btn) => btn.setButtonText("\u6253\u5F00\u767B\u5F55").setCta().onClick(() => {
+        this.plugin.openWereadLogin();
+      })
+    );
+    new import_obsidian.Setting(containerEl).setName("\u5FAE\u4FE1\u8BFB\u4E66 Cookie").setDesc(
+      "\u7C98\u8D34\u5B8C\u6574 Cookie \u5B57\u7B26\u4E32\uFF08\u683C\u5F0F\uFF1Awr_vid=...\uFF1B wr_skey=...\uFF09\u3002\u624B\u52A8\u65B9\u5F0F\uFF1AChrome \u6253\u5F00 weread.qq.com \u2192 F12 \u2192 Application \u2192 Cookies \u2192 \u590D\u5236\u6240\u6709\u952E\u503C\u4E3A name=value \u5E76\u7528\u5206\u53F7\u8FDE\u63A5\u3002"
+    ).addTextArea((ta) => {
+      ta.setValue(this.plugin.settings.wereadCookie).onChange(async (v) => {
+        this.plugin.settings.wereadCookie = v;
+        await this.plugin.saveSettings();
       });
-    new import_obsidian.Setting(containerEl)
-      .setName("\u9A8C\u8BC1 Cookie")
-      .setDesc("\u6253\u901A notebook API \u68C0\u67E5 Cookie \u662F\u5426\u6709\u6548\uFF08\u5931\u6548\u65F6 errcode -2012\uFF09\u3002")
-      .addButton((btn) =>
-        btn.setButtonText("\u9A8C\u8BC1").onClick(async () => {
-          const cookie = this.plugin.settings.wereadCookie.trim();
-          if (!cookie) {
-            new import_obsidian.Notice("\u8BF7\u5148\u586B\u5199 Cookie");
-            return;
-          }
-          const ok = await verifyWereadCookieSilent(cookie);
-          new import_obsidian.Notice(
-            ok ? "\u2705 Cookie \u6709\u6548\uFF0C\u53EF\u540C\u6B65\u5FAE\u4FE1\u8BFB\u4E66" : "\u274C Cookie \u5931\u6548\uFF0C\u8BF7\u91CD\u65B0\u767B\u5F55\u6216\u4ECE\u6D4F\u89C8\u5668\u7C98\u8D34",
-            8e3,
-          );
-        }),
-      );
+      ta.inputEl.rows = 4;
+      ta.inputEl.style.width = "100%";
+    });
+    new import_obsidian.Setting(containerEl).setName("\u9A8C\u8BC1 Cookie").setDesc("\u6253\u901A notebook API \u68C0\u67E5 Cookie \u662F\u5426\u6709\u6548\uFF08\u5931\u6548\u65F6 errcode -2012\uFF09\u3002").addButton(
+      (btn) => btn.setButtonText("\u9A8C\u8BC1").onClick(async () => {
+        const cookie = this.plugin.settings.wereadCookie.trim();
+        if (!cookie) {
+          new import_obsidian.Notice("\u8BF7\u5148\u586B\u5199 Cookie");
+          return;
+        }
+        const ok = await verifyWereadCookieSilent(cookie);
+        new import_obsidian.Notice(
+          ok ? "\u2705 Cookie \u6709\u6548\uFF0C\u53EF\u540C\u6B65\u5FAE\u4FE1\u8BFB\u4E66" : "\u274C Cookie \u5931\u6548\uFF0C\u8BF7\u91CD\u65B0\u767B\u5F55\u6216\u4ECE\u6D4F\u89C8\u5668\u7C98\u8D34",
+          8e3
+        );
+      })
+    );
     containerEl.createEl("h3", {
       text: "\u60F3\u6CD5\u63A8\u9001\u5230\u5FAE\u4FE1\u8BFB\u4E66",
-      cls: "readflow-settings-section-title",
+      cls: "readflow-settings-section-title"
     });
     containerEl.createEl("p", {
       cls: "setting-item-description",
-      text: "\u5C06 Obsidian \u4E2D\u7684\u60F3\u6CD5\u5199\u56DE\u5FAE\u4FE1\u8BFB\u4E66\uFF08\u9700\u6709\u6548 Cookie\uFF09\u3002\u4EC5\u63A8\u9001\u7EAF\u6587\u672C\u60F3\u6CD5\uFF0C\u4E0D\u5305\u542B\u6807\u7B7E/\u53CC\u94FE\u3002",
+      text: "\u5C06 Obsidian \u4E2D\u7684\u60F3\u6CD5\u5199\u56DE\u5FAE\u4FE1\u8BFB\u4E66\uFF08\u9700\u6709\u6548 Cookie\uFF09\u3002\u4EC5\u63A8\u9001\u7EAF\u6587\u672C\u60F3\u6CD5\uFF0C\u4E0D\u5305\u542B\u6807\u7B7E/\u53CC\u94FE\u3002"
     });
     containerEl.createEl("p", {
       cls: "setting-item-description",
-      text: "\u3010ReadFlow \u9762\u677F\u3011\u540C\u6B65\u540E\u7F16\u8F91\u6458\u5F55\u60F3\u6CD5 \u2192 \u300C\u2191 \u63A8\u9001\u60F3\u6CD5\u300D\u6216\u6279\u91CF\u63A8\u9001\u3002\u5FAE\u4FE1\u8BFB\u4E66\u6765\u6E90\u7684\u6458\u5F55\u9700\u5148\u540C\u6B65\u4EE5\u83B7\u53D6 reviewId\u3002",
+      text: "\u3010ReadFlow \u9762\u677F\u3011\u540C\u6B65\u540E\u7F16\u8F91\u6458\u5F55\u60F3\u6CD5 \u2192 \u300C\u2191 \u63A8\u9001\u60F3\u6CD5\u300D\u6216\u6279\u91CF\u63A8\u9001\u3002\u5FAE\u4FE1\u8BFB\u4E66\u6765\u6E90\u7684\u6458\u5F55\u9700\u5148\u540C\u6B65\u4EE5\u83B7\u53D6 reviewId\u3002"
     });
     containerEl.createEl("p", {
       cls: "setting-item-description",
-      text: "\u3010Obsidian \u7B14\u8BB0\u3011\u5728 frontmatter \u8BBE readflow-book-id\uFF08\u6216 book_id\uFF09\uFF0C\u53EF\u9009 readflow-chapter-uid\u3001readflow-weread-range\u3001readflow-weread-review-id\uFF1B\u6267\u884C\u547D\u4EE4\u300C\u5C06\u5F53\u524D\u7B14\u8BB0\u63A8\u9001\u5230\u5FAE\u4FE1\u8BFB\u4E66\u300D\u3002\u9996\u6B21\u63A8\u9001\u6210\u529F\u540E\u4F1A\u5199\u56DE review-id\u3002",
+      text: "\u3010Obsidian \u7B14\u8BB0\u3011\u5728 frontmatter \u8BBE readflow-book-id\uFF08\u6216 book_id\uFF09\uFF0C\u53EF\u9009 readflow-chapter-uid\u3001readflow-weread-range\u3001readflow-weread-review-id\uFF1B\u6267\u884C\u547D\u4EE4\u300C\u5C06\u5F53\u524D\u7B14\u8BB0\u63A8\u9001\u5230\u5FAE\u4FE1\u8BFB\u4E66\u300D\u3002\u9996\u6B21\u63A8\u9001\u6210\u529F\u540E\u4F1A\u5199\u56DE review-id\u3002"
     });
-    new import_obsidian.Setting(containerEl)
-      .setName("\u5C06\u5F53\u524D\u7B14\u8BB0\u63A8\u9001\u5230\u5FAE\u4FE1\u8BFB\u4E66")
-      .setDesc("\u63A8\u9001\u5F53\u524D Markdown \u7B14\u8BB0\u7684\u9009\u4E2D\u5185\u5BB9\uFF08\u82E5\u672A\u9009\u4E2D\u5219\u63A8\u9001\u6B63\u6587\uFF09\u3002")
-      .addButton((btn) =>
-        btn.setButtonText("\u7ACB\u5373\u63A8\u9001").setCta().onClick(() => {
-          void this.plugin.pushCurrentVaultNoteToWeread();
-        }),
-      );
-    new import_obsidian.Setting(containerEl)
-      .setName("\u4E66\u7C4D\u843D\u76D8\u76EE\u5F55")
-      .setDesc("\u76F8\u5BF9 vault \u6839\u76EE\u5F55\uFF0C\u5982 Books\uFF08API \u540C\u6B65\u5199\u5165\u76EE\u5F55\uFF09")
-      .addText((t) =>
-        t.setValue(this.plugin.settings.booksBasePath).onChange(async (v) => {
-          this.plugin.settings.booksBasePath = v.replace(/^\/+|\/+$/g, "") || "Books";
-          await this.plugin.saveSettings();
-        }),
-      );
-    new import_obsidian.Setting(containerEl)
-      .setName("MD \u5BFC\u5165\u626B\u63CF\u76EE\u5F55")
-      .setDesc(
-        "\u4ECE Vault \u5BFC\u5165\u65F6\u626B\u63CF\u7684\u76EE\u5F55\uFF08\u6BCF\u884C\u4E00\u4E2A\uFF09\uFF1B\u9ED8\u8BA4\u5305\u542B ReadingSpace/\u5FAE\u4FE1\u8BFB\u4E66\u3002\u4E66\u7C4D\u843D\u76D8\u76EE\u5F55\u4F1A\u81EA\u52A8\u5408\u5E76\u3002",
-      )
-      .addTextArea((ta) => {
-        ta.setValue(this.plugin.settings.mdImportPaths || "").onChange(async (v) => {
-          this.plugin.settings.mdImportPaths = v;
-          await this.plugin.saveSettings();
-        });
-        ta.inputEl.rows = 3;
-        ta.inputEl.style.width = "100%";
-        if (typeof ta.setPlaceholder === "function") {
-          ta.setPlaceholder("ReadingSpace/\u5FAE\u4FE1\u8BFB\u4E66");
-        }
+    new import_obsidian.Setting(containerEl).setName("\u5C06\u5F53\u524D\u7B14\u8BB0\u63A8\u9001\u5230\u5FAE\u4FE1\u8BFB\u4E66").setDesc("\u63A8\u9001\u5F53\u524D Markdown \u7B14\u8BB0\u7684\u9009\u4E2D\u5185\u5BB9\uFF08\u82E5\u672A\u9009\u4E2D\u5219\u63A8\u9001\u6B63\u6587\uFF09\u3002").addButton(
+      (btn) => btn.setButtonText("\u7ACB\u5373\u63A8\u9001").setCta().onClick(() => {
+        void this.plugin.pushCurrentVaultNoteToWeread();
+      })
+    );
+    new import_obsidian.Setting(containerEl).setName("\u4E66\u7C4D\u843D\u76D8\u76EE\u5F55").setDesc("\u76F8\u5BF9 vault \u6839\u76EE\u5F55\uFF0C\u5982 Books\uFF08API \u540C\u6B65\u5199\u5165\u76EE\u5F55\uFF09").addText(
+      (t) => t.setValue(this.plugin.settings.booksBasePath).onChange(async (v) => {
+        this.plugin.settings.booksBasePath = v.replace(/^\/+|\/+$/g, "") || "Books";
+        await this.plugin.saveSettings();
+      })
+    );
+    new import_obsidian.Setting(containerEl).setName("MD \u5BFC\u5165\u626B\u63CF\u76EE\u5F55").setDesc(
+      "\u4ECE Vault \u5BFC\u5165\u65F6\u626B\u63CF\u7684\u76EE\u5F55\uFF08\u6BCF\u884C\u4E00\u4E2A\uFF09\uFF1B\u9ED8\u8BA4\u5305\u542B ReadingSpace/\u5FAE\u4FE1\u8BFB\u4E66\u3002\u4E66\u7C4D\u843D\u76D8\u76EE\u5F55\u4F1A\u81EA\u52A8\u5408\u5E76\u3002"
+    ).addTextArea((ta) => {
+      ta.setValue(this.plugin.settings.mdImportPaths || "").onChange(async (v) => {
+        this.plugin.settings.mdImportPaths = v;
+        await this.plugin.saveSettings();
       });
-    new import_obsidian.Setting(containerEl)
-      .setName("\u539F\u5B50\u6458\u5F55\u5361\u7247")
-      .setDesc("\u5F00\u542F\u540E\u4E3A\u6BCF\u6761\u6458\u5F55\u751F\u6210\u72EC\u7ACB Markdown \u6587\u4EF6\u3002")
-      .addToggle((tg) =>
-        tg.setValue(this.plugin.settings.atomicHighlights).onChange(async (v) => {
-          this.plugin.settings.atomicHighlights = v;
-          await this.plugin.saveSettings();
-        }),
-      );
-    new import_obsidian.Setting(containerEl)
-      .setName("\u5173\u8054\u626B\u63CF\u6700\u5927\u6587\u4EF6\u6570")
-      .addText((t) =>
-        t.setValue(String(this.plugin.settings.linkerMaxFiles)).onChange(async (v) => {
-          const n = Math.max(50, parseInt(v, 10) || 400);
-          this.plugin.settings.linkerMaxFiles = n;
-          await this.plugin.saveSettings();
-        }),
-      );
-    new import_obsidian.Setting(containerEl)
-      .setName("\u5173\u8054\u5FFD\u7565\u8DEF\u5F84\u524D\u7F00\uFF08\u6BCF\u884C\u4E00\u4E2A\uFF09")
-      .addTextArea((ta) => {
-        ta.setValue(this.plugin.settings.linkerIgnorePrefixes).onChange(async (v) => {
-          this.plugin.settings.linkerIgnorePrefixes = v;
-          await this.plugin.saveSettings();
-        });
-        ta.inputEl.rows = 3;
-        ta.inputEl.style.width = "100%";
+      ta.inputEl.rows = 3;
+      ta.inputEl.style.width = "100%";
+      if (typeof ta.setPlaceholder === "function") {
+        ta.setPlaceholder("ReadingSpace/\u5FAE\u4FE1\u8BFB\u4E66");
+      }
+    });
+    new import_obsidian.Setting(containerEl).setName("\u539F\u5B50\u6458\u5F55\u5361\u7247").setDesc("\u5F00\u542F\u540E\u4E3A\u6BCF\u6761\u6458\u5F55\u751F\u6210\u72EC\u7ACB Markdown \u6587\u4EF6\u3002").addToggle(
+      (tg) => tg.setValue(this.plugin.settings.atomicHighlights).onChange(async (v) => {
+        this.plugin.settings.atomicHighlights = v;
+        await this.plugin.saveSettings();
+      })
+    );
+    new import_obsidian.Setting(containerEl).setName("\u5173\u8054\u626B\u63CF\u6700\u5927\u6587\u4EF6\u6570").addText(
+      (t) => t.setValue(String(this.plugin.settings.linkerMaxFiles)).onChange(async (v) => {
+        const n = Math.max(50, parseInt(v, 10) || 400);
+        this.plugin.settings.linkerMaxFiles = n;
+        await this.plugin.saveSettings();
+      })
+    );
+    new import_obsidian.Setting(containerEl).setName("\u5173\u8054\u5FFD\u7565\u8DEF\u5F84\u524D\u7F00\uFF08\u6BCF\u884C\u4E00\u4E2A\uFF09").addTextArea((ta) => {
+      ta.setValue(this.plugin.settings.linkerIgnorePrefixes).onChange(async (v) => {
+        this.plugin.settings.linkerIgnorePrefixes = v;
+        await this.plugin.saveSettings();
       });
+      ta.inputEl.rows = 3;
+      ta.inputEl.style.width = "100%";
+    });
     containerEl.createEl("h3", {
       text: "AI \u5206\u7C7B\u5668\uFF08LLM\uFF09",
-      cls: "readflow-settings-section-title",
+      cls: "readflow-settings-section-title"
     });
-    new import_obsidian.Setting(containerEl)
-      .setName("\u542F\u7528 LLM \u5206\u7C7B")
-      .setDesc(
-        "\u5F00\u542F\u540E\uFF0C\u65B0\u540C\u6B65\u7684\u6458\u5F55\u5C06\u81EA\u52A8\u901A\u8FC7 LLM \u63A8\u65AD\u7C7B\u578B\uFF08\u89C24E2\u5206\u7C7B\uFF1A\u89C2\u70B9/\u65B9\u6CD5/\u4F8B\u5B50/\u7ED3\u8BBA/\u7591\u95EE\uFF09",
-      )
-      .addToggle((tg) => {
-        const llm = this.plugin.settings.llmClassifier || {};
-        tg.setValue(!!llm.enabled).onChange(async (v) => {
-          this.plugin.settings.llmClassifier = { ...llm, enabled: v };
-          await this.plugin.saveSettings();
-        });
+    new import_obsidian.Setting(containerEl).setName("\u542F\u7528 LLM \u5206\u7C7B").setDesc(
+      "\u5F00\u542F\u540E\uFF0C\u65B0\u540C\u6B65\u7684\u6458\u5F55\u5C06\u81EA\u52A8\u901A\u8FC7 LLM \u63A8\u65AD\u7C7B\u578B\uFF08\u89C24E2\u5206\u7C7B\uFF1A\u89C2\u70B9/\u65B9\u6CD5/\u4F8B\u5B50/\u7ED3\u8BBA/\u7591\u95EE\uFF09"
+    ).addToggle((tg) => {
+      const llm = this.plugin.settings.llmClassifier || {};
+      tg.setValue(!!llm.enabled).onChange(async (v) => {
+        this.plugin.settings.llmClassifier = { ...llm, enabled: v };
+        await this.plugin.saveSettings();
       });
-    new import_obsidian.Setting(containerEl)
-      .setName("LLM \u6A21\u578B")
-      .setDesc("\u4F8B\u5982 qwen2.5\u3001gpt-4o-mini\u3001deepseek-chat")
-      .addText((t) => {
-        const llm = this.plugin.settings.llmClassifier || {};
-        t.setValue(llm.model || "qwen2.5").onChange(async (v) => {
-          this.plugin.settings.llmClassifier = { ...llm, model: v };
-          await this.plugin.saveSettings();
-        });
+    });
+    new import_obsidian.Setting(containerEl).setName("LLM \u6A21\u578B").setDesc("\u4F8B\u5982 qwen2.5\u3001gpt-4o-mini\u3001deepseek-chat").addText((t) => {
+      const llm = this.plugin.settings.llmClassifier || {};
+      t.setValue(llm.model || "qwen2.5").onChange(async (v) => {
+        this.plugin.settings.llmClassifier = { ...llm, model: v };
+        await this.plugin.saveSettings();
       });
-    new import_obsidian.Setting(containerEl)
-      .setName("API \u7AEF\u70B9")
-      .setDesc("Ollama \u6216\u5176\u4ED6 LLM API \u5730\u5740\uFF0C\u4F8B\u5982 http://localhost:11434/api/generate")
-      .addText((t) => {
-        const llm = this.plugin.settings.llmClassifier || {};
-        t.setValue(llm.endpoint || "").onChange(async (v) => {
-          this.plugin.settings.llmClassifier = { ...llm, endpoint: v };
-          await this.plugin.saveSettings();
-        });
+    });
+    new import_obsidian.Setting(containerEl).setName("API \u7AEF\u70B9").setDesc("Ollama \u6216\u5176\u4ED6 LLM API \u5730\u5740\uFF0C\u4F8B\u5982 http://localhost:11434/api/generate").addText((t) => {
+      const llm = this.plugin.settings.llmClassifier || {};
+      t.setValue(llm.endpoint || "").onChange(async (v) => {
+        this.plugin.settings.llmClassifier = { ...llm, endpoint: v };
+        await this.plugin.saveSettings();
       });
-    new import_obsidian.Setting(containerEl)
-      .setName("API Key\uFF08\u53EF\u9009\uFF09")
-      .setDesc("\u5982\u6709\u8BF4\u660E\u9700\u6C42")
-      .addText((t) => {
-        t.inputEl.type = "password";
-        const llm = this.plugin.settings.llmClassifier || {};
-        t.setValue(llm.apiKey || "").onChange(async (v) => {
-          this.plugin.settings.llmClassifier = { ...llm, apiKey: v };
-          await this.plugin.saveSettings();
-        });
+    });
+    new import_obsidian.Setting(containerEl).setName("API Key\uFF08\u53EF\u9009\uFF09").setDesc("\u5982\u6709\u8BF4\u660E\u9700\u6C42").addText((t) => {
+      t.inputEl.type = "password";
+      const llm = this.plugin.settings.llmClassifier || {};
+      t.setValue(llm.apiKey || "").onChange(async (v) => {
+        this.plugin.settings.llmClassifier = { ...llm, apiKey: v };
+        await this.plugin.saveSettings();
       });
+    });
     const testBtn = containerEl.createEl("button", {
       text: "\u6D4B\u8BD5 LLM \u5206\u7C7B",
       type: "button",
-      cls: "readflow-btn readflow-btn--secondary",
+      cls: "readflow-btn readflow-btn--secondary"
     });
     testBtn.addEventListener("click", async () => {
       try {
         const llm = this.plugin.settings.llmClassifier || {};
         const resp = await this.plugin._testLlm(llm);
         new import_obsidian.Notice(
-          resp.ok ? "\u2705 LLM \u8FDE\u63A5\u6B63\u5E38" : `\u274C \u8FDE\u63A5\u5931\u8D25: ${resp.error}`,
+          resp.ok ? "\u2705 LLM \u8FDE\u63A5\u6B63\u5E38" : `\u274C \u8FDE\u63A5\u5931\u8D25: ${resp.error}`
         );
       } catch (e) {
         new import_obsidian.Notice(`\u6D4B\u8BD5\u5F02\u5E38: ${e && e.message}`);
       }
     });
-
     containerEl.createEl("h3", {
       text: "\u5FAE\u4FE1\u8BFB\u4E66\u5B9A\u65F6\u540C\u6B65",
-      cls: "readflow-settings-section-title",
+      cls: "readflow-settings-section-title"
     });
-    new import_obsidian.Setting(containerEl)
-      .setName("\u542F\u7528\u5B9A\u65F6\u540C\u6B65")
-      .setDesc("\u6309\u95F4\u9694\u81EA\u52A8\u8C03\u7528 API \u540C\u6B65\uFF08\u9700\u6709\u6548 Cookie\uFF09\u3002Cookie \u5931\u6548\u65F6\u4F1A\u63D0\u793A\u5E76\u505C\u6B62\u3002")
-      .addToggle((tg) => {
-        tg.setValue(!!this.plugin.settings.autoSyncEnabled).onChange(async (v) => {
-          this.plugin.settings.autoSyncEnabled = v;
-          await this.plugin.saveSettings();
-          if (v) this.plugin.autoSyncManager.start();
-          else this.plugin.autoSyncManager.stop();
-        });
+    new import_obsidian.Setting(containerEl).setName("\u542F\u7528\u5B9A\u65F6\u540C\u6B65").setDesc("\u6309\u95F4\u9694\u81EA\u52A8\u8C03\u7528 API \u540C\u6B65\uFF08\u9700\u6709\u6548 Cookie\uFF09\u3002Cookie \u5931\u6548\u65F6\u4F1A\u63D0\u793A\u5E76\u505C\u6B62\u3002").addToggle((tg) => {
+      tg.setValue(!!this.plugin.settings.autoSyncEnabled).onChange(async (v) => {
+        this.plugin.settings.autoSyncEnabled = v;
+        await this.plugin.saveSettings();
+        if (v) this.plugin.autoSyncManager.start();
+        else this.plugin.autoSyncManager.stop();
       });
-    new import_obsidian.Setting(containerEl)
-      .setName("\u540C\u6B65\u95F4\u9694\uFF08\u5206\u949F\uFF09")
-      .setDesc("\u6700\u5C0F 15 \u5206\u949F")
-      .addDropdown((dd) => {
-        dd.addOption("15", "15 \u5206\u949F")
-          .addOption("30", "30 \u5206\u949F")
-          .addOption("60", "1 \u5C0F\u65F6")
-          .addOption("120", "2 \u5C0F\u65F6")
-          .addOption("360", "6 \u5C0F\u65F6")
-          .setValue(String(this.plugin.settings.autoSyncIntervalMinutes || 60))
-          .onChange(async (v) => {
-            this.plugin.settings.autoSyncIntervalMinutes = parseInt(v, 10);
-            await this.plugin.saveSettings();
-            if (this.plugin.settings.autoSyncEnabled) {
-              this.plugin.autoSyncManager.stop();
-              this.plugin.autoSyncManager.start();
-            }
-          });
+    });
+    new import_obsidian.Setting(containerEl).setName("\u540C\u6B65\u95F4\u9694\uFF08\u5206\u949F\uFF09").setDesc("\u6700\u5C0F 15 \u5206\u949F").addDropdown((dd) => {
+      dd.addOption("15", "15 \u5206\u949F").addOption("30", "30 \u5206\u949F").addOption("60", "1 \u5C0F\u65F6").addOption("120", "2 \u5C0F\u65F6").addOption("360", "6 \u5C0F\u65F6").setValue(String(this.plugin.settings.autoSyncIntervalMinutes || 60)).onChange(async (v) => {
+        this.plugin.settings.autoSyncIntervalMinutes = parseInt(v, 10);
+        await this.plugin.saveSettings();
+        if (this.plugin.settings.autoSyncEnabled) {
+          this.plugin.autoSyncManager.stop();
+          this.plugin.autoSyncManager.start();
+        }
       });
-
-    // 心跳设置
-    containerEl.createEl("h3", { text: "❤️ \u8BFB\u4E66\u5FC3\u8DF3", cls: "readflow-settings-section-title" });
-    new import_obsidian.Setting(containerEl)
-      .setName("\u542F\u7528\u5FC3\u8DF3")
-      .setDesc("\u5F00\u542F\u540E\u5B9A\u65F6\u5411\u5FAE\u4FE1\u8BFB\u4E66\u53D1\u9001\u9605\u8BFB\u4F4D\u7F6E")
-      .addToggle((tg) => {
-        tg.setValue(!!this.plugin.settings.heartbeatEnabled).onChange(async (v) => {
-          this.plugin.settings.heartbeatEnabled = v;
-          await this.plugin.saveSettings();
-          if (v) this.plugin.heartbeatManager.start(this.plugin.settings.heartbeatInterval || 30);
-          else this.plugin.heartbeatManager.stop();
-        });
+    });
+    containerEl.createEl("h3", { text: "\u2764\uFE0F \u8BFB\u4E66\u5FC3\u8DF3", cls: "readflow-settings-section-title" });
+    new import_obsidian.Setting(containerEl).setName("\u542F\u7528\u5FC3\u8DF3").setDesc("\u5F00\u542F\u540E\u5B9A\u65F6\u5411\u5FAE\u4FE1\u8BFB\u4E66\u53D1\u9001\u9605\u8BFB\u4F4D\u7F6E").addToggle((tg) => {
+      tg.setValue(!!this.plugin.settings.heartbeatEnabled).onChange(async (v) => {
+        this.plugin.settings.heartbeatEnabled = v;
+        await this.plugin.saveSettings();
+        if (v) this.plugin.heartbeatManager.start(this.plugin.settings.heartbeatInterval || 30);
+        else this.plugin.heartbeatManager.stop();
       });
-    new import_obsidian.Setting(containerEl)
-      .setName("\u5FC3\u8DF3\u95F4\u9694")
-      .setDesc("\u53D1\u9001\u8BFB\u8BFB\u4F4D\u7F6E\u7684\u65F6\u95F4\u95F4\u9694")
-      .addDropdown((dd) => {
-        dd.addOption("15", "15 \u79D2")
-          .addOption("30", "30 \u79D2")
-          .addOption("60", "1 \u5206\u949F")
-          .addOption("120", "2 \u5206\u949F")
-          .setValue(String(this.plugin.settings.heartbeatInterval || 30))
-          .onChange(async (v) => {
-            this.plugin.settings.heartbeatInterval = parseInt(v);
-            await this.plugin.saveSettings();
-            if (this.plugin.settings.heartbeatEnabled) {
-              this.plugin.heartbeatManager.stop();
-              this.plugin.heartbeatManager.start(parseInt(v));
-            }
-          });
+    });
+    new import_obsidian.Setting(containerEl).setName("\u5FC3\u8DF3\u95F4\u9694").setDesc("\u53D1\u9001\u8BFB\u8BFB\u4F4D\u7F6E\u7684\u65F6\u95F4\u95F4\u9694").addDropdown((dd) => {
+      dd.addOption("15", "15 \u79D2").addOption("30", "30 \u79D2").addOption("60", "1 \u5206\u949F").addOption("120", "2 \u5206\u949F").setValue(String(this.plugin.settings.heartbeatInterval || 30)).onChange(async (v) => {
+        this.plugin.settings.heartbeatInterval = parseInt(v);
+        await this.plugin.saveSettings();
+        if (this.plugin.settings.heartbeatEnabled) {
+          this.plugin.heartbeatManager.stop();
+          this.plugin.heartbeatManager.start(parseInt(v));
+        }
       });
-    new import_obsidian.Setting(containerEl)
-      .setName("\u9605\u8BFB\u7684\u4E66")
-      .setDesc(
-        "\u70B9\u51FB\u300C\u540C\u6B65\u67E5\u8BE2\u300D\u540E\uFF0C\u5728\u5217\u8868\u4E2D\u70B9\u51FB\u4E00\u672C\u4E66\u8BBE\u4E3A\u5F53\u524D\u9605\u8BFB\uFF08\u624D\u4F1A\u53D1\u9001\u5FC3\u8DF3\uFF09",
-      )
-      .addButton((btn) =>
-        btn
-          .setButtonText("\u540C\u6B65\u67E5\u8BE2")
-          .setCta()
-          .onClick(async () => {
-            const result = await this.plugin.syncHeartbeatData();
-            if (result.success) {
-              new import_obsidian.Notice(
-                `\u67E5\u8BE2\u6210\u529F\uFF01${result.booksWithProgress}\u672C\u6709\u8FDB\u5EA6`,
-              );
-            } else {
-              new import_obsidian.Notice(`\u67E5\u8BE2\u5931\u8D25: ${result.error}`);
-            }
-          }),
-      );
+    });
+    new import_obsidian.Setting(containerEl).setName("\u9605\u8BFB\u7684\u4E66").setDesc(
+      "\u70B9\u51FB\u300C\u540C\u6B65\u67E5\u8BE2\u300D\u540E\uFF0C\u5728\u5217\u8868\u4E2D\u70B9\u51FB\u4E00\u672C\u4E66\u8BBE\u4E3A\u5F53\u524D\u9605\u8BFB\uFF08\u624D\u4F1A\u53D1\u9001\u5FC3\u8DF3\uFF09"
+    ).addButton(
+      (btn) => btn.setButtonText("\u540C\u6B65\u67E5\u8BE2").setCta().onClick(async () => {
+        const result = await this.plugin.syncHeartbeatData();
+        if (result.success) {
+          new import_obsidian.Notice(
+            `\u67E5\u8BE2\u6210\u529F\uFF01${result.booksWithProgress}\u672C\u6709\u8FDB\u5EA6`
+          );
+        } else {
+          new import_obsidian.Notice(`\u67E5\u8BE2\u5931\u8D25: ${result.error}`);
+        }
+      })
+    );
     const hbStats = this.plugin.heartbeatManager ? this.plugin.heartbeatManager.getStats() : {};
     containerEl.createDiv({ cls: "setting-item-description", text: `\u72B6\u6001: ${hbStats.state === "running" ? "\u2705 \u8FD0\u884C\u4E2D" : "\u23F8 \u5DF2\u505C\u6B62"}` });
     containerEl.createDiv({ cls: "setting-item-description", text: `\u5DF2\u53D1\u9001: ${hbStats.totalSent || 0} \u6B21` });
-
-    // \u6A21\u62DF\u9605\u8BFB\u8BBE\u7F6E
-    containerEl.createEl("h3", { text: "\uD83D\uDD50 \u6A21\u62DF\u5728\u7EBF\u9605\u8BFB", cls: "readflow-settings-section-title" });
-    new import_obsidian.Setting(containerEl)
-      .setName("\u542F\u7528\u6A21\u62DF\u9605\u8BFB")
-      .setDesc("\u5F00\u542F\u540E\u81EA\u52A8\u4ECE\u6709\u8FDB\u5EA6\u7684\u4E66\u4E2D\u9009\u62E9\u4E00\u672C\uFF0C\u5B9A\u65F6\u53D1\u9001\u9605\u8BFB\u5FC3\u8DF3\uFF0C\u7D2F\u79EF\u6BCF\u65E5\u9605\u8BFB\u65F6\u957F\u3002\u65E0\u9700\u4EBA\u5DE5\u5E72\u9884\u3002")
-      .addToggle((tg) => {
-        tg.setValue(!!this.plugin.settings.simulatedReadingEnabled).onChange(async (v) => {
-          this.plugin.settings.simulatedReadingEnabled = v;
-          await this.plugin.saveSettings();
-          if (v) this.plugin.simulatedReadingManager.start();
-          else this.plugin.simulatedReadingManager.stop();
-        });
+    containerEl.createEl("h3", { text: "\u{1F550} \u6A21\u62DF\u5728\u7EBF\u9605\u8BFB", cls: "readflow-settings-section-title" });
+    new import_obsidian.Setting(containerEl).setName("\u542F\u7528\u6A21\u62DF\u9605\u8BFB").setDesc("\u5F00\u542F\u540E\u81EA\u52A8\u4ECE\u6709\u8FDB\u5EA6\u7684\u4E66\u4E2D\u9009\u62E9\u4E00\u672C\uFF0C\u5B9A\u65F6\u53D1\u9001\u9605\u8BFB\u5FC3\u8DF3\uFF0C\u7D2F\u79EF\u6BCF\u65E5\u9605\u8BFB\u65F6\u957F\u3002\u65E0\u9700\u4EBA\u5DE5\u5E72\u9884\u3002").addToggle((tg) => {
+      tg.setValue(!!this.plugin.settings.simulatedReadingEnabled).onChange(async (v) => {
+        this.plugin.settings.simulatedReadingEnabled = v;
+        await this.plugin.saveSettings();
+        if (v) this.plugin.simulatedReadingManager.start();
+        else this.plugin.simulatedReadingManager.stop();
       });
-    new import_obsidian.Setting(containerEl)
-      .setName("\u6BCF\u65E5\u76EE\u6807\u65F6\u957F")
-      .setDesc("\u6BCF\u5929\u81EA\u52A8\u7D2F\u8BA1\u9605\u8BFB\u591A\u5C11\u5206\u949F\u540E\u81EA\u52A8\u505C\u6B62")
-      .addDropdown((dd) => {
-        dd.addOption("30", "30 \u5206\u949F")
-          .addOption("60", "1 \u5C0F\u65F6")
-          .addOption("90", "1.5 \u5C0F\u65F6")
-          .addOption("120", "2 \u5C0F\u65F6")
-          .setValue(String(this.plugin.settings.simulatedReadingDailyMinutes || 90))
-          .onChange(async (v) => {
-            this.plugin.settings.simulatedReadingDailyMinutes = parseInt(v, 10);
-            await this.plugin.saveSettings();
-          });
+    });
+    new import_obsidian.Setting(containerEl).setName("\u6BCF\u65E5\u76EE\u6807\u65F6\u957F").setDesc("\u6BCF\u5929\u81EA\u52A8\u7D2F\u8BA1\u9605\u8BFB\u591A\u5C11\u5206\u949F\u540E\u81EA\u52A8\u505C\u6B62").addDropdown((dd) => {
+      dd.addOption("30", "30 \u5206\u949F").addOption("60", "1 \u5C0F\u65F6").addOption("90", "1.5 \u5C0F\u65F6").addOption("120", "2 \u5C0F\u65F6").setValue(String(this.plugin.settings.simulatedReadingDailyMinutes || 90)).onChange(async (v) => {
+        this.plugin.settings.simulatedReadingDailyMinutes = parseInt(v, 10);
+        await this.plugin.saveSettings();
       });
-    new import_obsidian.Setting(containerEl)
-      .setName("\u5FC3\u8DF3\u95F4\u9694")
-      .setDesc("\u591A\u4E45\u53D1\u9001\u4E00\u6B21\u9605\u8BFB\u4F4D\u7F6E\u66F4\u65B0")
-      .addDropdown((dd) => {
-        dd.addOption("30", "30 \u79D2")
-          .addOption("60", "1 \u5206\u949F")
-          .addOption("120", "2 \u5206\u949F")
-          .addOption("300", "5 \u5206\u949F")
-          .setValue(String(this.plugin.settings.simulatedReadingInterval || 60))
-          .onChange(async (v) => {
-            this.plugin.settings.simulatedReadingInterval = parseInt(v, 10);
-            await this.plugin.saveSettings();
-            if (this.plugin.settings.simulatedReadingEnabled) {
-              this.plugin.simulatedReadingManager.stop();
-              this.plugin.simulatedReadingManager.start();
-            }
-          });
+    });
+    new import_obsidian.Setting(containerEl).setName("\u5FC3\u8DF3\u95F4\u9694").setDesc("\u591A\u4E45\u53D1\u9001\u4E00\u6B21\u9605\u8BFB\u4F4D\u7F6E\u66F4\u65B0").addDropdown((dd) => {
+      dd.addOption("30", "30 \u79D2").addOption("60", "1 \u5206\u949F").addOption("120", "2 \u5206\u949F").addOption("300", "5 \u5206\u949F").setValue(String(this.plugin.settings.simulatedReadingInterval || 60)).onChange(async (v) => {
+        this.plugin.settings.simulatedReadingInterval = parseInt(v, 10);
+        await this.plugin.saveSettings();
+        if (this.plugin.settings.simulatedReadingEnabled) {
+          this.plugin.simulatedReadingManager.stop();
+          this.plugin.simulatedReadingManager.start();
+        }
       });
-    new import_obsidian.Setting(containerEl)
-      .setName("\u9009\u4E66\u6A21\u5F0F")
-      .setDesc("rotate=\u6309\u987A\u5E8F\u8F6E\u6362; random=\u968F\u673A; fixed=\u56FA\u5B9A\u6700\u8FD1\u9605\u8BFB\u7684\u4E66")
-      .addDropdown((dd) => {
-        dd.addOption("rotate", "\u987A\u5E8F\u8F6E\u6362")
-          .addOption("random", "\u968F\u673A\u9009\u62E9")
-          .addOption("fixed", "\u56FA\u5B9A\u6700\u8FD1")
-          .setValue(this.plugin.settings.simulatedReadingBookMode || "rotate")
-          .onChange(async (v) => {
-            this.plugin.settings.simulatedReadingBookMode = v;
-            await this.plugin.saveSettings();
-          });
+    });
+    new import_obsidian.Setting(containerEl).setName("\u9009\u4E66\u6A21\u5F0F").setDesc("rotate=\u6309\u987A\u5E8F\u8F6E\u6362; random=\u968F\u673A; fixed=\u56FA\u5B9A\u6700\u8FD1\u9605\u8BFB\u7684\u4E66").addDropdown((dd) => {
+      dd.addOption("rotate", "\u987A\u5E8F\u8F6E\u6362").addOption("random", "\u968F\u673A\u9009\u62E9").addOption("fixed", "\u56FA\u5B9A\u6700\u8FD1").setValue(this.plugin.settings.simulatedReadingBookMode || "rotate").onChange(async (v) => {
+        this.plugin.settings.simulatedReadingBookMode = v;
+        await this.plugin.saveSettings();
       });
+    });
     const srStats = this.plugin.simulatedReadingManager ? this.plugin.simulatedReadingManager.getStats() : {};
     containerEl.createDiv({ cls: "setting-item-description", text: `\u72B6\u6001: ${srStats.state === "running" ? "\u2705 \u8FD0\u884C\u4E2D" : "\u23F8 \u5DF2\u505C\u6B62"}` });
     containerEl.createDiv({ cls: "setting-item-description", text: `\u4ECA\u65E5\u5DF2\u8BFB: ${srStats.todayMinutes || 0} / ${this.plugin.settings.simulatedReadingDailyMinutes || 90} \u5206\u949F` });
     containerEl.createDiv({ cls: "setting-item-description", text: `\u5F53\u524D\u4E66\u7C4D: ${srStats.currentBookTitle || "\u65E0"}` });
   }
 };
-
-// 心跳管理器
-class HeartbeatManager {
+var HeartbeatManager = class {
   constructor(plugin) {
     this.plugin = plugin;
     this.state = "idle";
     this.currentBook = null;
     this.timer = null;
     this.stats = { totalSent: 0, consecutiveFailures: 0, lastSent: null };
-    this.listeners = new Set();
+    this.listeners = /* @__PURE__ */ new Set();
   }
   getStats() {
     return { ...this.stats, state: this.state, currentBook: this.currentBook };
@@ -460,9 +349,9 @@ class HeartbeatManager {
   async start(intervalSeconds = 30) {
     if (this.timer) clearInterval(this.timer);
     this.state = "running";
-    this.timer = setInterval(() => this.tick(), intervalSeconds * 1000);
+    this.timer = setInterval(() => this.tick(), intervalSeconds * 1e3);
     this.notify();
-    console.log("[ReadFlow] 心跳已启动，间隔", intervalSeconds, "秒");
+    console.log("[ReadFlow] \u5FC3\u8DF3\u5DF2\u542F\u52A8\uFF0C\u95F4\u9694", intervalSeconds, "\u79D2");
   }
   stop() {
     if (this.timer) {
@@ -472,7 +361,7 @@ class HeartbeatManager {
     this.state = "idle";
     this.currentBook = null;
     this.notify();
-    console.log("[ReadFlow] 心跳已停止");
+    console.log("[ReadFlow] \u5FC3\u8DF3\u5DF2\u505C\u6B62");
   }
   async tick() {
     if (!this.currentBook) return;
@@ -487,15 +376,13 @@ class HeartbeatManager {
       this.stats.consecutiveFailures++;
       if (result.error === "AUTH_FAILED") {
         this.stop();
-        new import_obsidian.Notice("心跳认证失败，请检查 Cookie");
+        new import_obsidian.Notice("\u5FC3\u8DF3\u8BA4\u8BC1\u5931\u8D25\uFF0C\u8BF7\u68C0\u67E5 Cookie");
       }
     }
     this.notify();
   }
-}
-
+};
 async function sendHeartbeat(cookie, payload) {
-  // 使用与 weread.ts 一致的 API 端点
   const url = `${BASE}/book/updateReadingProgress`;
   try {
     const resp = await requestUrl({
@@ -505,8 +392,8 @@ async function sendHeartbeat(cookie, payload) {
       body: JSON.stringify({
         bookId: payload.bookId,
         chapterUid: payload.chapterUid || 0,
-        readProgress: Math.max(0, Math.min(100, payload.readProgress || 0)),
-      }),
+        readProgress: Math.max(0, Math.min(100, payload.readProgress || 0))
+      })
     });
     if (resp.status >= 200 && resp.status < 300) return { ok: true };
     if (resp.status === 401 || resp.status === 403) return { ok: false, error: "AUTH_FAILED" };
@@ -515,8 +402,7 @@ async function sendHeartbeat(cookie, payload) {
     return { ok: false, error: e.message };
   }
 }
-
-class AutoSyncManager {
+var AutoSyncManager = class {
   constructor(plugin) {
     this.plugin = plugin;
     this.timer = null;
@@ -527,7 +413,7 @@ class AutoSyncManager {
     if (!this.plugin.settings.autoSyncEnabled) return;
     const mins = Math.max(15, Number(this.plugin.settings.autoSyncIntervalMinutes) || 60);
     this.timer = setInterval(() => void this.tick(), mins * 60 * 1e3);
-    console.log("[ReadFlow] 定时同步已启动，间隔", mins, "分钟");
+    console.log("[ReadFlow] \u5B9A\u65F6\u540C\u6B65\u5DF2\u542F\u52A8\uFF0C\u95F4\u9694", mins, "\u5206\u949F");
   }
   stop() {
     if (this.timer) {
@@ -545,7 +431,7 @@ class AutoSyncManager {
       if (!ok) {
         new import_obsidian.Notice(
           "\u5FAE\u4FE1\u8BFB\u4E66 Cookie \u5DF2\u5931\u6548\uFF0C\u5B9A\u65F6\u540C\u6B65\u5DF2\u505C\u6B62\u3002\u8BF7\u91CD\u65B0\u767B\u5F55\u6216\u7C98\u8D34 Cookie\u3002",
-          1e4,
+          1e4
         );
         this.plugin.settings.autoSyncEnabled = false;
         await this.plugin.persistDisk();
@@ -559,10 +445,8 @@ class AutoSyncManager {
       this.running = false;
     }
   }
-}
-
-// 模拟阅读管理器
-class SimulatedReadingManager {
+};
+var SimulatedReadingManager = class {
   constructor(plugin) {
     this.plugin = plugin;
     this.state = "idle";
@@ -570,17 +454,16 @@ class SimulatedReadingManager {
     this.stats = { totalSent: 0, consecutiveFailures: 0, lastSent: null, todayMinutes: 0, currentBookTitle: "" };
     this.currentBook = null;
     this.bookIndex = 0;
-    // Restore persisted stats
     const persisted = plugin.diskData.simulatedReadingStats || {};
     const todayKey = this.getDateKey();
     if (persisted.todayDate === todayKey && typeof persisted.todayMinutes === "number") {
       this.stats.todayMinutes = persisted.todayMinutes;
     }
     this.todayDate = todayKey;
-    this.listeners = new Set();
+    this.listeners = /* @__PURE__ */ new Set();
   }
   getDateKey() {
-    return new Date().toISOString().slice(0, 10);
+    return (/* @__PURE__ */ new Date()).toISOString().slice(0, 10);
   }
   getStats() {
     return { ...this.stats, state: this.state, currentBook: this.currentBook };
@@ -597,17 +480,15 @@ class SimulatedReadingManager {
     if (!this.plugin.settings.simulatedReadingEnabled) return;
     const intervalSeconds = this.plugin.settings.simulatedReadingInterval || 60;
     this.state = "running";
-    // Check if it's a new day
     const nowKey = this.getDateKey();
     if (nowKey !== this.todayDate) {
       this.todayDate = nowKey;
       this.stats.todayMinutes = 0;
     }
-    // Try to pick a book immediately
     await this.pickNextBook();
-    this.timer = setInterval(() => this.tick(), intervalSeconds * 1000);
+    this.timer = setInterval(() => this.tick(), intervalSeconds * 1e3);
     this.notify();
-    console.log("[ReadFlow] 模拟阅读已启动，间隔", intervalSeconds, "秒");
+    console.log("[ReadFlow] \u6A21\u62DF\u9605\u8BFB\u5DF2\u542F\u52A8\uFF0C\u95F4\u9694", intervalSeconds, "\u79D2");
   }
   stop() {
     if (this.timer) {
@@ -618,34 +499,32 @@ class SimulatedReadingManager {
     this.currentBook = null;
     this.stats.currentBookTitle = "";
     this.notify();
-    console.log("[ReadFlow] 模拟阅读已停止");
+    console.log("[ReadFlow] \u6A21\u62DF\u9605\u8BFB\u5DF2\u505C\u6B62");
   }
   async pickNextBook() {
     const books = this.plugin.heartbeatBooks || [];
     if (!books.length) {
       this.currentBook = null;
-      this.stats.currentBookTitle = "无可选书籍（请先同步查询）";
+      this.stats.currentBookTitle = "\u65E0\u53EF\u9009\u4E66\u7C4D\uFF08\u8BF7\u5148\u540C\u6B65\u67E5\u8BE2\uFF09";
       this.notify();
       return;
     }
     const mode = this.plugin.settings.simulatedReadingBookMode || "rotate";
     let target = null;
     if (mode === "fixed") {
-      target = books[0]; // 最近阅读的书（heartbeatBooks 已按 readUpdateTime 降序）
+      target = books[0];
     } else if (mode === "random") {
       target = books[Math.floor(Math.random() * books.length)];
     } else {
-      // rotate
       target = books[this.bookIndex % books.length];
       this.bookIndex++;
     }
     this.currentBook = target;
-    this.stats.currentBookTitle = target.title || "未知";
+    this.stats.currentBookTitle = target.title || "\u672A\u77E5";
     this.notify();
-    console.log("[ReadFlow] 模拟阅读已选书:", target.title, "bookId:", target.bookId);
+    console.log("[ReadFlow] \u6A21\u62DF\u9605\u8BFB\u5DF2\u9009\u4E66:", target.title, "bookId:", target.bookId);
   }
   async tick() {
-    // Check day rollover
     const nowKey = this.getDateKey();
     if (nowKey !== this.todayDate) {
       this.todayDate = nowKey;
@@ -654,8 +533,7 @@ class SimulatedReadingManager {
     }
     const dailyTarget = this.plugin.settings.simulatedReadingDailyMinutes || 90;
     if (this.stats.todayMinutes >= dailyTarget) {
-      // Daily goal reached, stop
-      console.log("[ReadFlow] 模拟阅读今日目标已达成", this.stats.todayMinutes, "/", dailyTarget, "分钟");
+      console.log("[ReadFlow] \u6A21\u62DF\u9605\u8BFB\u4ECA\u65E5\u76EE\u6807\u5DF2\u8FBE\u6210", this.stats.todayMinutes, "/", dailyTarget, "\u5206\u949F");
       this.stop();
       return;
     }
@@ -666,13 +544,13 @@ class SimulatedReadingManager {
     const cookie = this.plugin.settings.wereadCookie;
     if (!cookie) {
       this.stop();
-      new import_obsidian.Notice("模拟阅读: Cookie 未配置，已停止");
+      new import_obsidian.Notice("\u6A21\u62DF\u9605\u8BFB: Cookie \u672A\u914D\u7F6E\uFF0C\u5DF2\u505C\u6B62");
       return;
     }
     const payload = {
       bookId: this.currentBook.bookId,
       chapterUid: 0,
-      readProgress: Math.min(100, Math.max(0, this.currentBook.readProgress || 0)),
+      readProgress: Math.min(100, Math.max(0, this.currentBook.readProgress || 0))
     };
     const result = await sendHeartbeat(cookie, payload);
     if (result.ok) {
@@ -681,28 +559,24 @@ class SimulatedReadingManager {
       this.stats.lastSent = Date.now();
       const intervalSec = this.plugin.settings.simulatedReadingInterval || 60;
       this.stats.todayMinutes += intervalSec / 60;
-      // Persist today's minutes to disk
       this.plugin.diskData.simulatedReadingStats = {
         todayDate: this.todayDate,
-        todayMinutes: this.stats.todayMinutes,
+        todayMinutes: this.stats.todayMinutes
       };
       void this.plugin.persistDisk();
-      // Pick next book occasionally (every ~30 minutes or when progress reaches 100)
-      if (this.stats.todayMinutes % 30 < (intervalSec / 60)) {
+      if (this.stats.todayMinutes % 30 < intervalSec / 60) {
         await this.pickNextBook();
       }
     } else {
       this.stats.consecutiveFailures++;
       if (result.error === "AUTH_FAILED") {
         this.stop();
-        new import_obsidian.Notice("模拟阅读认证失败，已停止");
+        new import_obsidian.Notice("\u6A21\u62DF\u9605\u8BFB\u8BA4\u8BC1\u5931\u8D25\uFF0C\u5DF2\u505C\u6B62");
       }
     }
     this.notify();
   }
-}
-
-// src/importer/weread.ts
+};
 var import_obsidian2 = require("obsidian");
 var BASE = "https://weread.qq.com";
 var IWEREAD_BASE = "https://i.weread.qq.com";
@@ -730,7 +604,7 @@ function extractBookmarkRows(json) {
     o.list,
     isJsonObject(o.data) ? o.data.updated : void 0,
     isJsonObject(o.data) ? o.data.bookmarks : void 0,
-    isJsonObject(o.bookmark) ? o.bookmark.updated : void 0,
+    isJsonObject(o.bookmark) ? o.bookmark.updated : void 0
   ];
   for (const c of lists) {
     if (Array.isArray(c)) return c;
@@ -805,7 +679,7 @@ async function fetchJsonPreferNonEmpty(cookieRef, primaryUrl, fallbackUrl, label
     const resp = await (0, import_obsidian2.requestUrl)({
       url: primaryUrl,
       method: "GET",
-      headers: buildWebGetHeaders(cookieRef.value),
+      headers: buildWebGetHeaders(cookieRef.value)
     });
     applyResponseCookies(cookieRef, resp);
     primaryJson = resp.json;
@@ -820,7 +694,7 @@ async function tryFallbackIfEmpty(cookieRef, primaryJson, fallbackUrl, label, ro
     const resp2 = await (0, import_obsidian2.requestUrl)({
       url: fallbackUrl,
       method: "GET",
-      headers: buildWebGetHeaders(cookieRef.value),
+      headers: buildWebGetHeaders(cookieRef.value)
     });
     applyResponseCookies(cookieRef, resp2);
     const alt = resp2.json;
@@ -840,7 +714,7 @@ async function fetchJsonPreferNonEmptyMulti(cookieRef, urls, label, rowCount) {
       const resp = await (0, import_obsidian2.requestUrl)({
         url: urls[i],
         method: "GET",
-        headers: buildWebGetHeaders(cookieRef.value),
+        headers: buildWebGetHeaders(cookieRef.value)
       });
       applyResponseCookies(cookieRef, resp);
       const json = resp.json;
@@ -862,15 +736,14 @@ function extractReviewWrappers(json) {
   return Array.isArray(revs) ? revs : [];
 }
 function buildWebGetHeaders(cookieRaw) {
-  const ua =
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
+  const ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
   const headers = {
     "User-Agent": ua,
     "Accept-Encoding": "gzip, deflate",
     "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
     accept: "application/json, text/plain, */*",
     Referer: "https://weread.qq.com/",
-    Origin: "https://weread.qq.com",
+    Origin: "https://weread.qq.com"
   };
   const c = cookieRaw == null ? void 0 : cookieRaw.trim();
   if (c) {
@@ -884,16 +757,13 @@ function buildJsonPostHeaders(cookieRaw) {
   return h;
 }
 function encodeCookieForMobile(cookieRaw) {
-  return cookieRaw
-    .split(";")
-    .map((part) => {
-      const idx = part.indexOf("=");
-      if (idx === -1) return part.trim();
-      const name = part.slice(0, idx).trim();
-      const value = part.slice(idx + 1).trim();
-      return `${name}=${encodeURIComponent(decodeURIComponent(value))}`;
-    })
-    .join(";");
+  return cookieRaw.split(";").map((part) => {
+    const idx = part.indexOf("=");
+    if (idx === -1) return part.trim();
+    const name = part.slice(0, idx).trim();
+    const value = part.slice(idx + 1).trim();
+    return `${name}=${encodeURIComponent(decodeURIComponent(value))}`;
+  }).join(";");
 }
 function normalizeTs(t) {
   if (!t) return Date.now();
@@ -904,7 +774,7 @@ function normalizeNotebookRow(raw) {
   var _a, _b, _c, _d, _e, _f;
   const book = raw.book;
   const bookId = String(
-    (_b = (_a = book == null ? void 0 : book.bookId) != null ? _a : raw.bookId) != null ? _b : "",
+    (_b = (_a = book == null ? void 0 : book.bookId) != null ? _a : raw.bookId) != null ? _b : ""
   ).trim();
   if (!bookId) return null;
   const title = (_c = book == null ? void 0 : book.title) != null ? _c : raw.title;
@@ -918,10 +788,7 @@ function normalizeNotebookRow(raw) {
 function titleFromBookDetail(detail) {
   var _a, _b;
   if (!detail) return void 0;
-  const t =
-    detail.title ||
-    ((_a = detail.bookInfo) == null ? void 0 : _a.title) ||
-    ((_b = detail.book) == null ? void 0 : _b.title);
+  const t = detail.title || ((_a = detail.bookInfo) == null ? void 0 : _a.title) || ((_b = detail.book) == null ? void 0 : _b.title);
   return t && String(t).trim() ? String(t).trim() : void 0;
 }
 function titleFromBookmarkPayload(bmJson) {
@@ -932,12 +799,7 @@ function titleFromBookmarkPayload(bmJson) {
 function titleFromFirstReview(rvJson) {
   var _a, _b, _c;
   const reviews = rvJson == null ? void 0 : rvJson.reviews;
-  const t =
-    (_c =
-      (_b = (_a = reviews == null ? void 0 : reviews[0]) == null ? void 0 : _a.review) == null ? void 0 : _b.book) ==
-    null
-      ? void 0
-      : _c.title;
+  const t = (_c = (_b = (_a = reviews == null ? void 0 : reviews[0]) == null ? void 0 : _a.review) == null ? void 0 : _b.book) == null ? void 0 : _c.title;
   return t && t.trim() ? t.trim() : void 0;
 }
 async function verifyWereadCookieSilent(cookieRaw) {
@@ -947,7 +809,7 @@ async function verifyWereadCookieSilent(cookieRaw) {
     const req = {
       url: `${BASE}/api/user/notebook`,
       method: "GET",
-      headers: buildWebGetHeaders(cookieRaw),
+      headers: buildWebGetHeaders(cookieRaw)
     };
     const resp = await (0, import_obsidian2.requestUrl)(req);
     if (((_a = resp.json) == null ? void 0 : _a.errcode) === -2012) return false;
@@ -961,7 +823,7 @@ async function fetchNotebookBooksRaw(cookieRef) {
   const req = {
     url: `${BASE}/api/user/notebook`,
     method: "GET",
-    headers: buildWebGetHeaders(cookieRef.value),
+    headers: buildWebGetHeaders(cookieRef.value)
   };
   const resp = await (0, import_obsidian2.requestUrl)(req);
   applyResponseCookies(cookieRef, resp);
@@ -984,7 +846,7 @@ async function refreshWereadSessionOnSite(cookieRef) {
       url: `${BASE}/`,
       method: "GET",
       throw: false,
-      headers: buildWebGetHeaders(cookieRef.value),
+      headers: buildWebGetHeaders(cookieRef.value)
     });
     applyResponseCookies(cookieRef, resp);
   } catch (e) {
@@ -996,7 +858,7 @@ async function fetchBookDetail(cookieRef, bookId) {
     const req = {
       url: `${BASE}/web/book/info?bookId=${encodeURIComponent(bookId)}`,
       method: "GET",
-      headers: buildWebGetHeaders(cookieRef.value),
+      headers: buildWebGetHeaders(cookieRef.value)
     };
     const resp = await (0, import_obsidian2.requestUrl)(req);
     applyResponseCookies(cookieRef, resp);
@@ -1012,13 +874,13 @@ async function fetchBookmarkList(cookieRef, bookId) {
     `${BASE}/web/book/bookmarklist?bookId=${bid}`,
     `${IWEREAD_BASE}/book/bookmarklist?bookId=${bid}`,
     `${BASE}/web/book/bookmarklist?bookId=${bid}&synckey=0`,
-    `${IWEREAD_BASE}/book/bookmarklist?bookId=${bid}&synckey=0`,
+    `${IWEREAD_BASE}/book/bookmarklist?bookId=${bid}&synckey=0`
   ];
   const json = await fetchJsonPreferNonEmptyMulti(
     cookieRef,
     urls,
     "bookmarklist",
-    (j) => extractBookmarkRows(j).length,
+    (j) => extractBookmarkRows(j).length
   );
   logBookmarklistIfEmpty(bookId, json);
   return json;
@@ -1035,7 +897,7 @@ function logBookmarklistIfEmpty(bookId, json) {
     keys: Object.keys(o),
     errCode: (_a = o.errCode) != null ? _a : o.errcode,
     synckey: o.synckey,
-    updatedLen: Array.isArray(o.updated) ? o.updated.length : null,
+    updatedLen: Array.isArray(o.updated) ? o.updated.length : null
   });
 }
 async function fetchReviews(cookieRef, bookId) {
@@ -1050,32 +912,32 @@ async function fetchChapterInfos(cookieRef, bookId) {
     url: `${BASE}/web/book/chapterInfos`,
     method: "POST",
     headers: buildJsonPostHeaders(cookieRef.value),
-    body: JSON.stringify({ bookIds: [bookId], synckeys: [0], teenmode: 0 }),
+    body: JSON.stringify({ bookIds: [bookId], synckeys: [0], teenmode: 0 })
   };
   const resp = await (0, import_obsidian2.requestUrl)(req);
   applyResponseCookies(cookieRef, resp);
   return resp.json;
 }
 var PUSH_NOTE_REASON_MESSAGES = {
-  missing_fields: "缺少书籍 ID 或想法正文",
-  weread_reviewId_missing: "该摘录来自微信读书但缺少 reviewId。请先执行「同步微信读书」，再在面板推送",
-  create_api_error: "微信读书拒绝新建想法（create 接口错误）",
-  api_error: "微信读书 API 返回错误",
-  "未配置微信读书 Cookie": "请先在 ReadFlow 设置中配置 Cookie 或登录",
-  缺少想法或定位信息: "请填写想法，并确保摘录带有 wereadRange 或 wereadReviewId（微信读书来源需先同步）",
+  missing_fields: "\u7F3A\u5C11\u4E66\u7C4D ID \u6216\u60F3\u6CD5\u6B63\u6587",
+  weread_reviewId_missing: "\u8BE5\u6458\u5F55\u6765\u81EA\u5FAE\u4FE1\u8BFB\u4E66\u4F46\u7F3A\u5C11 reviewId\u3002\u8BF7\u5148\u6267\u884C\u300C\u540C\u6B65\u5FAE\u4FE1\u8BFB\u4E66\u300D\uFF0C\u518D\u5728\u9762\u677F\u63A8\u9001",
+  create_api_error: "\u5FAE\u4FE1\u8BFB\u4E66\u62D2\u7EDD\u65B0\u5EFA\u60F3\u6CD5\uFF08create \u63A5\u53E3\u9519\u8BEF\uFF09",
+  api_error: "\u5FAE\u4FE1\u8BFB\u4E66 API \u8FD4\u56DE\u9519\u8BEF",
+  "\u672A\u914D\u7F6E\u5FAE\u4FE1\u8BFB\u4E66 Cookie": "\u8BF7\u5148\u5728 ReadFlow \u8BBE\u7F6E\u4E2D\u914D\u7F6E Cookie \u6216\u767B\u5F55",
+  \u7F3A\u5C11\u60F3\u6CD5\u6216\u5B9A\u4F4D\u4FE1\u606F: "\u8BF7\u586B\u5199\u60F3\u6CD5\uFF0C\u5E76\u786E\u4FDD\u6458\u5F55\u5E26\u6709 wereadRange \u6216 wereadReviewId\uFF08\u5FAE\u4FE1\u8BFB\u4E66\u6765\u6E90\u9700\u5148\u540C\u6B65\uFF09"
 };
 function formatPushNoteError(result) {
   if (!result || result.ok) return "";
-  var msg = PUSH_NOTE_REASON_MESSAGES[result.reason] || result.reason || "未知错误";
+  var msg = PUSH_NOTE_REASON_MESSAGES[result.reason] || result.reason || "\u672A\u77E5\u9519\u8BEF";
   if (result.reason === "api_error" || result.reason === "create_api_error") {
     var detail = result.detail;
     if (detail && typeof detail === "object") {
       var code = detail.errCode != null ? detail.errCode : detail.errcode;
-      if (code != null) msg += "（errCode " + code + "）";
+      if (code != null) msg += "\uFF08errCode " + code + "\uFF09";
     }
   }
   if (String(result.reason || "").startsWith("network_")) {
-    msg = "网络或请求失败（" + (result.reason || "") + "）";
+    msg = "\u7F51\u7EDC\u6216\u8BF7\u6C42\u5931\u8D25\uFF08" + (result.reason || "") + "\uFF09";
     if (result.detail && result.detail.status) msg += " HTTP " + result.detail.status;
   }
   return msg;
@@ -1086,19 +948,16 @@ function canPushHighlightToWeread(highlight) {
   return highlight.sourceType !== "weread";
 }
 function parseVaultNotePushMeta(cache) {
-  var fm = (cache && cache.frontmatter) || {};
+  var fm = cache && cache.frontmatter || {};
   var bookId = String(
-    fm["readflow-book-id"] || fm.readflow_book_id || fm.book_id || fm.bookId || "",
+    fm["readflow-book-id"] || fm.readflow_book_id || fm.book_id || fm.bookId || ""
   ).trim();
   var chapterUid = parseInt(fm["readflow-chapter-uid"] || fm.readflow_chapter_uid || 0, 10) || 0;
   var wereadRange = String(fm["readflow-weread-range"] || fm.readflow_weread_range || "").trim();
   var wereadReviewId = String(
-    fm["readflow-weread-review-id"] ||
-      fm.readflow_weread_review_id ||
-      fm.weread_review_id ||
-      "",
+    fm["readflow-weread-review-id"] || fm.readflow_weread_review_id || fm.weread_review_id || ""
   ).trim();
-  return { bookId: bookId, chapterUid: chapterUid, wereadRange: wereadRange, wereadReviewId: wereadReviewId };
+  return { bookId, chapterUid, wereadRange, wereadReviewId };
 }
 async function extractVaultNoteBodyForPush(app, file) {
   var editor = app.workspace.activeEditor && app.workspace.activeEditor.editor;
@@ -1118,32 +977,29 @@ async function pushNoteToWeread(cookieRef, highlight) {
     return { ok: false, reason: "missing_fields" };
   }
   const bookId = highlight.bookId.replace(/^weread-/, "");
-  // Weread highlight missing wereadReviewId: try to create a new review from scratch
   if (!highlight.wereadReviewId) {
     if (highlight.sourceType === "weread") {
-      // Cannot reliably push — we don't know which weread record to attach to
       return {
         ok: false,
         reason: "weread_reviewId_missing",
-        detail: "该摘录来自微信读书，请先重新同步获取 reviewId后再推送",
-        retryable: false,
+        detail: "\u8BE5\u6458\u5F55\u6765\u81EA\u5FAE\u4FE1\u8BFB\u4E66\uFF0C\u8BF7\u5148\u91CD\u65B0\u540C\u6B65\u83B7\u53D6 reviewId\u540E\u518D\u63A8\u9001",
+        retryable: false
       };
     }
-    // Manual note: try to create a brand-new review via the create endpoint
     try {
       const createBody = {
         bookId,
         chapterUid: highlight.chapterUid || 0,
         type: 1,
         content: highlight.note,
-        synckey: 0,
+        synckey: 0
       };
       if (highlight.wereadRange) createBody.range = highlight.wereadRange;
       const createResp = await (0, import_obsidian2.requestUrl)({
         url: `${BASE}/web/review/create`,
         method: "POST",
         headers: buildJsonPostHeaders(cookieRef.value),
-        body: JSON.stringify(createBody),
+        body: JSON.stringify(createBody)
       });
       applyResponseCookies(cookieRef, createResp);
       const json = createResp.json;
@@ -1157,10 +1013,12 @@ async function pushNoteToWeread(cookieRef, highlight) {
       var errInfo3 = { message: e && e.message, status, isCreateAttempt: true };
       try {
         errInfo3.body = e && typeof e.text === "string" ? e.text.slice(0, 200) : void 0;
-      } catch (_) {}
+      } catch (_) {
+      }
       try {
         errInfo3.json = e && e.json;
-      } catch (_) {}
+      } catch (_) {
+      }
       return { ok: false, reason: "network_" + (status || "unknown"), detail: errInfo3, retryable: false };
     }
   }
@@ -1169,7 +1027,7 @@ async function pushNoteToWeread(cookieRef, highlight) {
     chapterUid: highlight.chapterUid || 0,
     type: 1,
     content: highlight.note,
-    synckey: 0,
+    synckey: 0
   };
   if (highlight.wereadRange) body.range = highlight.wereadRange;
   body.reviewId = highlight.wereadReviewId;
@@ -1178,7 +1036,7 @@ async function pushNoteToWeread(cookieRef, highlight) {
   const MAX_RETRIES = 2;
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
     if (attempt > 0) {
-      const delay = Math.min(500 * Math.pow(2, attempt - 1), 4000);
+      const delay = Math.min(500 * Math.pow(2, attempt - 1), 4e3);
       await new Promise((resolve) => setTimeout(resolve, delay));
       console.log(`[ReadFlow] pushNoteToWeread retry ${attempt}/${MAX_RETRIES}`);
     }
@@ -1188,7 +1046,7 @@ async function pushNoteToWeread(cookieRef, highlight) {
         url,
         method: "POST",
         headers: buildJsonPostHeaders(cookieRef.value),
-        body: JSON.stringify(body),
+        body: JSON.stringify(body)
       });
       applyResponseCookies(cookieRef, resp);
       const json = resp.json;
@@ -1210,54 +1068,36 @@ async function pushNoteToWeread(cookieRef, highlight) {
         var errInfo = { message: e && e.message, status, url: fallbackUrl, attempts: attempt + 1 };
         try {
           errInfo.body = e && typeof e.text === "string" ? e.text.slice(0, 200) : void 0;
-        } catch (_) {}
+        } catch (_) {
+        }
         try {
           errInfo.json = e && e.json;
-        } catch (_) {}
+        } catch (_) {
+        }
         return { ok: false, reason: "network_" + (status || "unknown"), detail: errInfo, retryable: false };
       }
       console.error("[ReadFlow] pushNoteToWeread failed", e);
       var errInfo2 = { message: e && e.message, status, attempts: attempt + 1 };
       try {
         errInfo2.body = e && typeof e.text === "string" ? e.text.slice(0, 200) : void 0;
-      } catch (_) {}
+      } catch (_) {
+      }
       try {
         errInfo2.json = e && e.json;
-      } catch (_) {}
+      } catch (_) {
+      }
       return { ok: false, reason: "network_" + (status || "unknown"), detail: errInfo2, retryable: true };
     }
   }
   return { ok: false, reason: "unknown", retryable: true };
 }
-async function deleteWereadReview(cookieRef, reviewId) {
-  if (!reviewId) return { ok: false, reason: "no_reviewId" };
-  try {
-    const resp = await (0, import_obsidian2.requestUrl)({
-      url: `${BASE}/web/review/deleteReview`,
-      method: "POST",
-      headers: buildJsonPostHeaders(cookieRef.value),
-      body: JSON.stringify({ reviewId }),
-    });
-    applyResponseCookies(cookieRef, resp);
-    return { ok: !hasBlockingError(resp.json) };
-  } catch (e) {
-    console.error("[ReadFlow] deleteWereadReview failed", e);
-    return { ok: false, reason: "network" };
-  }
-}
 function stripHtml(s) {
-  return s
-    .replace(/<[^>]+>/g, "")
-    .replace(/\s+/g, " ")
-    .trim();
+  return s.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
 }
 function parseChapterMap(chapterJson) {
   var _a, _b;
   const map = {};
-  const data =
-    (_b = (_a = chapterJson == null ? void 0 : chapterJson.data) == null ? void 0 : _a[0]) == null
-      ? void 0
-      : _b.updated;
+  const data = (_b = (_a = chapterJson == null ? void 0 : chapterJson.data) == null ? void 0 : _a[0]) == null ? void 0 : _b.updated;
   if (!Array.isArray(data)) return map;
   for (const ch of data) {
     if (ch.chapterUid != null && ch.title) {
@@ -1283,23 +1123,17 @@ function extractWereadReviewPayloads(json) {
     if (!reviewId) continue;
     const type = Number((_b = rev.type) != null ? _b : 0);
     if (type !== 1 && type !== 4) continue;
-    const chapterUid =
-      typeof rev.chapterUid === "number"
-        ? rev.chapterUid
-        : typeof rev.chapterUid === "string" && /^\d+$/.test(rev.chapterUid)
-          ? parseInt(rev.chapterUid, 10)
-          : void 0;
+    const chapterUid = typeof rev.chapterUid === "number" ? rev.chapterUid : typeof rev.chapterUid === "string" && /^\d+$/.test(rev.chapterUid) ? parseInt(rev.chapterUid, 10) : void 0;
     out.push({
       reviewId,
       type,
       range: rev.range ? String(rev.range) : void 0,
       contextAbstract: rev.contextAbstract ? String(rev.contextAbstract).trim() : void 0,
-      content:
-        stripHtml(String((_d = (_c = rev.content) != null ? _c : rev.htmlContent) != null ? _d : "")).trim() || void 0,
+      content: stripHtml(String((_d = (_c = rev.content) != null ? _c : rev.htmlContent) != null ? _d : "")).trim() || void 0,
       abstract: rev.abstract ? String(rev.abstract).trim() : void 0,
       chapter: rev.chapterTitle ? String(rev.chapterTitle) : rev.chapterName ? String(rev.chapterName) : void 0,
       chapterUid,
-      createdAt: normalizeTs(Number(rev.createTime) || 0),
+      createdAt: normalizeTs(Number(rev.createTime) || 0)
     });
   }
   return out;
@@ -1325,15 +1159,7 @@ function highlightsFromBookmarks(bookId, json, reviewsByRange) {
   const out = [];
   for (const u of updated) {
     const content = String(
-      (_e =
-        (_d =
-          (_c = (_b = (_a = u.markText) != null ? _a : u.contextAbstract) != null ? _b : u.abstract) != null
-            ? _c
-            : u.text) != null
-          ? _d
-          : u.content) != null
-        ? _e
-        : "",
+      (_e = (_d = (_c = (_b = (_a = u.markText) != null ? _a : u.contextAbstract) != null ? _b : u.abstract) != null ? _c : u.text) != null ? _d : u.content) != null ? _e : ""
     ).trim();
     const range = u.range ? String(u.range) : "";
     const matchedReview = range ? reviewsByRange.get(range) : void 0;
@@ -1346,12 +1172,7 @@ function highlightsFromBookmarks(bookId, json, reviewsByRange) {
       content,
       note: matchedReview ? reviewNoteText(matchedReview) : void 0,
       chapter: u.chapterName ? String(u.chapterName) : u.chapterTitle ? String(u.chapterTitle) : void 0,
-      chapterUid:
-        typeof u.chapterUid === "number"
-          ? u.chapterUid
-          : typeof u.chapterUid === "string" && /^\d+$/.test(u.chapterUid)
-            ? parseInt(u.chapterUid, 10)
-            : void 0,
+      chapterUid: typeof u.chapterUid === "number" ? u.chapterUid : typeof u.chapterUid === "string" && /^\d+$/.test(u.chapterUid) ? parseInt(u.chapterUid, 10) : void 0,
       status: "inbox",
       importance: 3,
       createdAt: (() => {
@@ -1361,13 +1182,13 @@ function highlightsFromBookmarks(bookId, json, reviewsByRange) {
       sourceType: "weread",
       wereadRange: range || void 0,
       wereadBookmarkId: u.bookmarkId ? String(u.bookmarkId) : void 0,
-      contextAbstract: u.contextAbstract ? String(u.contextAbstract) : void 0,
+      contextAbstract: u.contextAbstract ? String(u.contextAbstract) : void 0
     });
   }
   if (updated.length > 0 && out.length === 0) {
     console.warn(
       "[ReadFlow] bookmarklist \u6709\u6761\u76EE\u4F46\u65E0\u53EF\u7528\u6B63\u6587\uFF08\u68C0\u67E5 markText/contextAbstract \u662F\u5426\u4E3A\u7A7A\uFF09",
-      updated.length,
+      updated.length
     );
   }
   return out;
@@ -1395,7 +1216,7 @@ function highlightsFromReviews(bookId, json, bookmarkRanges) {
       sourceType: "weread",
       wereadRange: rev.range || void 0,
       wereadReviewId: rev.reviewId || void 0,
-      contextAbstract: rev.contextAbstract || void 0,
+      contextAbstract: rev.contextAbstract || void 0
     });
   }
   return out;
@@ -1422,7 +1243,7 @@ function mergeHighlights(existing, incoming) {
         wereadBookmarkId: prev.wereadBookmarkId || h.wereadBookmarkId,
         wereadReviewId: prev.wereadReviewId || h.wereadReviewId,
         contextAbstract: prev.contextAbstract || h.contextAbstract,
-        createdAt: h.createdAt > 0 ? h.createdAt : prev.createdAt > 0 ? prev.createdAt : 0,
+        createdAt: h.createdAt > 0 ? h.createdAt : prev.createdAt > 0 ? prev.createdAt : 0
       });
     } else {
       map.set(h.id, h);
@@ -1434,36 +1255,16 @@ async function syncOneBook(cookieRef, bookId, existing, metaTitle, metaAuthor, m
   var _a, _b, _c, _d, _e, _f;
   const bmJson = await fetchBookmarkList(cookieRef, bookId);
   const rvJson = await fetchReviews(cookieRef, bookId);
-  const hasTitle = !!(
-    (metaTitle && metaTitle.trim() && metaTitle !== bookId) ||
-    ((_a = existing == null ? void 0 : existing.title) == null ? void 0 : _a.trim())
-  );
-  const hasAuthor = !!(
-    (metaAuthor && metaAuthor.trim()) ||
-    ((_b = existing == null ? void 0 : existing.author) == null ? void 0 : _b.trim())
-  );
+  const hasTitle = !!(metaTitle && metaTitle.trim() && metaTitle !== bookId || ((_a = existing == null ? void 0 : existing.title) == null ? void 0 : _a.trim()));
+  const hasAuthor = !!(metaAuthor && metaAuthor.trim() || ((_b = existing == null ? void 0 : existing.author) == null ? void 0 : _b.trim()));
   const detail = hasTitle && hasAuthor ? null : await fetchBookDetail(cookieRef, bookId);
   const d = detail;
-  const title =
-    (metaTitle && metaTitle.trim() && metaTitle !== bookId ? metaTitle.trim() : void 0) ||
-    (existing == null ? void 0 : existing.title) ||
-    titleFromBookDetail(d) ||
-    titleFromBookmarkPayload(bmJson) ||
-    titleFromFirstReview(rvJson) ||
-    bookId;
-  const author =
-    metaAuthor ||
-    (existing == null ? void 0 : existing.author) ||
-    (d == null ? void 0 : d.author) ||
-    ((_c = d == null ? void 0 : d.bookInfo) == null ? void 0 : _c.author) ||
-    ((_d = d == null ? void 0 : d.book) == null ? void 0 : _d.author) ||
-    "";
+  const title = (metaTitle && metaTitle.trim() && metaTitle !== bookId ? metaTitle.trim() : void 0) || (existing == null ? void 0 : existing.title) || titleFromBookDetail(d) || titleFromBookmarkPayload(bmJson) || titleFromFirstReview(rvJson) || bookId;
+  const author = metaAuthor || (existing == null ? void 0 : existing.author) || (d == null ? void 0 : d.author) || ((_c = d == null ? void 0 : d.bookInfo) == null ? void 0 : _c.author) || ((_d = d == null ? void 0 : d.book) == null ? void 0 : _d.author) || "";
   const reviewPayloads = extractWereadReviewPayloads(rvJson);
   const reviewsByRange = buildReviewNoteMap(reviewPayloads);
   const bookmarkRanges = new Set(
-    extractBookmarkRows(bmJson)
-      .map((row) => (row.range ? String(row.range) : ""))
-      .filter(Boolean),
+    extractBookmarkRows(bmJson).map((row) => row.range ? String(row.range) : "").filter(Boolean)
   );
   const bmHl = highlightsFromBookmarks(bookId, bmJson, reviewsByRange);
   const rvHl = highlightsFromReviews(bookId, rvJson, bookmarkRanges);
@@ -1475,7 +1276,7 @@ async function syncOneBook(cookieRef, bookId, existing, metaTitle, metaAuthor, m
   const cachedChapterMap = (_e = existing == null ? void 0 : existing.chapterTitleByUid) != null ? _e : {};
   let chapterTitleByUid = cachedChapterMap;
   const needsChapterMap = merged.some(
-    (h) => !h.chapter && h.chapterUid != null && !cachedChapterMap[String(h.chapterUid)],
+    (h) => !h.chapter && h.chapterUid != null && !cachedChapterMap[String(h.chapterUid)]
   );
   if (needsChapterMap) {
     const chJson = await fetchChapterInfos(cookieRef, bookId);
@@ -1498,15 +1299,14 @@ async function syncOneBook(cookieRef, bookId, existing, metaTitle, metaAuthor, m
     chapterTitleByUid,
     topicCatalog: existing == null ? void 0 : existing.topicCatalog,
     notebookNoteCount: metaNoteCount,
-    notebookReviewCount: metaReviewCount,
+    notebookReviewCount: metaReviewCount
   };
 }
 function shouldSyncBook(row, existing, forceFull) {
   var _a, _b, _c, _d;
   if (forceFull) return true;
   if (!existing) return true;
-  const hasNotebookSnapshot =
-    typeof existing.notebookNoteCount === "number" && typeof existing.notebookReviewCount === "number";
+  const hasNotebookSnapshot = typeof existing.notebookNoteCount === "number" && typeof existing.notebookReviewCount === "number";
   if (!hasNotebookSnapshot) return true;
   const nextNoteCount = (_a = row.noteCount) != null ? _a : 0;
   const nextReviewCount = (_b = row.reviewCount) != null ? _b : 0;
@@ -1524,15 +1324,13 @@ async function syncAllBooksWithNotes(cookieRef, getExisting, forceFull = false, 
   if (targets.length > 0) {
     await refreshWereadSessionOnSite(cookieRef);
   }
-  onProgress == null
-    ? void 0
-    : onProgress({
-        phase: "scan",
-        scanned: candidates.length,
-        total: targets.length,
-        synced: 0,
-        skipped: Math.max(candidates.length - targets.length, 0),
-      });
+  onProgress == null ? void 0 : onProgress({
+    phase: "scan",
+    scanned: candidates.length,
+    total: targets.length,
+    synced: 0,
+    skipped: Math.max(candidates.length - targets.length, 0)
+  });
   const out = new Array(targets.length);
   let nextIndex = 0;
   let completed = 0;
@@ -1551,20 +1349,18 @@ async function syncAllBooksWithNotes(cookieRef, getExisting, forceFull = false, 
         r.title,
         r.author,
         r.noteCount,
-        r.reviewCount,
+        r.reviewCount
       );
       out[currentIndex] = cached;
       completed++;
-      onProgress == null
-        ? void 0
-        : onProgress({
-            phase: "sync",
-            scanned: candidates.length,
-            total: targets.length,
-            synced: completed,
-            skipped,
-            title: (_a = r.title) != null ? _a : r.bookId,
-          });
+      onProgress == null ? void 0 : onProgress({
+        phase: "sync",
+        scanned: candidates.length,
+        total: targets.length,
+        synced: completed,
+        skipped,
+        title: (_a = r.title) != null ? _a : r.bookId
+      });
     }
   };
   const workers = Array.from({ length: Math.min(MAX_SYNC_CONCURRENCY, targets.length) }, () => worker());
@@ -1573,25 +1369,21 @@ async function syncAllBooksWithNotes(cookieRef, getExisting, forceFull = false, 
     books: out.filter((b) => !!b),
     scanned: candidates.length,
     synced: targets.length,
-    skipped,
+    skipped
   };
 }
-
-// src/importer/wereadMd.ts - Parse Weread plugin MD files
 function parseTimestamp(str) {
   if (!str) return Date.now();
   const d = new Date(str.replace(/\//g, "-"));
   return isNaN(d.getTime()) ? Date.now() : d.getTime();
 }
-
 function hashStr(str) {
   let h = 0;
   for (let i = 0; i < str.length; i++) {
-    h = (Math.imul(31, h) + str.charCodeAt(i)) | 0;
+    h = Math.imul(31, h) + str.charCodeAt(i) | 0;
   }
   return Math.abs(h).toString(36);
 }
-
 function genHlId(bookId, blockId, reviewId) {
   if (reviewId) return `weread-rv-${reviewId.replace(/-/g, "_")}`;
   if (blockId) {
@@ -1601,31 +1393,36 @@ function genHlId(bookId, blockId, reviewId) {
   }
   return `weread-bm-${hashStr(bookId)}`;
 }
-
 function parseFrontmatter(lines, bodyStart) {
+  var _a, _b, _c, _d, _e, _f, _g, _h;
   const fm = lines.slice(0, bodyStart).join("\n");
   return {
-    bookId: (fm.match(/(?:bookId|wereadId)[\s:]+["']?([^"'\s,]+)/i)?.[1] || "").trim(),
-    isbn: (fm.match(/isbn[\s:]+["']?([^"'\s,]+)/i)?.[1] || "").trim(),
-    lastReadDate: (fm.match(/lastReadDate[\s:]+["']?([^"'\s,]+)/i)?.[1] || "").trim(),
-    progress: parseInt(fm.match(/(?:progress|reading-progress)[\s:]+["']?(\d+)/i)?.[1] || "0", 10) || 0,
-    readingTime: (fm.match(/(?:readingTime|reading-time)[\s:]+["']?(.+?)["']?\s*$/im)?.[1] || "").trim(),
-    readingDate: (fm.match(/(?:readingDate|reading-date)[\s:]+["']?([^"'\s,]+)/i)?.[1] || "").trim(),
-    author: (fm.match(/^author[\s:]+["']?(.+?)["']?\s*$/im)?.[1] || "").trim().replace(/^["']|["']$/g, ""),
-    cover: (fm.match(/cover[\s:]+["']?([^"'\s,]+)/i)?.[1] || "").trim(),
+    bookId: (((_a = fm.match(/(?:bookId|wereadId)[\s:]+["']?([^"'\s,]+)/i)) == null ? void 0 : _a[1]) || "").trim(),
+    isbn: (((_b = fm.match(/isbn[\s:]+["']?([^"'\s,]+)/i)) == null ? void 0 : _b[1]) || "").trim(),
+    lastReadDate: (((_c = fm.match(/lastReadDate[\s:]+["']?([^"'\s,]+)/i)) == null ? void 0 : _c[1]) || "").trim(),
+    progress: parseInt(((_d = fm.match(/(?:progress|reading-progress)[\s:]+["']?(\d+)/i)) == null ? void 0 : _d[1]) || "0", 10) || 0,
+    readingTime: (((_e = fm.match(/(?:readingTime|reading-time)[\s:]+["']?(.+?)["']?\s*$/im)) == null ? void 0 : _e[1]) || "").trim(),
+    readingDate: (((_f = fm.match(/(?:readingDate|reading-date)[\s:]+["']?([^"'\s,]+)/i)) == null ? void 0 : _f[1]) || "").trim(),
+    author: (((_g = fm.match(/^author[\s:]+["']?(.+?)["']?\s*$/im)) == null ? void 0 : _g[1]) || "").trim().replace(/^["']|["']$/g, ""),
+    cover: (((_h = fm.match(/cover[\s:]+["']?([^"'\s,]+)/i)) == null ? void 0 : _h[1]) || "").trim()
   };
 }
-
 function parseHlTextToReviewId(lines, notesStart) {
-  const m = new Map();
+  const m = /* @__PURE__ */ new Map();
   if (notesStart < 0) return m;
   let ch = "";
   for (let i = notesStart; i < lines.length; i++) {
     const t = lines[i].trim();
     const cm = t.match(/^#{2,3}\s+(.+)/);
-    if (cm) { ch = cm[1].trim(); continue; }
+    if (cm) {
+      ch = cm[1].trim();
+      continue;
+    }
     const rm = t.match(/^>\s*[\uD83C\uDDED\uD83D\uDCAD\u2B50\u2606📌]\s*(.+?)\s*\^(\d{6,}[-_][A-Za-z0-9]+)/);
-    if (rm) { m.set(rm[1].trim().replace(/\s+$/, "").replace(/\s+/g, " "), { reviewId: rm[2], chapter: ch }); continue; }
+    if (rm) {
+      m.set(rm[1].trim().replace(/\s+$/, "").replace(/\s+/g, " "), { reviewId: rm[2], chapter: ch });
+      continue;
+    }
     if (t.startsWith("> ") && /[\uD83C\uDDED\uD83D\uDCAD\u2B50📌]/.test(t)) {
       for (let j = i + 1; j < Math.min(i + 5, lines.length); j++) {
         const nxt = lines[j].trim();
@@ -1642,77 +1439,71 @@ function parseHlTextToReviewId(lines, notesStart) {
   }
   return m;
 }
-
-function parseWereadBlockId(blockId) {
-  if (!blockId || !blockId.startsWith("^")) return null;
-  const inner = blockId.slice(1);
-  const parts = inner.split("-");
-  if (parts.length < 4) return null;
-  return {
-    bookId: parts[0],
-    chapterUid: parseInt(parts[1], 10) || 0,
-    start: parseInt(parts[2], 10) || 0,
-    end: parseInt(parts[3], 10) || 0,
-    range: parts.slice(1).join("-")
-  };
-}
-
 function parseWereadMdFile(content, filePath) {
+  var _a;
   const lines = content.split("\n");
-
   let bodyStart = 0;
   for (let i = 0; i < lines.length; i++) {
-    if (lines[i].trim() === "---") { bodyStart = i + 1; break; }
+    if (lines[i].trim() === "---") {
+      bodyStart = i + 1;
+      break;
+    }
   }
-
   const fm = parseFrontmatter(lines, bodyStart);
   let bookId = fm.bookId, isbn = fm.isbn;
   let finishedDate = fm.lastReadDate, author = fm.author;
   let progress = fm.progress, readingTime = fm.readingTime, readingDate = fm.readingDate, cover = fm.cover;
   let title = "";
-
   let hlSectionStart = -1, notesSectionStart = -1;
   for (let i = bodyStart; i < lines.length; i++) {
     const t = lines[i].trim();
-    if (t === "# 元数据") {
+    if (t === "# \u5143\u6570\u636E") {
       for (let j = i + 1; j < lines.length; j++) {
         const tj = lines[j].trim();
         if (tj.startsWith("#")) break;
         const abM = tj.match(/^>\s*书名[：:]\s*(.+)/);
-        if (abM) { title = abM[1].trim(); break; }
+        if (abM) {
+          title = abM[1].trim();
+          break;
+        }
         const auM = tj.match(/^>\s*作者[：:]\s*(.+)/);
-        if (auM && !author) { author = auM[1].trim(); break; }
+        if (auM && !author) {
+          author = auM[1].trim();
+          break;
+        }
       }
     }
-    if (t === "# 高亮划线") { hlSectionStart = i + 1; }
-    if (t === "# 读书笔记" || t === "# 本书评论") { notesSectionStart = i + 1; break; }
+    if (t === "# \u9AD8\u4EAE\u5212\u7EBF") {
+      hlSectionStart = i + 1;
+    }
+    if (t === "# \u8BFB\u4E66\u7B14\u8BB0" || t === "# \u672C\u4E66\u8BC4\u8BBA") {
+      notesSectionStart = i + 1;
+      break;
+    }
   }
-
   const hlTextToReviewId = parseHlTextToReviewId(lines, notesSectionStart);
-
   const highlights = [];
   let currentChapter = "";
   let currentChapterUid = 0;
   const scanStart = hlSectionStart >= 0 ? hlSectionStart : bodyStart;
-
   for (let i = scanStart; i < lines.length; i++) {
     const line = lines[i];
     const trimmed = line.trim();
-    if (trimmed === "# 读书笔记" || trimmed === "# 本书评论") break;
-
+    if (trimmed === "# \u8BFB\u4E66\u7B14\u8BB0" || trimmed === "# \u672C\u4E66\u8BC4\u8BBA") break;
     const chapM = trimmed.match(/^#{2,3}\s+(.+)/);
-    if (chapM) { currentChapter = chapM[1].trim(); continue; }
-    if (!trimmed.startsWith("> 📌")) continue;
-
+    if (chapM) {
+      currentChapter = chapM[1].trim();
+      continue;
+    }
+    if (!trimmed.startsWith("> \u{1F4CC}")) continue;
     const contentLines = [trimmed.slice(5).trim()];
     for (let k = i + 1; k < Math.min(i + 20, lines.length); k++) {
       const cl = lines[k].trim();
-      if (!cl || cl === "# 读书笔记" || cl === "# 本书评论") break;
-      if (cl.startsWith("> ⏱") || cl.startsWith("- ") || cl.startsWith("> 📌")) break;
+      if (!cl || cl === "# \u8BFB\u4E66\u7B14\u8BB0" || cl === "# \u672C\u4E66\u8BC4\u8BBA") break;
+      if (cl.startsWith("> \u23F1") || cl.startsWith("- ") || cl.startsWith("> \u{1F4CC}")) break;
       const cleaned = cl.replace(/^>\s?/, "").trim();
       if (cleaned) contentLines.push(cleaned);
     }
-
     let rawContent = contentLines.join(" ").trim();
     let blockId = "", wereadRange = "";
     if (/ \^[\w]+-[\d]+-[\d]+-[\d]+$/.test(rawContent)) {
@@ -1729,15 +1520,12 @@ function parseWereadMdFile(content, filePath) {
       }
     }
     if (!rawContent) continue;
-
     let createdAt = Date.now();
     let wereadReviewId = "";
-
     for (let j = i + 1; j < Math.min(i + 12, lines.length); j++) {
       const nxt = lines[j].trim();
       if (!nxt) continue;
-
-      if (nxt.startsWith("> ⏱")) {
+      if (nxt.startsWith("> \u23F1")) {
         const inner = nxt.slice(5).trim();
         const caretIdx = inner.lastIndexOf("^");
         if (caretIdx !== -1) {
@@ -1774,17 +1562,15 @@ function parseWereadMdFile(content, filePath) {
         const vm = nxt.match(/\^(\w+)/);
         if (vm) {
           wereadReviewId = vm[1].replace(/-/g, "_");
-          if (lines[j + 1] && lines[j + 1].trim().startsWith("- ⏱")) {
-            createdAt = parseTimestamp(lines[j + 1].trim().match(/(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})/)?.[1] || "");
+          if (lines[j + 1] && lines[j + 1].trim().startsWith("- \u23F1")) {
+            createdAt = parseTimestamp(((_a = lines[j + 1].trim().match(/(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})/)) == null ? void 0 : _a[1]) || "");
           }
         }
         continue;
       }
       break;
     }
-
     if (!bookId) continue;
-
     if (!wereadReviewId) {
       const mapped = hlTextToReviewId.get(rawContent.trimEnd());
       if (mapped) {
@@ -1792,9 +1578,7 @@ function parseWereadMdFile(content, filePath) {
         if (!currentChapter && mapped.chapter) currentChapter = mapped.chapter;
       }
     }
-
     const hlId = genHlId(bookId, blockId, wereadReviewId);
-
     highlights.push({
       id: hlId,
       bookId,
@@ -1810,12 +1594,10 @@ function parseWereadMdFile(content, filePath) {
       importance: 3
     });
   }
-
   if (!title) {
     const pathParts = filePath.replace(/\\/g, "/").split("/");
     title = pathParts[pathParts.length - 1].replace(/\.md$/i, "");
   }
-
   return {
     bookId: bookId || isbn || title,
     title,
@@ -1830,39 +1612,7 @@ function parseWereadMdFile(content, filePath) {
     meta: { isbn, bookId, finishedDate, filePath }
   };
 }
-
-// Scan vault for Weread MD files and import
-async function importBooksFromVaultMd(app, settings) {
-  const baseFolder = settings.booksBasePath || "Books";
-  const folder = app.vault.getAbstractFileByPath(baseFolder);
-  if (!folder || !(folder instanceof import_obsidian3.TFolder)) {
-    return { imported: 0, skipped: 0, errors: 0 };
-  }
-
-  const files = app.vault.getMarkdownFiles();
-  const mdFiles = files.filter(f => {
-    const p = f.path.replace(/\\/g, "/");
-    return p.startsWith(baseFolder + "/") && p.match(/\/[\u4e00-\u9fff\w-]+\.md$/);
-  });
-
-  let imported = 0, skipped = 0, errors = 0;
-
-  for (const file of mdFiles) {
-    try {
-      const content = await app.vault.read(file);
-      const parsed = parseWereadMdFile(content, file.path);
-      if (parsed.highlights.length === 0) { skipped++; continue; }
-      imported++;
-    } catch (e) {
-      errors++;
-    }
-  }
-
-  return { imported, skipped, errors };
-}
-
-// src/processor/linker.ts
-var INDEX_TTL_MS = 10 * 60 * 1000; // 10 minutes
+var INDEX_TTL_MS = 10 * 60 * 1e3;
 function tokenize(text) {
   const out = /* @__PURE__ */ new Set();
   const lower = text.toLowerCase();
@@ -1905,10 +1655,7 @@ var VaultLinker = class {
       return;
     }
     const settings = this.getSettings();
-    const ignoreLines = settings.linkerIgnorePrefixes
-      .split("\n")
-      .map((s) => s.trim().replace(/^\/+|\/+$/g, ""))
-      .filter(Boolean);
+    const ignoreLines = settings.linkerIgnorePrefixes.split("\n").map((s) => s.trim().replace(/^\/+|\/+$/g, "")).filter(Boolean);
     const maxFiles = settings.linkerMaxFiles;
     const files = this.app.vault.getMarkdownFiles();
     const picked = [];
@@ -1934,7 +1681,8 @@ var VaultLinker = class {
       if (cache == null ? void 0 : cache.frontmatter) {
         try {
           head += " " + JSON.stringify(cache.frontmatter);
-        } catch (e) {}
+        } catch (e) {
+        }
       }
       let body = "";
       try {
@@ -1967,11 +1715,7 @@ var VaultLinker = class {
     return this.lastBuild;
   }
 };
-
-// src/storage/vaultWriter.ts
 var import_obsidian3 = require("obsidian");
-
-// src/structure/tree.ts
 function parseWereadRangeStart(h) {
   if (h.wereadRange) {
     var parts = String(h.wereadRange).split("-");
@@ -2016,22 +1760,16 @@ function buildChapterTree(highlights) {
     return {
       chapter,
       chapterUid: (_a2 = hls[0]) == null ? void 0 : _a2.chapterUid,
-      highlights: [...hls].sort((a, b) => compareHighlightTime(a, b, "asc")),
+      highlights: [...hls].sort((a, b) => compareHighlightTime(a, b, "asc"))
     };
   });
 }
-
-// src/processor/knowledge.ts
 function shortLabel(text, limit = 18) {
   const oneLine = text.replace(/\s+/g, " ").trim();
   return oneLine.length > limit ? `${oneLine.slice(0, limit)}...` : oneLine;
 }
 function mermaidEscape(text) {
-  return text
-    .replace(/\n/g, " ")
-    .replace(/[()[\]{}`]/g, "")
-    .replace(/"/g, "'")
-    .trim();
+  return text.replace(/\n/g, " ").replace(/[()[\]{}`]/g, "").replace(/"/g, "'").trim();
 }
 function tokenize2(text) {
   const out = /* @__PURE__ */ new Set();
@@ -2081,22 +1819,20 @@ function summarizeTopics(book) {
     if (!topicMap.has(key)) topicMap.set(key, []);
     topicMap.get(key).push(highlight);
   }
-  return [...topicMap.entries()]
-    .map(([topic, items]) => {
-      var _a;
-      const byType = {};
-      for (const item of items) {
-        const type = item.highlightType || "\u672A\u5206\u7C7B";
-        byType[type] = ((_a = byType[type]) != null ? _a : 0) + 1;
-      }
-      return {
-        topic,
-        count: items.length,
-        byType,
-        items,
-      };
-    })
-    .sort((a, b) => b.count - a.count || a.topic.localeCompare(b.topic));
+  return [...topicMap.entries()].map(([topic, items]) => {
+    var _a;
+    const byType = {};
+    for (const item of items) {
+      const type = item.highlightType || "\u672A\u5206\u7C7B";
+      byType[type] = ((_a = byType[type]) != null ? _a : 0) + 1;
+    }
+    return {
+      topic,
+      count: items.length,
+      byType,
+      items
+    };
+  }).sort((a, b) => b.count - a.count || a.topic.localeCompare(b.topic));
 }
 function inferKnowledgeEdges(book) {
   var _a;
@@ -2109,7 +1845,7 @@ function inferKnowledgeEdges(book) {
         sourceId: source.id,
         targetId: relation.targetId,
         hint: relation.hint,
-        explicit: true,
+        explicit: true
       };
       edgeMap.set(edgeKey(edge), edge);
     }
@@ -2128,7 +1864,7 @@ function inferKnowledgeEdges(book) {
         sourceId: question.id,
         targetId: target.id,
         hint: "\u56E0\u679C",
-        explicit: false,
+        explicit: false
       });
     }
     for (const idea of ideas) {
@@ -2138,7 +1874,7 @@ function inferKnowledgeEdges(book) {
         sourceId: idea.id,
         targetId: example.id,
         hint: "\u8865\u5145",
-        explicit: false,
+        explicit: false
       });
     }
     for (const method of methods) {
@@ -2148,7 +1884,7 @@ function inferKnowledgeEdges(book) {
         sourceId: method.id,
         targetId: conclusion.id,
         hint: "\u56E0\u679C",
-        explicit: false,
+        explicit: false
       });
     }
     const ordered = [...group].sort((a, b) => a.createdAt - b.createdAt);
@@ -2160,7 +1896,7 @@ function inferKnowledgeEdges(book) {
           sourceId: prev.id,
           targetId: cur.id,
           hint: "\u91CD\u590D",
-          explicit: false,
+          explicit: false
         });
       }
     }
@@ -2175,9 +1911,7 @@ function buildTopicMindmap(book) {
     lines.push(`    ${mermaidEscape(summary.topic)}`);
     for (const [type, count] of Object.entries(summary.byType)) {
       lines.push(`      ${mermaidEscape(`${type} (${count})`)}`);
-      for (const row of summary.items
-        .filter((item) => (item.highlightType || "\u672A\u5206\u7C7B") === type)
-        .slice(0, 4)) {
+      for (const row of summary.items.filter((item) => (item.highlightType || "\u672A\u5206\u7C7B") === type).slice(0, 4)) {
         lines.push(`        ${mermaidEscape(shortLabel(row.content, 26))}`);
       }
     }
@@ -2196,9 +1930,7 @@ function parseContextAbstract(h) {
     if (idx === -1) idx = raw.indexOf(excerpt.slice(0, 20));
     if (idx === -1) idx = raw.indexOf(excerpt.slice(0, 10));
   }
-  var before = "",
-    main = "",
-    after = "";
+  var before = "", main = "", after = "";
   if (idx !== -1) {
     before = raw.slice(0, idx).trim();
     main = excerpt;
@@ -2208,14 +1940,14 @@ function parseContextAbstract(h) {
     before = "";
     after = raw.slice(120);
   }
-  if (before.length > 300) before = "…" + before.slice(-280);
-  if (after.length > 300) after = after.slice(0, 280) + "…";
+  if (before.length > 300) before = "\u2026" + before.slice(-280);
+  if (after.length > 300) after = after.slice(0, 280) + "\u2026";
   return {
     before: before || null,
     main: main || raw.slice(0, 100),
     after: after || null,
     chapter: h.chapter || null,
-    wereadRange: h.wereadRange || null,
+    wereadRange: h.wereadRange || null
   };
 }
 function buildRelationsMermaid(book) {
@@ -2230,7 +1962,7 @@ function buildRelationsMermaid(book) {
     const sourceNode = `h_${source.id.replace(/[^a-zA-Z0-9_]/g, "_")}`;
     const targetNode = `h_${target.id.replace(/[^a-zA-Z0-9_]/g, "_")}`;
     lines.push(
-      `${sourceNode}["${mermaidEscape(shortLabel(source.content))}"] -->|${edge.hint}${edge.explicit ? "" : "\xB7\u63A8\u65AD"}| ${targetNode}["${mermaidEscape(shortLabel(target.content))}"]`,
+      `${sourceNode}["${mermaidEscape(shortLabel(source.content))}"] -->|${edge.hint}${edge.explicit ? "" : "\xB7\u63A8\u65AD"}| ${targetNode}["${mermaidEscape(shortLabel(target.content))}"]`
     );
   }
   lines.push("```");
@@ -2257,7 +1989,7 @@ ${rows.map((row) => `- ${row.content.slice(0, 100)}${row.content.length > 100 ? 
     render("\u5173\u952E\u65B9\u6CD5", pick("method", 4)),
     render("\u91CD\u8981\u4F8B\u5B50", pick("example", 4)),
     render("\u5173\u952E\u7ED3\u8BBA", pick("conclusion", 4)),
-    render("\u5F85\u89E3\u95EE\u9898", pick("question", 4)),
+    render("\u5F85\u89E3\u95EE\u9898", pick("question", 4))
   ].join("\n");
 }
 function buildTopicStructure(book) {
@@ -2275,8 +2007,6 @@ function buildTopicStructure(book) {
   }
   return lines.join("\n");
 }
-
-// src/processor/mindmap.ts
 function buildBookMindMapTree(scopeBook) {
   var _a;
   var topics = summarizeTopics(scopeBook);
@@ -2289,7 +2019,7 @@ function buildBookMindMapTree(scopeBook) {
     exp: true,
     ch: [],
     _x: 0,
-    _y: 0,
+    _y: 0
   };
   for (var ti = 0; ti < Math.min(topics.length, 15); ti++) {
     var s = topics[ti];
@@ -2302,7 +2032,7 @@ function buildBookMindMapTree(scopeBook) {
       exp: ti < 4,
       ch: [],
       _x: 0,
-      _y: 0,
+      _y: 0
     };
     var byType = {};
     for (var i = 0; i < s.items.length; i++) {
@@ -2311,7 +2041,7 @@ function buildBookMindMapTree(scopeBook) {
       if (!byType[tp]) byType[tp] = [];
       byType[tp].push(item);
     }
-    var ents = Object.entries(byType).sort(function (a, b) {
+    var ents = Object.entries(byType).sort(function(a, b) {
       return b[1].length - a[1].length;
     });
     for (var ei = 0; ei < ents.length; ei++) {
@@ -2327,7 +2057,7 @@ function buildBookMindMapTree(scopeBook) {
         exp: false,
         ch: [],
         _x: 0,
-        _y: 0,
+        _y: 0
       };
       for (var hi = 0; hi < Math.min(items.length, 8); hi++) {
         var h = items[hi];
@@ -2342,14 +2072,14 @@ function buildBookMindMapTree(scopeBook) {
           ch: [],
           _x: 0,
           _y: 0,
-          srcId: h.id,
+          srcId: h.id
         });
       }
       if (gn.ch.length > 0) tn.ch.push(gn);
     }
     root.ch.push(tn);
   }
-  var uncat = scopeBook.highlights.filter(function (h2) {
+  var uncat = scopeBook.highlights.filter(function(h2) {
     return !(h2.topic || "").trim();
   });
   if (uncat.length > 0 && uncat.length <= 60) {
@@ -2362,7 +2092,7 @@ function buildBookMindMapTree(scopeBook) {
       exp: false,
       ch: [],
       _x: 0,
-      _y: 0,
+      _y: 0
     };
     for (var ui = 0; ui < Math.min(uncat.length, 12); ui++) {
       var uh = uncat[ui];
@@ -2377,15 +2107,12 @@ function buildBookMindMapTree(scopeBook) {
         ch: [],
         _x: 0,
         _y: 0,
-        srcId: uh.id,
+        srcId: uh.id
       });
     }
     root.ch.push(un);
   }
   return root;
-}
-function buildMindMapTree(scopeBook) {
-  return buildBookMindMapTree(scopeBook);
 }
 function sortDirArrow(dir) {
   return dir === "asc" ? "\u2191" : "\u2193";
@@ -2396,56 +2123,56 @@ var MINDMAP_MODE_META = {
     desc: "\u6309\u4E3B\u9898\u4E0E\u7C7B\u578B\u6D4F\u89C8\u5168\u4E66\u6458\u5F55",
     base: "book",
     view: "tree",
-    lens: "all",
+    lens: "all"
   },
   topic: {
     label: "\u4E3B\u9898\u805A\u7891",
     desc: "\u805A\u7126\u5355\u4E2A\u4E3B\u9898\u4E0B\u7684\u6458\u5F55",
     base: "topic",
     view: "tree",
-    lens: "all",
+    lens: "all"
   },
   people: {
     label: "\u4EBA\u7269\u5173\u7CFB",
     desc: "\u4EBA\u540D\u5B9E\u4F53\u3001\u5171\u73B0\u4E0E\u624B\u52A8\u5173\u7CFB",
     base: "entity",
     view: "graph",
-    lens: "people",
+    lens: "people"
   },
   ideas: {
     label: "\u89C2\u70B9\u68B3\u7406",
     desc: "\u5DF2\u5206\u7C7B\u89C2\u70B9 + \u5F85\u5206\u7C7B\u6458\u5F55",
     base: "book",
     view: "tree",
-    lens: "ideas",
+    lens: "ideas"
   },
   narrative: {
     label: "\u5E8F\u4E8B\u8109\u7EDC",
     desc: "\u6309\u7AE0\u8282\u68B3\u7406\u4EBA\u7269\u51FA\u573A\u4E0E\u60C5\u8282\u6458\u5F55",
     base: "book",
     view: "timeline",
-    lens: "narrative",
-  },
+    lens: "narrative"
+  }
 };
 var WORKBENCH_META = {
   ideas: {
     label: "\u89C2\u70B9\u68B3\u7406",
     desc: "\u4E3B\u9898\u3001\u7C7B\u578B\u4E0E\u89C2\u70B9\u7C7B\u6458\u5F55",
     modes: ["ideas", "structure", "topic"],
-    defaultMode: "ideas",
+    defaultMode: "ideas"
   },
   people: {
     label: "\u4EBA\u7269\u5173\u7CFB",
     desc: "\u4EBA\u540D\u5B9E\u4F53\u3001\u5171\u73B0\u4E0E\u624B\u52A8\u5173\u7CFB",
     modes: ["people"],
-    defaultMode: "people",
+    defaultMode: "people"
   },
   narrative: {
     label: "\u5E8F\u4E8B\u8109\u7EDC",
     desc: "\u6309\u7AE0\u8282\u68B3\u7406\u4EBA\u7269\u51FA\u573A\u4E0E\u60C5\u8282",
     modes: ["narrative"],
-    defaultMode: "narrative",
-  },
+    defaultMode: "narrative"
+  }
 };
 function workbenchForMode(mode) {
   for (var wbId of Object.keys(WORKBENCH_META)) {
@@ -2539,8 +2266,8 @@ function resolveEntityDisplayName(ent, items) {
   var best = null;
   var bestCount = -1;
   var bestLen = Infinity;
-  freq.forEach(function (count, text) {
-    if (count > bestCount || (count === bestCount && text.length < bestLen)) {
+  freq.forEach(function(count, text) {
+    if (count > bestCount || count === bestCount && text.length < bestLen) {
       bestCount = count;
       bestLen = text.length;
       best = text;
@@ -2550,9 +2277,6 @@ function resolveEntityDisplayName(ent, items) {
 }
 function entityCanonicalKey(raw) {
   return entityDisplayLabel(raw).toLowerCase();
-}
-function entityEntId(name) {
-  return "ent:" + entityDisplayLabel(name);
 }
 function collectPersonEntries(scopeBook) {
   var seen = /* @__PURE__ */ new Set();
@@ -2565,13 +2289,13 @@ function collectPersonEntries(scopeBook) {
     seen.add(ck);
     entries.push({ value: name, text: name, tag: s.label });
   }
-  return entries.sort(function (a, b) {
+  return entries.sort(function(a, b) {
     return a.text.localeCompare(b.text, "zh-CN");
   });
 }
 function buildEntityAliasMap(book) {
   var map = /* @__PURE__ */ new Map();
-  var raw = (book && book.entityAliases) || {};
+  var raw = book && book.entityAliases || {};
   for (var canon of Object.keys(raw)) {
     var canonKey = entityCanonicalKey(canon);
     map.set(canonKey, canonKey);
@@ -2591,7 +2315,7 @@ function resolveEntityCanonKey(name, aliasMap) {
 }
 function entityEntIdForGraph(name, aliasMap, lookup) {
   var canonKey = resolveEntityCanonKey(name, aliasMap);
-  var label = (lookup && lookup.get(canonKey)) || entityDisplayLabel(name);
+  var label = lookup && lookup.get(canonKey) || entityDisplayLabel(name);
   return "ent:" + label;
 }
 function highlightByIdMap(book) {
@@ -2609,7 +2333,7 @@ function relationAnchorMeta(book, sinceHighlightId) {
     highlightId: sinceHighlightId,
     chapterUid: hl.chapterUid || 0,
     chapter: chapterLabel(hl),
-    excerpt: shortLabel(hl.content, 28),
+    excerpt: shortLabel(hl.content, 28)
   };
 }
 function newPlotEventId() {
@@ -2627,11 +2351,9 @@ function inferEntityCooccurrenceSuggestions(scopeBook) {
   var pairMap = /* @__PURE__ */ new Map();
   for (var i = 0; i < scopeBook.highlights.length; i++) {
     var h = scopeBook.highlights[i];
-    var ents = (h.entities || [])
-      .map(function (e) {
-        return entityDisplayLabel(e);
-      })
-      .filter(Boolean);
+    var ents = (h.entities || []).map(function(e) {
+      return entityDisplayLabel(e);
+    }).filter(Boolean);
     for (var a2 = 0; a2 < ents.length; a2++) {
       for (var b2 = a2 + 1; b2 < ents.length; b2++) {
         var ak = entityCanonicalKey(ents[a2]);
@@ -2645,7 +2367,7 @@ function inferEntityCooccurrenceSuggestions(scopeBook) {
             count: 0,
             highlights: [],
             sinceHighlightId: h.id,
-            chapterUid: h.chapterUid || 0,
+            chapterUid: h.chapterUid || 0
           });
         }
         var row = pairMap.get(key);
@@ -2655,19 +2377,16 @@ function inferEntityCooccurrenceSuggestions(scopeBook) {
       }
     }
   }
-  return [...pairMap.values()]
-    .filter(function (p) {
-      var ak3 = entityCanonicalKey(p.source);
-      var bk3 = entityCanonicalKey(p.target);
-      return !existing.has(ak3 + "|" + bk3) && !existing.has(bk3 + "|" + ak3);
-    })
-    .sort(function (x, y) {
-      return y.count - x.count || x.source.localeCompare(y.source, "zh-CN");
-    })
-    .slice(0, 12);
+  return [...pairMap.values()].filter(function(p) {
+    var ak3 = entityCanonicalKey(p.source);
+    var bk3 = entityCanonicalKey(p.target);
+    return !existing.has(ak3 + "|" + bk3) && !existing.has(bk3 + "|" + ak3);
+  }).sort(function(x, y) {
+    return y.count - x.count || x.source.localeCompare(y.source, "zh-CN");
+  }).slice(0, 12);
 }
 function inferBookWorkbenchProfile(book) {
-  var highlights = (book && book.highlights) || [];
+  var highlights = book && book.highlights || [];
   var total = highlights.length;
   if (total === 0) {
     return { workbench: "ideas", confidence: 0, label: WORKBENCH_META.ideas.label, reason: "\u6682\u65E0\u6458\u5F55" };
@@ -2688,23 +2407,23 @@ function inferBookWorkbenchProfile(book) {
     if (chapterCount >= 3 && entityRatio >= 0.2) {
       return {
         workbench: "narrative",
-        confidence: Math.min(1, entityRatio + (chapterCount / total) * 0.2),
+        confidence: Math.min(1, entityRatio + chapterCount / total * 0.2),
         label: WORKBENCH_META.narrative.label,
-        reason: withEntities + " \u6761\u542B\u4EBA\u7269\u6807\u7B7E\uFF0C" + chapterCount + " \u4E2A\u7AE0\u8282 \u2014 \u9002\u5408\u5E8F\u4E8B\u8109\u7EDC",
+        reason: withEntities + " \u6761\u542B\u4EBA\u7269\u6807\u7B7E\uFF0C" + chapterCount + " \u4E2A\u7AE0\u8282 \u2014 \u9002\u5408\u5E8F\u4E8B\u8109\u7EDC"
       };
     }
     return {
       workbench: "people",
       confidence: entityRatio,
       label: WORKBENCH_META.people.label,
-      reason: withEntities + " \u6761\u542B\u4EBA\u7269\u6807\u7B7E \u2014 \u9002\u5408\u4EBA\u7269\u5173\u7CFB",
+      reason: withEntities + " \u6761\u542B\u4EBA\u7269\u6807\u7B7E \u2014 \u9002\u5408\u4EBA\u7269\u5173\u7CFB"
     };
   }
   return {
     workbench: "ideas",
     confidence: Math.max(0.35, ideaRatio || 0.5),
     label: WORKBENCH_META.ideas.label,
-    reason: withIdeas + " \u6761\u5DF2\u5206\u7C7B\u89C2\u70B9 \u2014 \u9002\u5408\u89C2\u70B9\u68B3\u7406",
+    reason: withIdeas + " \u6761\u5DF2\u5206\u7C7B\u89C2\u70B9 \u2014 \u9002\u5408\u89C2\u70B9\u68B3\u7406"
   };
 }
 function maybeApplyBookWorkbenchProfile(view, book) {
@@ -2726,12 +2445,12 @@ function maybeApplyBookWorkbenchProfile(view, book) {
 function applyMindMapLens(highlights, lens) {
   if (!lens || lens === "all") return highlights;
   if (lens === "people") {
-    return highlights.filter(function (h) {
-      return ((h.entities || []).length) > 0;
+    return highlights.filter(function(h) {
+      return (h.entities || []).length > 0;
     });
   }
   if (lens === "ideas") {
-    return highlights.filter(function (h) {
+    return highlights.filter(function(h) {
       if (!h.highlightType) return true;
       return !!MINDMAP_IDEA_TYPES[h.highlightType];
     });
@@ -2749,10 +2468,10 @@ function chapterLabel(h) {
   return (h.chapter || "").trim() || "(\u672A\u5206\u7AE0)";
 }
 function relationEdgeHint(er, book) {
-  var hint = (er && er.hint) || "\u5173\u7CFB";
+  var hint = er && er.hint || "\u5173\u7CFB";
   var anchor = relationAnchorMeta(book, er && er.sinceHighlightId);
   if (anchor && anchor.chapter && anchor.chapter !== "(\u672A\u5206\u7AE0)") {
-    return hint + "\u00B7" + shortLabel(anchor.chapter, 8);
+    return hint + "\xB7" + shortLabel(anchor.chapter, 8);
   }
   return hint;
 }
@@ -2769,11 +2488,11 @@ function buildNarrativeTimelineModel(scopeBook, book) {
         key: ck,
         label: chapterLabel(h0),
         sortKey: chapterSortKey(h0),
-        highlights: [],
+        highlights: []
       });
     }
   }
-  chapterOrder.sort(function (a, b) {
+  chapterOrder.sort(function(a, b) {
     return a.sortKey - b.sortKey || a.label.localeCompare(b.label, "zh-CN");
   });
   var chapterMap = /* @__PURE__ */ new Map();
@@ -2791,7 +2510,7 @@ function buildNarrativeTimelineModel(scopeBook, book) {
   var rows = [];
   for (var pi = 0; pi < people.length; pi++) {
     var st = people[pi];
-    var cells = chapterOrder.map(function () {
+    var cells = chapterOrder.map(function() {
       return [];
     });
     for (var ii = 0; ii < st.items.length; ii++) {
@@ -2803,30 +2522,30 @@ function buildNarrativeTimelineModel(scopeBook, book) {
     rows.push({
       label: st.displayName || entityDisplayLabel(st.label),
       canonical: entityCanonicalKey(st.label),
-      cells: cells,
+      cells
     });
   }
-  var untaggedCells = chapterOrder.map(function () {
+  var untaggedCells = chapterOrder.map(function() {
     return [];
   });
   for (var ui = 0; ui < scopeBook.highlights.length; ui++) {
     var uh = scopeBook.highlights[ui];
-    if ((uh.entities || []).some(function (e) {
+    if ((uh.entities || []).some(function(e) {
       return String(e || "").trim();
     })) continue;
     var uKey = chapterLabel(uh) + "|" + chapterSortKey(uh);
     var uch = chapterMap.get(uKey);
     if (uch) untaggedCells[uch.index].push(uh);
   }
-  if (untaggedCells.some(function (c) {
+  if (untaggedCells.some(function(c) {
     return c.length > 0;
   })) {
     rows.push({ label: "\u672A\u6807\u6CE8\u6458\u5F55", canonical: "__untagged__", cells: untaggedCells, muted: true });
   }
-  var plotEvents = (book && book.plotEvents) || [];
+  var plotEvents = book && book.plotEvents || [];
   if (plotEvents.length > 0) {
     var hlMap = highlightByIdMap(scopeBook);
-    var plotCells = chapterOrder.map(function () {
+    var plotCells = chapterOrder.map(function() {
       return [];
     });
     for (var pei = 0; pei < plotEvents.length; pei++) {
@@ -2838,20 +2557,20 @@ function buildNarrativeTimelineModel(scopeBook, book) {
       var pCol = chapterMap.get(pKey);
       if (pCol) plotCells[pCol.index].push({ highlight: phl, plot: pe });
     }
-    if (plotCells.some(function (c) {
+    if (plotCells.some(function(c) {
       return c.length > 0;
     })) {
       rows.push({ label: "\u60C5\u8282\u7EBF", canonical: "__plot__", cells: plotCells, plot: true });
     }
   }
-  return { chapters: chapterOrder, rows: rows, lookup: lookup };
+  return { chapters: chapterOrder, rows, lookup };
 }
 function renderNarrativeTimeline(container, book, scopeBook, opts) {
   var model = buildNarrativeTimelineModel(scopeBook, book);
   if (model.chapters.length === 0) {
     container.createEl("p", {
       text: "\u6682\u65E0\u7AE0\u8282\u6570\u636E\u3002\u540C\u6B65\u6216\u624B\u52A8\u6458\u5F55\u540E\u518D\u8BD5\u3002",
-      cls: "readflow-muted",
+      cls: "readflow-muted"
     });
     return null;
   }
@@ -2868,13 +2587,13 @@ function renderNarrativeTimeline(container, book, scopeBook, opts) {
     chHead.createEl("span", { text: shortLabel(model.chapters[ci2].label, 10), cls: "readflow-narrative-col-title" });
     chHead.createEl("span", {
       text: String(model.chapters[ci2].highlights.length),
-      cls: "readflow-narrative-col-count",
+      cls: "readflow-narrative-col-count"
     });
   }
   if (model.rows.length === 0) {
     wrap.createEl("p", {
       text: "\u6682\u65E0\u4EBA\u7269\u6807\u7B7E\u3002\u5728\u6458\u5F55\u4E2D\u6DFB\u52A0\u5B9E\u4F53\u6807\u7B7E\u540E\u53EF\u5728\u6B64\u67E5\u770B\u51FA\u573A\u65F6\u95F4\u7EBF\u3002",
-      cls: "readflow-muted",
+      cls: "readflow-muted"
     });
     return null;
   }
@@ -2897,16 +2616,16 @@ function renderNarrativeTimeline(container, book, scopeBook, opts) {
         var chip = cell.createEl("button", {
           type: "button",
           text: shortLabel(plotHint || hl.content, 14),
-          cls: row.plot ? "readflow-narrative-chip readflow-narrative-chip--plot" : "readflow-narrative-chip",
+          cls: row.plot ? "readflow-narrative-chip readflow-narrative-chip--plot" : "readflow-narrative-chip"
         });
         chip.title = plotHint ? plotHint + "\n" + hl.content : hl.content;
-        chip.addEventListener("click", function (id) {
-          return function (e) {
+        chip.addEventListener("click", /* @__PURE__ */ (function(id) {
+          return function(e) {
             e.preventDefault();
             e.stopPropagation();
             if (opts && typeof opts.onHighlightSelect === "function") opts.onHighlightSelect(id);
           };
-        }(hl.id));
+        })(hl.id));
       }
       if (items.length > 3) {
         cell.createSpan({ text: "+" + (items.length - 3), cls: "readflow-narrative-more" });
@@ -2916,16 +2635,16 @@ function renderNarrativeTimeline(container, book, scopeBook, opts) {
   return wrap;
 }
 function scopedBookForMindMap(scopeBook, opts) {
-  var lens = (opts && opts.lens) || "all";
+  var lens = opts && opts.lens || "all";
   return {
     title: scopeBook.title,
-    highlights: applyMindMapLens(scopeBook.highlights, lens),
+    highlights: applyMindMapLens(scopeBook.highlights, lens)
   };
 }
 function appendEntityLeaves(en, st, ei) {
   for (var hi = 0; hi < Math.min(st.items.length, 10); hi++) {
     var h = st.items[hi];
-    var co = (h.entities || []).filter(function (e) {
+    var co = (h.entities || []).filter(function(e) {
       return e.trim() && entityCanonicalKey(e) !== entityCanonicalKey(st.label);
     });
     var coText = co.length ? "\n\u5171\u73B0: " + co.map(entityDisplayLabel).join("\u3001") : "";
@@ -2940,7 +2659,7 @@ function appendEntityLeaves(en, st, ei) {
       ch: [],
       _x: 0,
       _y: 0,
-      srcId: h.id,
+      srcId: h.id
     });
   }
 }
@@ -2948,8 +2667,8 @@ function buildTopicMindMapTree(scopeBook, topicName) {
   var _a;
   var key = (topicName || "").trim();
   if (!key) return buildBookMindMapTree(scopeBook);
-  var items = scopeBook.highlights.filter(function (h) {
-    var t = (h.topic || "").trim() || "\u672A\u5F52\u7C7B";
+  var items = scopeBook.highlights.filter(function(h2) {
+    var t = (h2.topic || "").trim() || "\u672A\u5F52\u7C7B";
     return t === key;
   });
   var root = {
@@ -2961,7 +2680,7 @@ function buildTopicMindMapTree(scopeBook, topicName) {
     exp: true,
     ch: [],
     _x: 0,
-    _y: 0,
+    _y: 0
   };
   if (items.length === 0) return root;
   var byType = {};
@@ -2971,7 +2690,7 @@ function buildTopicMindMapTree(scopeBook, topicName) {
     if (!byType[tp]) byType[tp] = [];
     byType[tp].push(item);
   }
-  var ents = Object.entries(byType).sort(function (a, b) {
+  var ents = Object.entries(byType).sort(function(a, b) {
     return b[1].length - a[1].length;
   });
   for (var ei = 0; ei < ents.length; ei++) {
@@ -2987,7 +2706,7 @@ function buildTopicMindMapTree(scopeBook, topicName) {
       exp: ei < 3,
       ch: [],
       _x: 0,
-      _y: 0,
+      _y: 0
     };
     for (var hi = 0; hi < Math.min(typeItems.length, 12); hi++) {
       var h = typeItems[hi];
@@ -3002,7 +2721,7 @@ function buildTopicMindMapTree(scopeBook, topicName) {
         ch: [],
         _x: 0,
         _y: 0,
-        srcId: h.id,
+        srcId: h.id
       });
     }
     if (gn.ch.length > 0) root.ch.push(gn);
@@ -3012,24 +2731,19 @@ function buildTopicMindMapTree(scopeBook, topicName) {
 function buildIdeaMindMapTree(scopeBook) {
   var _a;
   var items = scopeBook.highlights;
-  var untypedCount = items.filter(function (h) {
-    return !h.highlightType;
+  var untypedCount = items.filter(function(h2) {
+    return !h2.highlightType;
   }).length;
   var root = {
     id: "__mm_root",
     label: shortLabel("\u89C2\u70B9\u68B3\u7406", 20),
-    full:
-      "\u89C2\u70B9\u68B3\u7406\uFF08" +
-      items.length +
-      "\u6761" +
-      (untypedCount ? "\uFF0C" + untypedCount + "\u6761\u5F85\u5206\u7C7B" : "") +
-      "\uFF09",
+    full: "\u89C2\u70B9\u68B3\u7406\uFF08" + items.length + "\u6761" + (untypedCount ? "\uFF0C" + untypedCount + "\u6761\u5F85\u5206\u7C7B" : "") + "\uFF09",
     ntype: "root",
     htype: null,
     exp: true,
     ch: [],
     _x: 0,
-    _y: 0,
+    _y: 0
   };
   if (items.length === 0) return root;
   var byType = {};
@@ -3038,7 +2752,7 @@ function buildIdeaMindMapTree(scopeBook) {
     if (!byType[tp]) byType[tp] = [];
     byType[tp].push(items[i]);
   }
-  var ents = Object.entries(byType).sort(function (a, b) {
+  var ents = Object.entries(byType).sort(function(a, b) {
     if (a[0] === "\u5F85\u5206\u7C7B") return -1;
     if (b[0] === "\u5F85\u5206\u7C7B") return 1;
     return b[1].length - a[1].length;
@@ -3056,7 +2770,7 @@ function buildIdeaMindMapTree(scopeBook) {
       exp: ei < 4,
       ch: [],
       _x: 0,
-      _y: 0,
+      _y: 0
     };
     for (var hi = 0; hi < Math.min(typeItems.length, 12); hi++) {
       var h = typeItems[hi];
@@ -3071,7 +2785,7 @@ function buildIdeaMindMapTree(scopeBook) {
         ch: [],
         _x: 0,
         _y: 0,
-        srcId: h.id,
+        srcId: h.id
       });
     }
     if (gn.ch.length > 0) root.ch.push(gn);
@@ -3080,7 +2794,7 @@ function buildIdeaMindMapTree(scopeBook) {
 }
 function collectEntityStats(scopeBook) {
   var map = /* @__PURE__ */ new Map();
-  var addEntStat = function (ent) {
+  var addEntStat = function(ent) {
     var tag = String(ent || "").trim();
     if (!tag) return;
     var ck = entityCanonicalKey(tag);
@@ -3105,7 +2819,7 @@ function collectEntityStats(scopeBook) {
   for (var _v of map.values()) {
     _v.displayName = resolveEntityDisplayName(_v.label, _v.items);
   }
-  return [...map.values()].sort(function (a, b) {
+  return [...map.values()].sort(function(a, b) {
     return b.items.length - a.items.length || a.displayName.localeCompare(b.displayName, "zh-CN");
   });
 }
@@ -3119,7 +2833,7 @@ function buildEntityLabelLookup(scopeBook) {
 }
 function entityGraphLabel(name, lookup) {
   var ck = entityCanonicalKey(name);
-  return (lookup && lookup.get(ck)) || entityDisplayLabel(name);
+  return lookup && lookup.get(ck) || entityDisplayLabel(name);
 }
 function appendManualEntityRelationNodes(root, entityRelations, lookup) {
   if (!entityRelations || !entityRelations.length) return;
@@ -3132,7 +2846,7 @@ function appendManualEntityRelationNodes(root, entityRelations, lookup) {
     exp: true,
     ch: [],
     _x: 0,
-    _y: 0,
+    _y: 0
   };
   for (var ri = 0; ri < Math.min(entityRelations.length, 24); ri++) {
     var rel = entityRelations[ri];
@@ -3141,7 +2855,7 @@ function appendManualEntityRelationNodes(root, entityRelations, lookup) {
     var tgtLabel = entityGraphLabel(rel.target, lookup);
     relRoot.ch.push({
       id: "__mm_mrel_" + ri,
-      label: shortLabel(srcLabel + " \u00B7 " + (rel.hint || "\u5173\u7CFB") + " \u00B7 " + tgtLabel, 18),
+      label: shortLabel(srcLabel + " \xB7 " + (rel.hint || "\u5173\u7CFB") + " \xB7 " + tgtLabel, 18),
       full: srcLabel + " \u2194 " + tgtLabel + "\n" + (rel.hint || "\u5173\u7CFB"),
       ntype: "leaf",
       htype: null,
@@ -3149,7 +2863,7 @@ function appendManualEntityRelationNodes(root, entityRelations, lookup) {
       exp: false,
       ch: [],
       _x: 0,
-      _y: 0,
+      _y: 0
     });
   }
   if (relRoot.ch.length > 0) root.ch.push(relRoot);
@@ -3159,22 +2873,20 @@ function buildEntityMindMapTree(scopeBook, focusEntity, groupByRole, entityRelat
   var focus = (focusEntity || "").trim();
   if (focus) {
     var fl = entityCanonicalKey(focus);
-    stats = stats.filter(function (s) {
+    stats = stats.filter(function(s) {
       return entityCanonicalKey(s.label) === fl || s.label === focus || s.label.toLowerCase() === focus.toLowerCase();
     });
   }
   var root = {
     id: "__mm_root",
     label: shortLabel(focus || (groupByRole ? "\u4EBA\u7269\u5173\u7CFB" : "\u5B9E\u4F53\u5173\u7CFB"), 20),
-    full: focus
-      ? focus + " \u5B9E\u4F53\u7F51\u7EDC"
-      : (groupByRole ? "\u4EBA\u7269\u5173\u7CFB" : "\u5B9E\u4F53\u5173\u7CFB") + "\uFF08" + stats.length + "\u4E2A\u5B9E\u4F53\uFF09",
+    full: focus ? focus + " \u5B9E\u4F53\u7F51\u7EDC" : (groupByRole ? "\u4EBA\u7269\u5173\u7CFB" : "\u5B9E\u4F53\u5173\u7CFB") + "\uFF08" + stats.length + "\u4E2A\u5B9E\u4F53\uFF09",
     ntype: "root",
     htype: null,
     exp: true,
     ch: [],
     _x: 0,
-    _y: 0,
+    _y: 0
   };
   if (groupByRole) {
     var lookup = buildEntityLabelLookup(scopeBook);
@@ -3186,7 +2898,7 @@ function buildEntityMindMapTree(scopeBook, focusEntity, groupByRole, entityRelat
       if (!roleMap.has(roleKey)) roleMap.set(roleKey, []);
       roleMap.get(roleKey).push({ parsed: parsed0, stat: st0 });
     }
-    var roleEntries = [...roleMap.entries()].sort(function (a, b) {
+    var roleEntries = [...roleMap.entries()].sort(function(a, b) {
       if (a[0] === "\u672A\u6807\u6CE8") return 1;
       if (b[0] === "\u672A\u6807\u6CE8") return -1;
       return b[1].length - a[1].length || a[0].localeCompare(b[0], "zh-CN");
@@ -3204,7 +2916,7 @@ function buildEntityMindMapTree(scopeBook, focusEntity, groupByRole, entityRelat
         exp: ri < 3,
         ch: [],
         _x: 0,
-        _y: 0,
+        _y: 0
       };
       for (var pi = 0; pi < Math.min(roleItems.length, 15); pi++) {
         var pack = roleItems[pi];
@@ -3212,13 +2924,13 @@ function buildEntityMindMapTree(scopeBook, focusEntity, groupByRole, entityRelat
         var pn = {
           id: "__mm_pers_" + ri + "_" + pi,
           label: shortLabel(dispName, 14),
-          full: dispName + " \u00B7 " + pack.stat.label + " (" + pack.stat.items.length + "\u6761)",
+          full: dispName + " \xB7 " + pack.stat.label + " (" + pack.stat.items.length + "\u6761)",
           ntype: "type",
           htype: null,
           exp: pi < 3,
           ch: [],
           _x: 0,
-          _y: 0,
+          _y: 0
         };
         appendEntityLeaves(pn, pack.stat, ri * 100 + pi);
         if (pn.ch.length > 0) rn.ch.push(pn);
@@ -3227,10 +2939,10 @@ function buildEntityMindMapTree(scopeBook, focusEntity, groupByRole, entityRelat
     }
     appendManualEntityRelationNodes(root, entityRelations, lookup);
     if (!focus) {
-      var untagged = scopeBook.highlights.filter(function (h) {
-        return !((h.entities || []).some(function (e) {
+      var untagged = scopeBook.highlights.filter(function(h) {
+        return !(h.entities || []).some(function(e) {
           return String(e || "").trim();
-        }));
+        });
       });
       if (untagged.length > 0) {
         var un = {
@@ -3242,7 +2954,7 @@ function buildEntityMindMapTree(scopeBook, focusEntity, groupByRole, entityRelat
           exp: false,
           ch: [],
           _x: 0,
-          _y: 0,
+          _y: 0
         };
         for (var ui = 0; ui < Math.min(untagged.length, 12); ui++) {
           var uh = untagged[ui];
@@ -3257,7 +2969,7 @@ function buildEntityMindMapTree(scopeBook, focusEntity, groupByRole, entityRelat
             ch: [],
             _x: 0,
             _y: 0,
-            srcId: uh.id,
+            srcId: uh.id
           });
         }
         root.ch.push(un);
@@ -3279,7 +2991,7 @@ function buildEntityMindMapTree(scopeBook, focusEntity, groupByRole, entityRelat
       exp: ei < 4,
       ch: [],
       _x: 0,
-      _y: 0,
+      _y: 0
     };
     appendEntityLeaves(en, st, ei);
     if (en.ch.length > 0 || st.items.length === 0) {
@@ -3293,19 +3005,16 @@ function buildEntityMindMapTree(scopeBook, focusEntity, groupByRole, entityRelat
   return root;
 }
 function buildMindMapTreeFromOptions(scopeBook, opts) {
-  var base = (opts && opts.base) || "book";
-  var lens = (opts && opts.lens) || "all";
+  var base = opts && opts.base || "book";
+  var lens = opts && opts.lens || "all";
   var scoped = scopedBookForMindMap(scopeBook, opts);
-  var entityRelations =
-    (opts && opts.sourceBook && opts.sourceBook.entityRelations) ||
-    scopeBook.entityRelations ||
-    [];
+  var entityRelations = opts && opts.sourceBook && opts.sourceBook.entityRelations || scopeBook.entityRelations || [];
   if (lens === "ideas") return buildIdeaMindMapTree(scoped);
   if (lens === "people" || base === "entity") {
-    return buildEntityMindMapTree(scoped, (opts && opts.entity) || "", lens === "people", entityRelations);
+    return buildEntityMindMapTree(scoped, opts && opts.entity || "", lens === "people", entityRelations);
   }
   if (base === "topic") {
-    var topic = (opts && opts.topic) || "";
+    var topic = opts && opts.topic || "";
     if (!topic) return buildBookMindMapTree(scoped);
     return buildTopicMindMapTree(scoped, topic);
   }
@@ -3351,13 +3060,13 @@ var MM_TYPE_COLORS = {
   method: "#0891b2",
   example: "#059669",
   conclusion: "#dc2626",
-  question: "#d97706",
+  question: "#d97706"
 };
 var MM_NTYPE_COLORS = {
   root: "#2563eb",
   topic: "#7c3aed",
   type: "#475569",
-  leaf: "#64748b",
+  leaf: "#64748b"
 };
 function mmNodeColor(node) {
   if (node.htype && MM_TYPE_COLORS[node.htype]) return MM_TYPE_COLORS[node.htype];
@@ -3377,54 +3086,33 @@ function mmNodeH(node) {
 function renderMindMapCanvas(container, scopeBook, onCrystallize, opts) {
   var expanded = opts && opts.expanded;
   var root = buildMindMapTreeFromOptions(scopeBook, opts);
-  var emptyMsg =
-    opts && opts.lens === "people"
-      ? "\u6682\u65E0\u4EBA\u7269\u6807\u7B7E\u3002\u8BF7\u7528\u300C\u89D2\u8272:\u540D\u5B57\u300D\u6807\u6CE8\u6458\u5F55\u3002"
-      : opts && opts.lens === "ideas"
-        ? "\u6682\u65E0\u89C2\u70B9\u7C7B\u6458\u5F55\u3002\u8BF7\u8BBE\u7F6E\u6458\u5F55\u7C7B\u578B\uFF08\u89C2\u70B9/\u65B9\u6CD5/\u7ED3\u8BBA\u7B49\uFF09\u3002"
-        : opts && opts.base === "entity"
-          ? "\u6682\u65E0\u5B9E\u4F53\u6807\u7B7E\u3002\u8BF7\u5728\u6458\u5F55\u4E2D\u6DFB\u52A0 entities\uFF08\u5982\u4EBA\u540D\uFF09\u540E\u518D\u8BD5\u3002"
-          : opts && opts.base === "topic"
-            ? "\u5F53\u524D\u4E3B\u9898\u4E0B\u6682\u65E0\u6458\u5F55\u6570\u636E\u3002"
-            : "\u6682\u65E0\u6458\u5F55\u6570\u636E\uFF0C\u65E0\u6CD5\u751F\u6210\u8111\u56FE\u3002";
+  var emptyMsg = opts && opts.lens === "people" ? "\u6682\u65E0\u4EBA\u7269\u6807\u7B7E\u3002\u8BF7\u7528\u300C\u89D2\u8272:\u540D\u5B57\u300D\u6807\u6CE8\u6458\u5F55\u3002" : opts && opts.lens === "ideas" ? "\u6682\u65E0\u89C2\u70B9\u7C7B\u6458\u5F55\u3002\u8BF7\u8BBE\u7F6E\u6458\u5F55\u7C7B\u578B\uFF08\u89C2\u70B9/\u65B9\u6CD5/\u7ED3\u8BBA\u7B49\uFF09\u3002" : opts && opts.base === "entity" ? "\u6682\u65E0\u5B9E\u4F53\u6807\u7B7E\u3002\u8BF7\u5728\u6458\u5F55\u4E2D\u6DFB\u52A0 entities\uFF08\u5982\u4EBA\u540D\uFF09\u540E\u518D\u8BD5\u3002" : opts && opts.base === "topic" ? "\u5F53\u524D\u4E3B\u9898\u4E0B\u6682\u65E0\u6458\u5F55\u6570\u636E\u3002" : "\u6682\u65E0\u6458\u5F55\u6570\u636E\uFF0C\u65E0\u6CD5\u751F\u6210\u8111\u56FE\u3002";
   if (root.ch.length === 0) {
     container.createEl("p", { text: emptyMsg, cls: "readflow-muted" });
     return null;
   }
   var wrap = container.createDiv("readflow-mm-wrap");
   var canvas = wrap.createEl("canvas", { cls: "readflow-mm-canvas" });
-  var W =
-    wrap.getBoundingClientRect().width > 0
-      ? wrap.getBoundingClientRect().width
-      : container.getBoundingClientRect().width || 500;
-  let H = expanded
-    ? Math.max(400, wrap.getBoundingClientRect().height || container.getBoundingClientRect().height - 40, 260)
-    : 260;
+  var W = wrap.getBoundingClientRect().width > 0 ? wrap.getBoundingClientRect().width : container.getBoundingClientRect().width || 500;
+  let H = expanded ? Math.max(400, wrap.getBoundingClientRect().height || container.getBoundingClientRect().height - 40, 260) : 260;
   canvas.width = W;
   canvas.height = H;
-  var LX = 150,
-    GAP = 32;
+  var LX = 150, GAP = 32;
   var totalH = mmSubH(root, GAP);
   layoutMM(root, 30, 0, Math.max(totalH, H), LX, GAP);
   var allN = collectMMNodes(root, []);
   var allE = collectMMEdges(root, []);
-  var scale = 1,
-    tx = 0,
-    ty = 0;
-  var hov = null,
-    panActive = false,
-    didPan = false,
-    downPos = null,
-    panOrig = { x: 0, y: 0 };
+  var scale = 1, tx = 0, ty = 0;
+  var hov = null, panActive = false, didPan = false, downPos = null, panOrig = { x: 0, y: 0 };
   if (totalH > H) {
-    scale = Math.max(0.5, (H / totalH) * 0.9);
+    scale = Math.max(0.5, H / totalH * 0.9);
     tx = 10;
     ty = (H - totalH * scale) / 2;
   }
-  var isDark = function () {
+  var isDark = function() {
     return document.body.classList.contains("theme-dark");
   };
-  var drawRR = function (ctx, x2, y2, w, h, r) {
+  var drawRR = function(ctx, x2, y2, w, h, r) {
     ctx.beginPath();
     ctx.moveTo(x2 + r, y2);
     ctx.lineTo(x2 + w - r, y2);
@@ -3450,10 +3138,8 @@ function renderMindMapCanvas(container, scopeBook, onCrystallize, opts) {
     ctx.scale(scale, scale);
     for (var i = 0; i < allE.length; i++) {
       var e = allE[i];
-      var fx = e.from._x + mmNodeW(e.from),
-        fy = e.from._y;
-      var tx2 = e.to._x,
-        ty2 = e.to._y;
+      var fx = e.from._x + mmNodeW(e.from), fy = e.from._y;
+      var tx2 = e.to._x, ty2 = e.to._y;
       var cpx = fx + (tx2 - fx) * 0.5;
       var isHovEdge = hov && (hov.id === e.from.id || hov.id === e.to.id);
       ctx.strokeStyle = isHovEdge ? mmNodeColor(e.to) : dk ? "#334155" : "#cbd5e1";
@@ -3467,18 +3153,13 @@ function renderMindMapCanvas(container, scopeBook, onCrystallize, opts) {
     ctx.globalAlpha = 1;
     for (var i = 0; i < allN.length; i++) {
       var n = allN[i];
-      var nw = mmNodeW(n),
-        nh = mmNodeH(n);
-      var nx = n._x,
-        ny = n._y - nh / 2;
+      var nw = mmNodeW(n), nh = mmNodeH(n);
+      var nx = n._x, ny = n._y - nh / 2;
       var col = mmNodeColor(n);
       var isH = n === hov;
-      var faded =
-        hov &&
-        n !== hov &&
-        !allE.some(function (e2) {
-          return (e2.from === hov && e2.to === n) || (e2.to === hov && e2.from === n);
-        });
+      var faded = hov && n !== hov && !allE.some(function(e2) {
+        return e2.from === hov && e2.to === n || e2.to === hov && e2.from === n;
+      });
       ctx.globalAlpha = faded ? 0.3 : 1;
       if (isH) {
         ctx.shadowColor = col;
@@ -3521,15 +3202,13 @@ function renderMindMapCanvas(container, scopeBook, onCrystallize, opts) {
     ctx.globalAlpha = 1;
     ctx.restore();
     if (hov) {
-      var sx = hov._x * scale + tx,
-        sy = (hov._y - mmNodeH(hov) / 2) * scale + ty - 8;
+      var sx = hov._x * scale + tx, sy = (hov._y - mmNodeH(hov) / 2) * scale + ty - 8;
       var text = hov.full.length > 80 ? hov.full.slice(0, 80) + "\u2026" : hov.full;
       var lines = text.split("\n");
       var maxLine = lines[0];
       ctx.font = "12px system-ui, sans-serif";
       var tw2 = Math.min(ctx.measureText(maxLine).width, 320);
-      var bw = tw2 + 24,
-        bh = 14 + lines.length * 16;
+      var bw = tw2 + 24, bh = 14 + lines.length * 16;
       var bx = Math.max(4, Math.min(W - bw - 4, sx));
       var by = Math.max(4, sy - bh - 6);
       ctx.fillStyle = isDark() ? "#1e293b" : "#0f172a";
@@ -3545,7 +3224,6 @@ function renderMindMapCanvas(container, scopeBook, onCrystallize, opts) {
       }
     }
   }
-  // Delay first draw until layout is settled so getBoundingClientRect has real size
   function notifyScale() {
     if (opts && opts.onScaleChange) opts.onScaleChange(scale);
   }
@@ -3554,7 +3232,7 @@ function renderMindMapCanvas(container, scopeBook, onCrystallize, opts) {
     tx = 0;
     ty = 0;
     if (totalH > H) {
-      scale = Math.max(0.5, (H / totalH) * 0.9);
+      scale = Math.max(0.5, H / totalH * 0.9);
       tx = 10;
       ty = (H - totalH * scale) / 2;
     }
@@ -3579,7 +3257,7 @@ function renderMindMapCanvas(container, scopeBook, onCrystallize, opts) {
     var f = e.deltaY > 0 ? 1 - step : 1 + step;
     zoomAt(f, e.clientX, e.clientY);
   }
-  requestAnimationFrame(function () {
+  requestAnimationFrame(function() {
     var _cr2 = wrap.getBoundingClientRect();
     var changed = false;
     if (_cr2.width > 0 && _cr2.width !== W) {
@@ -3598,7 +3276,7 @@ function renderMindMapCanvas(container, scopeBook, onCrystallize, opts) {
       allN = collectMMNodes(root, []);
       allE = collectMMEdges(root, []);
       if (totalH > H) {
-        scale = Math.max(0.5, (H / totalH) * 0.9);
+        scale = Math.max(0.5, H / totalH * 0.9);
         tx = 10;
         ty = (H - totalH * scale) / 2;
       }
@@ -3609,27 +3287,29 @@ function renderMindMapCanvas(container, scopeBook, onCrystallize, opts) {
   function hitTest(mx, my) {
     for (var i = allN.length - 1; i >= 0; i--) {
       var n = allN[i];
-      var nw = mmNodeW(n),
-        nh = mmNodeH(n);
+      var nw = mmNodeW(n), nh = mmNodeH(n);
       if (mx >= n._x && mx <= n._x + nw && my >= n._y - nh / 2 && my <= n._y + nh / 2) return n;
     }
     return null;
   }
   canvas.addEventListener("wheel", onWheel, { passive: false });
   if (expanded) wrap.addEventListener("wheel", onWheel, { passive: false });
-  canvas.addEventListener("mousedown", function (e) {
+  canvas.addEventListener("mousedown", function(e) {
     if (e.button === 0) {
       downPos = { x: e.clientX, y: e.clientY };
       panOrig = { x: e.clientX - tx, y: e.clientY - ty };
     }
   });
-  canvas.addEventListener("mousemove", function (e) {
+  canvas.addEventListener("mousemove", function(e) {
     var rect = canvas.getBoundingClientRect();
     var mx = (e.clientX - rect.left - tx) / scale;
     var my = (e.clientY - rect.top - ty) / scale;
     if (downPos) {
       var dx = e.clientX - downPos.x, dy = e.clientY - downPos.y;
-      if (!panActive && dx * dx + dy * dy > 16) { panActive = true; didPan = true; }
+      if (!panActive && dx * dx + dy * dy > 16) {
+        panActive = true;
+        didPan = true;
+      }
       if (panActive) {
         tx = e.clientX - panOrig.x;
         ty = e.clientY - panOrig.y;
@@ -3644,8 +3324,11 @@ function renderMindMapCanvas(container, scopeBook, onCrystallize, opts) {
       draw();
     }
   });
-  canvas.addEventListener("click", function (e) {
-    if (didPan) { didPan = false; return; }
+  canvas.addEventListener("click", function(e) {
+    if (didPan) {
+      didPan = false;
+      return;
+    }
     var rect = canvas.getBoundingClientRect();
     var mx = (e.clientX - rect.left - tx) / scale;
     var my = (e.clientY - rect.top - ty) / scale;
@@ -3659,11 +3342,11 @@ function renderMindMapCanvas(container, scopeBook, onCrystallize, opts) {
       draw();
     }
   });
-  canvas.addEventListener("mouseup", function () {
+  canvas.addEventListener("mouseup", function() {
     panActive = false;
     downPos = null;
   });
-  canvas.addEventListener("mouseleave", function () {
+  canvas.addEventListener("mouseleave", function() {
     panActive = false;
     downPos = null;
     hov = null;
@@ -3671,17 +3354,17 @@ function renderMindMapCanvas(container, scopeBook, onCrystallize, opts) {
   });
   canvas.addEventListener("dblclick", resetView);
   var controls = {
-    zoomIn: function () {
+    zoomIn: function() {
       zoomAt(1.18);
     },
-    zoomOut: function () {
+    zoomOut: function() {
       zoomAt(1 / 1.18);
     },
-    resetView: resetView,
-    getScale: function () {
+    resetView,
+    getScale: function() {
       return scale;
     },
-    reflow: function () {
+    reflow: function() {
       var _cr2 = wrap.getBoundingClientRect();
       var changed = false;
       if (_cr2.width > 0 && _cr2.width !== W) {
@@ -3700,7 +3383,7 @@ function renderMindMapCanvas(container, scopeBook, onCrystallize, opts) {
         allN = collectMMNodes(root, []);
         allE = collectMMEdges(root, []);
         if (expanded && totalH > H) {
-          scale = Math.max(0.5, (H / totalH) * 0.9);
+          scale = Math.max(0.5, H / totalH * 0.9);
           tx = 10;
           ty = (H - totalH * scale) / 2;
         } else if (expanded) {
@@ -3711,16 +3394,24 @@ function renderMindMapCanvas(container, scopeBook, onCrystallize, opts) {
         draw();
         notifyScale();
       }
-    },
+    }
   };
   wrap.readflowMmControls = controls;
-  var ro = new ResizeObserver(function () {
+  var ro = new ResizeObserver(function() {
     var nw = wrap.getBoundingClientRect().width;
     var changed = false;
-    if (nw > 0 && nw !== W) { W = nw; canvas.width = W; changed = true; }
+    if (nw > 0 && nw !== W) {
+      W = nw;
+      canvas.width = W;
+      changed = true;
+    }
     if (expanded) {
       var nh = wrap.getBoundingClientRect().height;
-      if (nh > 0 && nh !== H) { H = nh; canvas.height = H; changed = true; }
+      if (nh > 0 && nh !== H) {
+        H = nh;
+        canvas.height = H;
+        changed = true;
+      }
     }
     if (changed) {
       totalH = mmSubH(root, GAP);
@@ -3728,11 +3419,13 @@ function renderMindMapCanvas(container, scopeBook, onCrystallize, opts) {
       allN = collectMMNodes(root, []);
       allE = collectMMEdges(root, []);
       if (expanded && totalH > H) {
-        scale = Math.max(0.5, (H / totalH) * 0.9);
+        scale = Math.max(0.5, H / totalH * 0.9);
         tx = 10;
         ty = (H - totalH * scale) / 2;
       } else if (expanded) {
-        scale = 1; tx = 0; ty = 0;
+        scale = 1;
+        tx = 0;
+        ty = 0;
       }
       draw();
     }
@@ -3743,15 +3436,15 @@ function renderMindMapCanvas(container, scopeBook, onCrystallize, opts) {
 function generateKnowledgeCard(book, highlightIds, title, insight) {
   var card = {
     id: "kc-" + Date.now() + "-" + Math.random().toString(36).slice(2, 6),
-    title: title,
-    insight: insight,
+    title,
+    insight,
     sourceHighlightIds: highlightIds,
     bookId: book.bookId,
     bookTitle: book.title,
     tags: [],
     connections: [],
     createdAt: Date.now(),
-    importance: 3,
+    importance: 3
   };
   return card;
 }
@@ -3759,7 +3452,7 @@ function buildKnowledgeExportMd(card, book) {
   var sources = [];
   if (book) {
     for (var i = 0; i < card.sourceHighlightIds.length; i++) {
-      var h = book.highlights.find(function (x) {
+      var h = book.highlights.find(function(x) {
         return x.id === card.sourceHighlightIds[i];
       });
       if (h) sources.push(h);
@@ -3771,13 +3464,9 @@ function buildKnowledgeExportMd(card, book) {
     'source: "' + (card.bookTitle || "").replace(/"/g, "'") + '"',
     "created: " + new Date(card.createdAt).toISOString().slice(0, 10),
     "importance: " + card.importance,
-    "tags: [" +
-      card.tags
-        .map(function (t) {
-          return '"' + t + '"';
-        })
-        .join(", ") +
-      "]",
+    "tags: [" + card.tags.map(function(t) {
+      return '"' + t + '"';
+    }).join(", ") + "]",
     "---",
     "",
     "# " + card.title,
@@ -3787,7 +3476,7 @@ function buildKnowledgeExportMd(card, book) {
     card.insight,
     "",
     "## \u6765\u6E90\u6458\u5F55",
-    "",
+    ""
   ];
   for (var i = 0; i < sources.length; i++) {
     var s = sources[i];
@@ -3806,25 +3495,15 @@ function buildKnowledgeExportMd(card, book) {
   lines.push("");
   return lines.join("\n");
 }
-
-// src/storage/vaultWriter.ts
 function safeSegment(name) {
-  const s = name
-    .replace(/[\\/:*?"<>|]/g, "_")
-    .replace(/\s+/g, " ")
-    .trim()
-    .slice(0, 120);
+  const s = name.replace(/[\\/:*?"<>|]/g, "_").replace(/\s+/g, " ").trim().slice(0, 120);
   return s || "untitled";
 }
 function yamlEscape(s) {
   return JSON.stringify(s != null ? s : "");
 }
 function highlightFilename(h) {
-  const slug =
-    h.content
-      .slice(0, 40)
-      .replace(/[\\/:*?"<>|]/g, "_")
-      .trim() || "note";
+  const slug = h.content.slice(0, 40).replace(/[\\/:*?"<>|]/g, "_").trim() || "note";
   return `${h.id.replace(/[^a-zA-Z0-9_-]/g, "_")}_${slug}.md`;
 }
 function bookWikilink(settings, book) {
@@ -3856,8 +3535,7 @@ async function writeBookToVault(app, settings, book) {
   const bw = bookWikilink(settings, book);
   let highlightsSection = "## \u6458\u5F55\u76EE\u5F55\n\n";
   if (book.highlights.length === 0) {
-    highlightsSection +=
-      "> **ReadFlow**\uFF1A\u672A\u5199\u5165\u4EFB\u4F55\u5212\u7EBF/\u4E66\u8BC4\u6B63\u6587\u3002\u540C\u6B65\u5DF2\u4F1A\u81EA\u52A8\u5408\u5E76\u670D\u52A1\u7AEF `Set-Cookie`\uFF08\u4E0E Weread \u63D2\u4EF6\u540C\u7406\uFF0C\u7528\u4E8E\u4FEE\u590D /web \u4E66\u7B7E\u63A5\u53E3\uFF09\u3002\u82E5\u4ECD\u6709\u6B64\u4E66\u7B14\u8BB0\uFF1A\u8BF7 **\u518D\u70B9\u4E00\u6B21\u300C\u540C\u6B65\u5FAE\u4FE1\u8BFB\u4E66\u300D** \u6216\u7528 **\u684C\u9762\u300C\u6253\u5F00\u767B\u5F55\u300D** \u91CD\u767B\uFF1B\u5728 Obsidian \u5F00\u53D1\u8005\u5DE5\u5177 Console \u641C\u7D22 **`[ReadFlow] bookmarklist`** \u67E5\u770B `errCode` / `keys` \u8BCA\u65AD\u3002\n\n";
+    highlightsSection += "> **ReadFlow**\uFF1A\u672A\u5199\u5165\u4EFB\u4F55\u5212\u7EBF/\u4E66\u8BC4\u6B63\u6587\u3002\u540C\u6B65\u5DF2\u4F1A\u81EA\u52A8\u5408\u5E76\u670D\u52A1\u7AEF `Set-Cookie`\uFF08\u4E0E Weread \u63D2\u4EF6\u540C\u7406\uFF0C\u7528\u4E8E\u4FEE\u590D /web \u4E66\u7B7E\u63A5\u53E3\uFF09\u3002\u82E5\u4ECD\u6709\u6B64\u4E66\u7B14\u8BB0\uFF1A\u8BF7 **\u518D\u70B9\u4E00\u6B21\u300C\u540C\u6B65\u5FAE\u4FE1\u8BFB\u4E66\u300D** \u6216\u7528 **\u684C\u9762\u300C\u6253\u5F00\u767B\u5F55\u300D** \u91CD\u767B\uFF1B\u5728 Obsidian \u5F00\u53D1\u8005\u5DE5\u5177 Console \u641C\u7D22 **`[ReadFlow] bookmarklist`** \u67E5\u770B `errCode` / `keys` \u8BCA\u65AD\u3002\n\n";
   }
   for (const node of tree) {
     highlightsSection += `### ${node.chapter}
@@ -3877,30 +3555,22 @@ async function writeBookToVault(app, settings, book) {
     highlightsSection += "\n";
   }
   const inbox = book.highlights.filter((h) => h.status === "inbox");
-  const inboxSection =
-    "## \u672A\u6574\u7406\u6458\u5F55\n\n" +
-    inbox
-      .map(
-        (h) => `- (${h.id}) ${h.content.slice(0, 120)}${h.content.length > 120 ? "\u2026" : ""}
-`,
-      )
-      .join("");
+  const inboxSection = "## \u672A\u6574\u7406\u6458\u5F55\n\n" + inbox.map(
+    (h) => `- (${h.id}) ${h.content.slice(0, 120)}${h.content.length > 120 ? "\u2026" : ""}
+`
+  ).join("");
   const topicMindmap = buildTopicMindmap(book);
-  const topicMindmapSection = topicMindmap
-    ? `## \u4E3B\u9898\u8111\u56FE
+  const topicMindmapSection = topicMindmap ? `## \u4E3B\u9898\u8111\u56FE
 
 ${topicMindmap}
-`
-    : "";
+` : "";
   const topicStructureSection = buildTopicStructure(book);
   const coreInsightsSection = buildCoreInsights(book);
   const relationGraph = buildRelationsMermaid(book);
-  const relationSection = relationGraph
-    ? `## \u903B\u8F91\u5173\u7CFB
+  const relationSection = relationGraph ? `## \u903B\u8F91\u5173\u7CFB
 
 ${relationGraph}
-`
-    : "## \u903B\u8F91\u5173\u7CFB\n\n- \u6682\u65E0\u53EF\u751F\u6210\u7684\u5173\u7CFB\u56FE\n";
+` : "## \u903B\u8F91\u5173\u7CFB\n\n- \u6682\u65E0\u53EF\u751F\u6210\u7684\u5173\u7CFB\u56FE\n";
   const meta = [
     "---",
     "type: book",
@@ -3931,7 +3601,7 @@ ${relationGraph}
     "",
     relationSection,
     highlightsSection,
-    inboxSection,
+    inboxSection
   ].join("\n");
   await upsertVaultFile(app, bookPath, meta);
 }
@@ -3944,7 +3614,7 @@ async function writeTopicKnowledgeToVault(app, settings, book, topic) {
   const topicBook = {
     ...book,
     title: `${book.title} - ${topicName}`,
-    highlights: topicRows,
+    highlights: topicRows
   };
   const base = (0, import_obsidian3.normalizePath)(settings.booksBasePath);
   const folder = (0, import_obsidian3.normalizePath)(`${base}/${safeSegment(book.title)}`);
@@ -3984,7 +3654,7 @@ async function writeTopicKnowledgeToVault(app, settings, book, topic) {
     "## \u4E3B\u9898\u6458\u5F55",
     "",
     ...topicRows.map((h) => `- ${h.content.slice(0, 120)}${h.content.length > 120 ? "\u2026" : ""}`),
-    "",
+    ""
   ].join("\n");
   await upsertVaultFile(app, topicPath, body);
   return topicPath;
@@ -3993,43 +3663,28 @@ function formatEmbeddedHighlight(book, h, bookLink) {
   const type = h.highlightType ? `\`[${h.highlightType}]\` ` : "";
   const tags = h.topic ? ` \u{1F3F7} ${h.topic}` : "";
   const linkNames = (h.links || []).map((p) => p.replace(/\.md$/i, "").split("/").pop() || p);
-  const relationWikilinks = (h.relations || [])
-    .map((relation) => {
-      const target = book.highlights.find((row) => row.id === relation.targetId);
-      const targetExcerpt = ((target == null ? void 0 : target.content) || relation.targetId).slice(0, 60);
-      const hint = relation.hint || "\u5173\u7CFB";
-      const targetIdSafe = relation.targetId.replace(/[^a-zA-Z0-9]/g, "_");
-      return `  - ${hint}:: [[${bookLink}#${targetIdSafe}|${targetExcerpt}\u2026]]`;
-    })
-    .join("\n");
-  const links =
-    linkNames.length > 0
-      ? `
-  - \u5173\u8054: ${linkNames.map((n) => `[[${n}]]`).join(" ")}`
-      : "";
-  const relationLines = relationWikilinks
-    ? `\u270F **\u903B\u8F91\u5173\u7CFB**
+  const relationWikilinks = (h.relations || []).map((relation) => {
+    const target = book.highlights.find((row) => row.id === relation.targetId);
+    const targetExcerpt = ((target == null ? void 0 : target.content) || relation.targetId).slice(0, 60);
+    const hint = relation.hint || "\u5173\u7CFB";
+    const targetIdSafe = relation.targetId.replace(/[^a-zA-Z0-9]/g, "_");
+    return `  - ${hint}:: [[${bookLink}#${targetIdSafe}|${targetExcerpt}\u2026]]`;
+  }).join("\n");
+  const links = linkNames.length > 0 ? `
+  - \u5173\u8054: ${linkNames.map((n) => `[[${n}]]`).join(" ")}` : "";
+  const relationLines = relationWikilinks ? `\u270F **\u903B\u8F91\u5173\u7CFB**
 ${relationWikilinks}
-`
-    : "";
+` : "";
   const hIdSafe = h.id.replace(/[^a-zA-Z0-9]/g, "_");
-  return (
-    `- ${type}**\u6458\u5F55**${tags} ^${hIdSafe}
+  return `- ${type}**\u6458\u5F55**${tags} ^${hIdSafe}
 
   > ${h.content.replace(/\n/g, "\n  > ")}
 
-` +
-    (h.note
-      ? `  - \u60F3\u6CD5:: ${h.note}
-`
-      : "") +
-    (relationLines ? `${relationLines}` : "") +
-    links +
-    `
+` + (h.note ? `  - \u60F3\u6CD5:: ${h.note}
+` : "") + (relationLines ? `${relationLines}` : "") + links + `
   - \u4E66\u7C4D:: [[${bookLink}]]
 
-`
-  );
+`;
 }
 async function writeAtomicHighlight(app, settings, hlFolder, linkPathNoExt, book, h) {
   var _a, _b, _c;
@@ -4045,7 +3700,7 @@ async function writeAtomicHighlight(app, settings, hlFolder, linkPathNoExt, book
     `importance: ${h.importance}`,
     `created: ${h.createdAt}`,
     `source: ${h.sourceType}`,
-    `id: ${yamlEscape(h.id)}`,
+    `id: ${yamlEscape(h.id)}`
   );
   if ((_a = h.links) == null ? void 0 : _a.length) {
     lines.push("links:");
@@ -4068,16 +3723,10 @@ async function writeAtomicHighlight(app, settings, hlFolder, linkPathNoExt, book
     "> " + h.content.replace(/\n/g, "\n> "),
     "",
     h.note ? "## \u6211\u7684\u60F3\u6CD5\n\n" + h.note + "\n\n" : "",
-    ((_c = h.relations) == null ? void 0 : _c.length)
-      ? "## \u6458\u5F55\u5173\u7CFB\n\n" +
-          h.relations
-            .map((relation) => {
-              const target = book.highlights.find((row) => row.id === relation.targetId);
-              return `- ${relation.hint} -> ${((target == null ? void 0 : target.content) || relation.targetId).slice(0, 80)}`;
-            })
-            .join("\n") +
-          "\n\n"
-      : "",
+    ((_c = h.relations) == null ? void 0 : _c.length) ? "## \u6458\u5F55\u5173\u7CFB\n\n" + h.relations.map((relation) => {
+      const target = book.highlights.find((row) => row.id === relation.targetId);
+      return `- ${relation.hint} -> ${((target == null ? void 0 : target.content) || relation.targetId).slice(0, 80)}`;
+    }).join("\n") + "\n\n" : "",
     "## AI \u63D0\u70BC",
     "",
     "_\uFF08v1 \u9884\u7559\uFF09_",
@@ -4093,41 +3742,33 @@ async function writeAtomicHighlight(app, settings, hlFolder, linkPathNoExt, book
     "## \u7ED3\u6784\u4F4D\u7F6E",
     "",
     `- \u4E66\u7C4D:: [[${bw}]]`,
-    "",
+    ""
   );
   const body = lines.join("\n");
   await upsertVaultFile(app, hlPath, body);
 }
-
-// src/ui/HighlightPanelView.ts
 var import_obsidian5 = require("obsidian");
-
-// src/types.ts
 var HIGHLIGHT_TYPE_LABELS = {
   idea: "\u89C2\u70B9",
   method: "\u65B9\u6CD5",
   example: "\u4F8B\u5B50",
   conclusion: "\u7ED3\u8BBA",
-  question: "\u7591\u95EE",
+  question: "\u7591\u95EE"
 };
 var STATUS_LABELS = {
   inbox: "\u5F85\u6574\u7406",
   reviewing: "\u5DF2\u9605\u8BFB",
   drafted: "\u8349\u7A3F\u5B8C\u6210",
-  processed: "\u5DF2\u5904\u7406",
+  processed: "\u5DF2\u5904\u7406"
 };
 var STATUS_COLORS = {
   inbox: "#f59e0b",
   reviewing: "#3b82f6",
   drafted: "#8b5cf6",
-  processed: "#10b981",
+  processed: "#10b981"
 };
 var STATUS_FLOW = ["inbox", "reviewing", "drafted", "processed"];
-
-// src/ui/QuickCaptureModal.ts
 var import_obsidian4 = require("obsidian");
-
-// src/processor/classifier.ts
 function suggestHighlightType(text) {
   const t = text.slice(0, 500);
   if (/[？?]$|为什么|如何|怎么|是否|吗/.test(t)) return "question";
@@ -4137,8 +3778,6 @@ function suggestHighlightType(text) {
   if (/认为|观点|主张|应该|必须/.test(t)) return "idea";
   return void 0;
 }
-
-// src/ui/textSimilarity.ts
 function tokenizeLoose(text) {
   const out = /* @__PURE__ */ new Set();
   const lower = text.toLowerCase();
@@ -4158,18 +3797,10 @@ function tokenOverlapScore(a, b) {
   for (const x of A) if (B.has(x)) inter++;
   return inter / Math.sqrt(A.size * B.size);
 }
-
-// src/ui/related.ts
 function suggestRelatedHighlights(all, content, excludeId) {
-  const scored = all
-    .filter((h) => h.id !== excludeId)
-    .map((h) => ({ h, score: tokenOverlapScore(content, h.content) }))
-    .filter((x) => x.score > 0.08)
-    .sort((a, b) => b.score - a.score);
+  const scored = all.filter((h) => h.id !== excludeId).map((h) => ({ h, score: tokenOverlapScore(content, h.content) })).filter((x) => x.score > 0.08).sort((a, b) => b.score - a.score);
   return scored.map((x) => x.h);
 }
-
-// src/ui/QuickCaptureModal.ts
 var QuickCaptureModal = class extends import_obsidian4.Modal {
   constructor(app, plugin, options, onSaved) {
     super(app);
@@ -4200,38 +3831,25 @@ var QuickCaptureModal = class extends import_obsidian4.Modal {
     contentEl.addClass("readflow-capture-modal");
     if (this.options.compactMode) contentEl.addClass("readflow-capture-modal--compact");
     const h = this.options.highlight;
-    this.content =
-      (_b = (_a = h == null ? void 0 : h.content) != null ? _a : this.options.initialContent) != null ? _b : "";
+    this.content = (_b = (_a = h == null ? void 0 : h.content) != null ? _a : this.options.initialContent) != null ? _b : "";
     this.note = (_c = h == null ? void 0 : h.note) != null ? _c : "";
     this.topic = (_d = h == null ? void 0 : h.topic) != null ? _d : "";
-    this.entities = [...((_e = h == null ? void 0 : h.entities) != null ? _e : [])];
-    this.highlightType =
-      (_g = (_f = h == null ? void 0 : h.highlightType) != null ? _f : suggestHighlightType(this.content)) != null
-        ? _g
-        : "";
+    this.entities = [...(_e = h == null ? void 0 : h.entities) != null ? _e : []];
+    this.highlightType = (_g = (_f = h == null ? void 0 : h.highlightType) != null ? _f : suggestHighlightType(this.content)) != null ? _g : "";
     this.importance = (_h = h == null ? void 0 : h.importance) != null ? _h : 3;
-    this.selectedLinks = [...((_i = h == null ? void 0 : h.links) != null ? _i : [])];
-    this.bookTitle =
-      (_l = (_k = (_j = this.options.book) == null ? void 0 : _j.title) != null ? _k : this.options.manualBookTitle) !=
-      null
-        ? _l
-        : "";
+    this.selectedLinks = [...(_i = h == null ? void 0 : h.links) != null ? _i : []];
+    this.bookTitle = (_l = (_k = (_j = this.options.book) == null ? void 0 : _j.title) != null ? _k : this.options.manualBookTitle) != null ? _l : "";
     if (!this.highlightType && this.content) {
       this.highlightType = (_m = suggestHighlightType(this.content)) != null ? _m : "";
     }
-    this.contextAbstract =
-      (_a = this.options.initialContextAbstract) != null
-        ? _a
-        : (_b = h == null ? void 0 : h.contextAbstract) != null
-          ? _b
-          : "";
+    this.contextAbstract = (_a = this.options.initialContextAbstract) != null ? _a : (_b = h == null ? void 0 : h.contextAbstract) != null ? _b : "";
     this.titleEl.setText(
-      h ? "\u6574\u7406\u6458\u5F55" : this.options.compactMode ? "\u5FEB\u901F\u6458\u5F55" : "\u65B0\u6458\u5F55",
+      h ? "\u6574\u7406\u6458\u5F55" : this.options.compactMode ? "\u5FEB\u901F\u6458\u5F55" : "\u65B0\u6458\u5F55"
     );
     const sourceSec = contentEl.createDiv("readflow-modal-section");
     sourceSec.createEl("h4", { text: "\u6765\u6E90\u4FE1\u606F" });
     new import_obsidian4.Setting(sourceSec).setName("\u4E66\u540D").addText((t) => {
-      t.setValue(this.bookTitle).onChange((v) => (this.bookTitle = v));
+      t.setValue(this.bookTitle).onChange((v) => this.bookTitle = v);
       t.setDisabled(!!this.options.book && !this.options.manualBookTitle);
     });
     new import_obsidian4.Setting(sourceSec).setName("\u539F\u6587 / \u6458\u5F55").addTextArea((ta) => {
@@ -4257,7 +3875,7 @@ var QuickCaptureModal = class extends import_obsidian4.Modal {
         const isMain = ci === mainIdx && line === this.content;
         const el = ctxPreview.createEl("p", {
           text: (ci < mainIdx ? "\u2026" : "") + line.slice(0, 120) + (line.length > 120 ? "\u2026" : ""),
-          cls: isMain ? "readflow-capture-ctx-main" : "readflow-capture-ctx-sub",
+          cls: isMain ? "readflow-capture-ctx-main" : "readflow-capture-ctx-sub"
         });
         if (isMain) el.style.fontWeight = "600";
       }
@@ -4302,7 +3920,7 @@ var QuickCaptureModal = class extends import_obsidian4.Modal {
     }
     new import_obsidian4.Setting(structureSec).setName("\u4E3B\u9898\uFF08\u53EF\u9009\uFF09").addText((t) => {
       var _a2;
-      t.setValue(this.topic).onChange((v) => (this.topic = v));
+      t.setValue(this.topic).onChange((v) => this.topic = v);
       if (this.options.book) {
         const listId = `readflow-topic-list-${Date.now()}`;
         const datalist = structureSec.createEl("datalist");
@@ -4310,10 +3928,10 @@ var QuickCaptureModal = class extends import_obsidian4.Modal {
         const topics = [
           ...new Set(
             [
-              ...((_a2 = this.options.book.topicCatalog) != null ? _a2 : []),
-              ...this.options.book.highlights.map((row) => (row.topic || "").trim()),
-            ].filter(Boolean),
-          ),
+              ...(_a2 = this.options.book.topicCatalog) != null ? _a2 : [],
+              ...this.options.book.highlights.map((row) => (row.topic || "").trim())
+            ].filter(Boolean)
+          )
         ];
         for (const topic of topics) {
           datalist.createEl("option", { value: topic });
@@ -4321,22 +3939,14 @@ var QuickCaptureModal = class extends import_obsidian4.Modal {
         t.inputEl.setAttribute("list", listId);
       }
     });
-    new import_obsidian4.Setting(structureSec)
-      .setName("\u5B9E\u4F53\u6807\u7B7E\uFF08\u53EF\u9009\uFF09")
-      .setDesc(
-        "\u4EBA\u7269\u3001\u5730\u70B9\u3001\u6982\u5FF5\u7B49\uFF0C\u9017\u53F7\u5206\u9694\u3002\u4EBA\u7269\u53EF\u7528\u300C\u89D2\u8272:\u540D\u5B57\u300D\uFF08\u5982\u5BFC\u5E08:\u7EB3\u74E6\u5C14\uFF09\uFF0C\u5173\u7CFB\u5728\u77E5\u8BC6\u7ED3\u6784\u533A\u65B0\u589E\u3002",
-      )
-      .addText((t) => {
-        t.setValue(this.entities.join(", "))
-          .setPlaceholder("\u4F8B\uFF1A\u674E\u514B\u7528, \u592A\u539F, \u664B\u9633\u4E4B\u6218")
-          .onChange((v) => {
-            this.entities = v
-              .split(",")
-              .map((s) => s.trim())
-              .filter(Boolean);
-          });
-        t.inputEl.style.width = "100%";
+    new import_obsidian4.Setting(structureSec).setName("\u5B9E\u4F53\u6807\u7B7E\uFF08\u53EF\u9009\uFF09").setDesc(
+      "\u4EBA\u7269\u3001\u5730\u70B9\u3001\u6982\u5FF5\u7B49\uFF0C\u9017\u53F7\u5206\u9694\u3002\u4EBA\u7269\u53EF\u7528\u300C\u89D2\u8272:\u540D\u5B57\u300D\uFF08\u5982\u5BFC\u5E08:\u7EB3\u74E6\u5C14\uFF09\uFF0C\u5173\u7CFB\u5728\u77E5\u8BC6\u7ED3\u6784\u533A\u65B0\u589E\u3002"
+    ).addText((t) => {
+      t.setValue(this.entities.join(", ")).setPlaceholder("\u4F8B\uFF1A\u674E\u514B\u7528, \u592A\u539F, \u664B\u9633\u4E4B\u6218").onChange((v) => {
+        this.entities = v.split(",").map((s) => s.trim()).filter(Boolean);
       });
+      t.inputEl.style.width = "100%";
+    });
     new import_obsidian4.Setting(structureSec).setName("\u60F3\u6CD5\uFF08\u53EF\u9009\uFF09").addTextArea((ta) => {
       ta.setValue(this.note).onChange((v) => {
         this.note = v;
@@ -4346,11 +3956,9 @@ var QuickCaptureModal = class extends import_obsidian4.Modal {
       ta.inputEl.style.width = "100%";
     });
     new import_obsidian4.Setting(structureSec).setName("\u91CD\u8981\u5EA6 1-5").addSlider((sl) => {
-      sl.setLimits(1, 5, 1)
-        .setValue(this.importance)
-        .onChange((v) => {
-          this.importance = v;
-        });
+      sl.setLimits(1, 5, 1).setValue(this.importance).onChange((v) => {
+        this.importance = v;
+      });
     });
     this.linkSec = contentEl.createDiv("readflow-capture-links readflow-modal-section");
     this.relSec = contentEl.createDiv("readflow-capture-related readflow-modal-section");
@@ -4370,7 +3978,7 @@ var QuickCaptureModal = class extends import_obsidian4.Modal {
         wereadRange: h.wereadRange,
         wereadReviewId: h.wereadReviewId,
         sourceType: h.sourceType,
-        chapterUid: h.chapterUid,
+        chapterUid: h.chapterUid
       };
       if (canPushHighlightToWeread(draftForPush)) {
         const savePushBtn = actions.createEl("button", { text: "\u4FDD\u5B58\u5E76\u63A8\u9001", type: "button" });
@@ -4394,7 +4002,7 @@ var QuickCaptureModal = class extends import_obsidian4.Modal {
     if (this.suggestions.length === 0) {
       container.createEl("p", {
         text: "\u65E0\u5019\u9009\uFF0C\u53EF\u5148\u6267\u884C\u547D\u4EE4\u300CReadFlow: \u91CD\u5EFA\u5173\u8054\u7D22\u5F15\u300D",
-        cls: "readflow-muted",
+        cls: "readflow-muted"
       });
       return;
     }
@@ -4423,14 +4031,14 @@ var QuickCaptureModal = class extends import_obsidian4.Modal {
     if (!this.options.book) {
       container.createEl("p", {
         text: "\u5F53\u524D\u672A\u5339\u914D\u5230\u4E66\u7C4D\uFF0C\u4FDD\u5B58\u540E\u53EF\u5728\u5DE5\u4F5C\u53F0\u7EE7\u7EED\u6574\u7406\u3002",
-        cls: "readflow-muted",
+        cls: "readflow-muted"
       });
       return;
     }
     this.relatedFromBook = suggestRelatedHighlights(
       this.options.book.highlights,
       this.content,
-      (_a = this.options.highlight) == null ? void 0 : _a.id,
+      (_a = this.options.highlight) == null ? void 0 : _a.id
     ).slice(0, this.options.compactMode ? 3 : 5);
     if (this.relatedFromBook.length === 0) {
       container.createEl("p", { text: "\u6682\u65E0\u76F8\u8FD1\u6761\u76EE", cls: "readflow-muted" });
@@ -4439,7 +4047,7 @@ var QuickCaptureModal = class extends import_obsidian4.Modal {
     for (const rh of this.relatedFromBook) {
       const row = container.createDiv("readflow-related-row");
       row.createEl("span", {
-        text: rh.content.slice(0, 100) + (rh.content.length > 100 ? "\u2026" : ""),
+        text: rh.content.slice(0, 100) + (rh.content.length > 100 ? "\u2026" : "")
       });
     }
   }
@@ -4453,7 +4061,7 @@ var QuickCaptureModal = class extends import_obsidian4.Modal {
     if (!sourceText && relatedRows.length === 0 && linkedRows.length === 0) {
       container.createEl("p", {
         text: "\u8F93\u5165\u6458\u5F55\u5185\u5BB9\u540E\uFF0C\u8FD9\u91CC\u4F1A\u751F\u6210\u5173\u7CFB\u8349\u56FE\u3002",
-        cls: "readflow-muted",
+        cls: "readflow-muted"
       });
       return;
     }
@@ -4462,15 +4070,13 @@ var QuickCaptureModal = class extends import_obsidian4.Modal {
     const sourceNode = sourceCol.createDiv("readflow-graph-node readflow-graph-node--primary");
     sourceNode.createEl("span", { text: "\u5F53\u524D\u6458\u5F55", cls: "readflow-graph-node-label" });
     sourceNode.createEl("strong", {
-      text: sourceText
-        ? `${sourceText.slice(0, 56)}${sourceText.length > 56 ? "\u2026" : ""}`
-        : "\u7B49\u5F85\u8F93\u5165\u5185\u5BB9",
-      cls: "readflow-graph-node-title",
+      text: sourceText ? `${sourceText.slice(0, 56)}${sourceText.length > 56 ? "\u2026" : ""}` : "\u7B49\u5F85\u8F93\u5165\u5185\u5BB9",
+      cls: "readflow-graph-node-title"
     });
     if (noteText) {
       sourceNode.createEl("p", {
         text: `\u60F3\u6CD5\uFF1A${noteText.slice(0, 56)}${noteText.length > 56 ? "\u2026" : ""}`,
-        cls: "readflow-graph-node-subtitle",
+        cls: "readflow-graph-node-subtitle"
       });
     }
     const edgeCol = graph.createDiv("readflow-graph-edges");
@@ -4482,7 +4088,7 @@ var QuickCaptureModal = class extends import_obsidian4.Modal {
       node.createEl("span", { text: related.chapter || "\u76F8\u5173\u6458\u5F55", cls: "readflow-graph-node-label" });
       node.createEl("strong", {
         text: `${related.content.slice(0, 44)}${related.content.length > 44 ? "\u2026" : ""}`,
-        cls: "readflow-graph-node-title",
+        cls: "readflow-graph-node-title"
       });
     }
     for (const linkPath of linkedRows) {
@@ -4497,7 +4103,7 @@ var QuickCaptureModal = class extends import_obsidian4.Modal {
     if (edgeCol.childElementCount === 0) {
       const empty = edgeCol.createDiv("readflow-graph-empty");
       empty.setText(
-        "\u6682\u65E0\u81EA\u52A8\u5173\u7CFB\uFF0C\u4FDD\u5B58\u540E\u53EF\u5728\u5DE5\u4F5C\u53F0\u7EE7\u7EED\u8865\u5145\u3002",
+        "\u6682\u65E0\u81EA\u52A8\u5173\u7CFB\uFF0C\u4FDD\u5B58\u540E\u53EF\u5728\u5DE5\u4F5C\u53F0\u7EE7\u7EED\u8865\u5145\u3002"
       );
     }
   }
@@ -4522,10 +4128,7 @@ var QuickCaptureModal = class extends import_obsidian4.Modal {
     }
     const prev = this.options.highlight;
     const h = {
-      id:
-        (_c = prev == null ? void 0 : prev.id) != null
-          ? _c
-          : `rf-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      id: (_c = prev == null ? void 0 : prev.id) != null ? _c : `rf-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
       bookId,
       content: this.content.trim(),
       note: this.note.trim() || void 0,
@@ -4544,7 +4147,7 @@ var QuickCaptureModal = class extends import_obsidian4.Modal {
       wereadRange: prev == null ? void 0 : prev.wereadRange,
       wereadBookmarkId: prev == null ? void 0 : prev.wereadBookmarkId,
       wereadReviewId: prev == null ? void 0 : prev.wereadReviewId,
-      contextAbstract: this.contextAbstract || void 0,
+      contextAbstract: this.contextAbstract || void 0
     };
     let book = (_g = this.options.book) != null ? _g : this.plugin.diskData.books[bookId];
     if (!book) {
@@ -4553,21 +4156,21 @@ var QuickCaptureModal = class extends import_obsidian4.Modal {
         title: this.bookTitle.trim(),
         author: "",
         highlights: [],
-        lastSync: Date.now(),
+        lastSync: Date.now()
       };
     }
     const others = book.highlights.filter((x) => x.id !== h.id);
     book = { ...book, highlights: [...others, h], lastSync: Date.now() };
     if ((_h = h.topic) == null ? void 0 : _h.trim()) {
       book.topicCatalog = [
-        .../* @__PURE__ */ new Set([...((_i = book.topicCatalog) != null ? _i : []), h.topic.trim()]),
+        .../* @__PURE__ */ new Set([...(_i = book.topicCatalog) != null ? _i : [], h.topic.trim()])
       ];
     }
     this.plugin.diskData.books[book.bookId] = book;
     if (this.bookTitle.trim() && !this.options.book) {
       book.title = this.bookTitle.trim();
     }
-    this.plugin.persistDisk().then(async function () {
+    this.plugin.persistDisk().then(async function() {
       if (pushAfter && canPushHighlightToWeread(h)) {
         const pushRes = await _self.plugin.pushHighlightNote(book.bookId, h);
         if (pushRes.ok) {
@@ -4575,7 +4178,7 @@ var QuickCaptureModal = class extends import_obsidian4.Modal {
         } else {
           new import_obsidian4.Notice(
             "\u5DF2\u4FDD\u5B58\u672C\u5730\uFF0C\u4F46\u63A8\u9001\u5931\u8D25\uFF1A" + formatPushNoteError(pushRes),
-            1e4,
+            1e4
           );
         }
       } else {
@@ -4592,8 +4195,6 @@ var QuickCaptureModal = class extends import_obsidian4.Modal {
 function safeManualId(title) {
   return title.replace(/[^a-zA-Z0-9\u4e00-\u9fff]/g, "_").slice(0, 40);
 }
-
-// src/ui/HighlightPanelView.ts
 var READFLOW_VIEW_TYPE = "readflow-highlight-panel";
 var RELATION_HINT_OPTIONS = ["\u8865\u5145", "\u91CD\u590D", "\u56E0\u679C", "\u5BF9\u6BD4"];
 var ENTITY_RELATION_HINTS = ["\u76F8\u5173", "\u5E08\u5F92", "\u540C\u4E8B", "\u5408\u4F5C", "\u7ADE\u4E89", "\u5BB6\u65CF", "\u5F15\u7528"];
@@ -4612,7 +4213,7 @@ var EntityRelationModal = class extends import_obsidian5.Modal {
     if (this.entries.length < 1) {
       contentEl.createEl("p", {
         text: "\u8BF7\u5148\u5728\u6458\u5F55\u7F16\u8F91\u4E2D\u6DFB\u52A0\u5B9E\u4F53\u6807\u7B7E\uFF0C\u683C\u5F0F\u5982\u300C\u5BFC\u5E08:\u7EB3\u74E6\u5C14\u300D\uFF08\u9017\u53F7\u5206\u9694\u591A\u4E2A\uFF09\u3002",
-        cls: "readflow-muted",
+        cls: "readflow-muted"
       });
       const okBtn = contentEl.createEl("button", { text: "\u77E5\u9053\u4E86", type: "button" });
       okBtn.classList.add("readflow-btn", "readflow-btn--primary");
@@ -4646,7 +4247,7 @@ var EntityRelationModal = class extends import_obsidian5.Modal {
     const customHint = form.createEl("input", {
       type: "text",
       cls: "readflow-input",
-      placeholder: "\u5982\uFF1A\u5E08\u5F92\u3001\u540C\u95E8",
+      placeholder: "\u5982\uFF1A\u5E08\u5F92\u3001\u540C\u95E8"
     });
     customHint.style.display = "none";
     hintSelect.addEventListener("change", () => {
@@ -4656,14 +4257,14 @@ var EntityRelationModal = class extends import_obsidian5.Modal {
     const anchorSelect = form.createEl("select", { cls: "readflow-select" });
     anchorSelect.createEl("option", { value: "", text: "\u65E0\u951A\u70B9" });
     const sortedHl = [...this.scopeBook.highlights].sort(
-      (a, b) => chapterSortKey(a) - chapterSortKey(b) || a.createdAt - b.createdAt,
+      (a, b) => chapterSortKey(a) - chapterSortKey(b) || a.createdAt - b.createdAt
     );
     for (const h of sortedHl) {
       if (!(h.entities || []).length) continue;
       const opt = anchorSelect.createEl("option");
       opt.value = h.id;
       const ch = chapterLabel(h);
-      opt.textContent = shortLabel((ch && ch !== "(\u672A\u5206\u7AE0)" ? ch + " \u00B7 " : "") + h.content, 40);
+      opt.textContent = shortLabel((ch && ch !== "(\u672A\u5206\u7AE0)" ? ch + " \xB7 " : "") + h.content, 40);
     }
     const actions = contentEl.createDiv("readflow-modal-actions");
     const cancelBtn = actions.createEl("button", { text: "\u53D6\u6D88", type: "button" });
@@ -4682,13 +4283,12 @@ var EntityRelationModal = class extends import_obsidian5.Modal {
         new import_obsidian5.Notice("\u8BF7\u9009\u62E9\u4E0D\u540C\u7684\u4E24\u4F4D\u4EBA\u7269");
         return;
       }
-      const hint =
-        hintSelect.value === "__custom" ? customHint.value.trim() || "\u76F8\u5173" : hintSelect.value;
+      const hint = hintSelect.value === "__custom" ? customHint.value.trim() || "\u76F8\u5173" : hintSelect.value;
       const anchorId = anchorSelect.value.trim();
       const anchorHl = anchorId ? sortedHl.find((h) => h.id === anchorId) : null;
       this.onSave(source, target, hint, {
         sinceHighlightId: anchorId || void 0,
-        chapterUid: anchorHl ? anchorHl.chapterUid : void 0,
+        chapterUid: anchorHl ? anchorHl.chapterUid : void 0
       });
       this.close();
     });
@@ -4711,18 +4311,18 @@ var PlotEventModal = class extends import_obsidian5.Modal {
     const hintInput = form.createEl("input", {
       type: "text",
       cls: "readflow-input",
-      placeholder: "\u5982\uFF1A\u9996\u6B21\u76F8\u9047\u3001\u51B2\u7A81\u7206\u53D1",
+      placeholder: "\u5982\uFF1A\u9996\u6B21\u76F8\u9047\u3001\u51B2\u7A81\u7206\u53D1"
     });
     form.createEl("label", { text: "\u951A\u5B9A\u6458\u5F55", cls: "readflow-field-label" });
     const hlSelect = form.createEl("select", { cls: "readflow-select" });
     const sortedHl = [...this.scopeBook.highlights].sort(
-      (a, b) => chapterSortKey(a) - chapterSortKey(b) || a.createdAt - b.createdAt,
+      (a, b) => chapterSortKey(a) - chapterSortKey(b) || a.createdAt - b.createdAt
     );
     for (const h of sortedHl) {
       const opt = hlSelect.createEl("option");
       opt.value = h.id;
       const ch = chapterLabel(h);
-      opt.textContent = shortLabel((ch && ch !== "(\u672A\u5206\u7AE0)" ? ch + " \u00B7 " : "") + h.content, 44);
+      opt.textContent = shortLabel((ch && ch !== "(\u672A\u5206\u7AE0)" ? ch + " \xB7 " : "") + h.content, 44);
     }
     form.createEl("label", { text: "\u53C2\u4E0E\u4EBA\u7269\uFF08\u53EF\u591A\u9009\uFF09", cls: "readflow-field-label" });
     const partHost = form.createDiv("readflow-plot-participants");
@@ -4761,7 +4361,7 @@ var PlotEventModal = class extends import_obsidian5.Modal {
         hint,
         atHighlightId,
         participants,
-        chapterUid: anchorHl ? anchorHl.chapterUid : void 0,
+        chapterUid: anchorHl ? anchorHl.chapterUid : void 0
       });
       this.close();
     });
@@ -4779,10 +4379,7 @@ function filterBooksByQuery(books, query) {
   const q = String(query || "").trim().toLowerCase();
   if (!q) return books;
   return books.filter(
-    (b) =>
-      b.title.toLowerCase().includes(q) ||
-      (b.author || "").toLowerCase().includes(q) ||
-      b.bookId.toLowerCase().includes(q),
+    (b) => b.title.toLowerCase().includes(q) || (b.author || "").toLowerCase().includes(q) || b.bookId.toLowerCase().includes(q)
   );
 }
 function buildBooksForSelect(sortedBooks, query) {
@@ -4805,9 +4402,7 @@ function repopulateBookSelect(select, booksForSelect, selectedBookId, options = 
     placeholder.value = "";
   }
   for (const b of booksForSelect) {
-    const syncDate = b.lastSync
-      ? new Date(b.lastSync).toLocaleDateString("zh-CN", { month: "short", day: "numeric" })
-      : "\u672A\u540C\u6B65";
+    const syncDate = b.lastSync ? new Date(b.lastSync).toLocaleDateString("zh-CN", { month: "short", day: "numeric" }) : "\u672A\u540C\u6B65";
     const opt = select.createEl("option", { text: `${b.title} \xB7 ${b.highlights.length} \u6761 \xB7 ${syncDate}` });
     opt.value = b.bookId;
   }
@@ -4819,11 +4414,10 @@ function repopulateBookSelect(select, booksForSelect, selectedBookId, options = 
 }
 function attachDetachedPanelResize(panel) {
   if (!(panel instanceof HTMLElement)) return;
-  var MIN_W = 320,
-    MIN_H = 240;
+  var MIN_W = 320, MIN_H = 240;
   var savedW = parseInt(localStorage.getItem("readflow.detachedW") || "440", 10);
   var savedH = parseInt(localStorage.getItem("readflow.detachedH") || "0", 10);
-  var clampDim = function (v, min, max) {
+  var clampDim = function(v, min, max) {
     return Math.max(min, Math.min(max, v));
   };
   panel.style.width = clampDim(savedW, MIN_W, window.innerWidth - 24) + "px";
@@ -4836,21 +4430,19 @@ function attachDetachedPanelResize(panel) {
   grip.className = "readflow-detached-resize-grip";
   grip.setAttribute("title", "\u62D6\u62FD\u8C03\u6574\u7A97\u53E3\u5927\u5C0F");
   panel.appendChild(grip);
-  grip.addEventListener("mousedown", function (e) {
+  grip.addEventListener("mousedown", function(e) {
     e.preventDefault();
     e.stopPropagation();
     grip.classList.add("is-dragging");
-    var startX = e.clientX,
-      startY = e.clientY;
-    var startW = panel.offsetWidth,
-      startH = panel.offsetHeight;
-    var onMove = function (ev) {
+    var startX = e.clientX, startY = e.clientY;
+    var startW = panel.offsetWidth, startH = panel.offsetHeight;
+    var onMove = function(ev) {
       var nw = clampDim(startW + ev.clientX - startX, MIN_W, window.innerWidth - 24);
       var nh = clampDim(startH + ev.clientY - startY, MIN_H, window.innerHeight - 48);
       panel.style.width = nw + "px";
       panel.style.height = nh + "px";
     };
-    var onUp = function () {
+    var onUp = function() {
       grip.classList.remove("is-dragging");
       document.removeEventListener("mousemove", onMove);
       document.removeEventListener("mouseup", onUp);
@@ -4894,14 +4486,13 @@ function attachMindMapModalResize(modal) {
     console.warn("[ReadFlow] attachMindMapModalResize: modal box not found");
     return null;
   }
-  var MIN_W = 600,
-    MIN_H = 400;
+  var MIN_W = 600, MIN_H = 400;
   var savedW = parseInt(localStorage.getItem("readflow.mmModalW") || "1100", 10);
   var savedH = parseInt(localStorage.getItem("readflow.mmModalH") || "720", 10);
-  var clampDim = function (v, min, max) {
+  var clampDim = function(v, min, max) {
     return Math.max(min, Math.min(max, v));
   };
-  var applySize = function (w, h) {
+  var applySize = function(w, h) {
     var cw = clampDim(w, MIN_W, window.innerWidth * 0.96);
     var ch = clampDim(h, MIN_H, window.innerHeight * 0.92);
     applyMindMapModalDimensions(containerEl, modalBox, cw, ch);
@@ -4913,18 +4504,16 @@ function attachMindMapModalResize(modal) {
   if (existing) existing.remove();
   var grip = modalBox.createDiv("readflow-mm-modal-resize-grip");
   grip.setAttribute("title", "\u62D6\u62FD\u8C03\u6574\u7A97\u53E3\u5927\u5C0F");
-  grip.addEventListener("mousedown", function (e) {
+  grip.addEventListener("mousedown", function(e) {
     e.preventDefault();
     e.stopPropagation();
     grip.classList.add("is-dragging");
-    var startX = e.clientX,
-      startY = e.clientY;
-    var startW = modalBox.offsetWidth,
-      startH = modalBox.offsetHeight;
-    var onMove = function (ev) {
+    var startX = e.clientX, startY = e.clientY;
+    var startW = modalBox.offsetWidth, startH = modalBox.offsetHeight;
+    var onMove = function(ev) {
       applySize(startW + ev.clientX - startX, startH + ev.clientY - startY);
     };
-    var onUp = function () {
+    var onUp = function() {
       grip.classList.remove("is-dragging");
       document.removeEventListener("mousemove", onMove);
       document.removeEventListener("mouseup", onUp);
@@ -4938,15 +4527,15 @@ function attachMindMapModalResize(modal) {
 }
 function buildRelationGraphModel(book, scopeBook, opts) {
   var _a, _b;
-  var base = (opts && opts.base) || "book";
-  var lens = (opts && opts.lens) || "all";
-  var topicFilter = ((opts && opts.topic) || "").trim();
-  var focusEntity = ((opts && opts.entity) || "").trim();
+  var base = opts && opts.base || "book";
+  var lens = opts && opts.lens || "all";
+  var topicFilter = (opts && opts.topic || "").trim();
+  var focusEntity = (opts && opts.entity || "").trim();
   if (lens === "people") base = "entity";
   var highlights = applyMindMapLens(scopeBook.highlights, lens);
   if (base === "topic" && topicFilter) {
-    highlights = highlights.filter(function (h) {
-      var t = (h.topic || "").trim() || "\u672A\u5F52\u7C7B";
+    highlights = highlights.filter(function(h3) {
+      var t = (h3.topic || "").trim() || "\u672A\u5F52\u7C7B";
       return t === topicFilter;
     });
   }
@@ -4955,29 +4544,29 @@ function buildRelationGraphModel(book, scopeBook, opts) {
   var usingTopicFallback = false;
   var entityLabelLookup = buildEntityLabelLookup(scopeBook);
   var aliasMap = buildEntityAliasMap(book);
-  var addHl = function (h) {
-    if (!h || nodeMap.has(h.id)) return;
-    nodeMap.set(h.id, {
-      id: h.id,
-      label: h.content.slice(0, 10) + (h.content.length > 10 ? "\u2026" : ""),
+  var addHl = function(h3) {
+    if (!h3 || nodeMap.has(h3.id)) return;
+    nodeMap.set(h3.id, {
+      id: h3.id,
+      label: h3.content.slice(0, 10) + (h3.content.length > 10 ? "\u2026" : ""),
       kind: "highlight",
-      type: h.highlightType,
-      status: h.status,
-      highlight: h,
+      type: h3.highlightType,
+      status: h3.status,
+      highlight: h3
     });
   };
-  var addEnt = function (name) {
+  var addEnt = function(name) {
     var id = entityEntIdForGraph(name, aliasMap, entityLabelLookup);
     if (nodeMap.has(id)) return;
     nodeMap.set(id, {
-      id: id,
+      id,
       label: shortLabel(entityGraphLabel(name, entityLabelLookup), 8),
       kind: "entity",
       type: null,
-      status: null,
+      status: null
     });
   };
-  var addBookEntityRelations = function () {
+  var addBookEntityRelations = function() {
     for (var er of book.entityRelations || []) {
       if (!er || !er.source || !er.target) continue;
       addEnt(er.source);
@@ -4987,15 +4576,15 @@ function buildRelationGraphModel(book, scopeBook, opts) {
         target: entityEntIdForGraph(er.target, aliasMap, entityLabelLookup),
         hint: relationEdgeHint(er, book),
         dim: false,
-        evolution: !!er.sinceHighlightId,
+        evolution: !!er.sinceHighlightId
       });
     }
   };
   if (base === "entity") {
     for (var i = 0; i < highlights.length; i++) {
       var h = highlights[i];
-      var ents = (h.entities || []).map(function (e) {
-        return e.trim();
+      var ents = (h.entities || []).map(function(e2) {
+        return e2.trim();
       }).filter(Boolean);
       if (ents.length === 0) continue;
       addHl(h);
@@ -5005,7 +4594,7 @@ function buildRelationGraphModel(book, scopeBook, opts) {
           source: entityEntIdForGraph(ents[j], aliasMap, entityLabelLookup),
           target: h.id,
           hint: "\u63D0\u53CA",
-          dim: false,
+          dim: false
         });
       }
       for (var a = 0; a < ents.length; a++) {
@@ -5014,7 +4603,7 @@ function buildRelationGraphModel(book, scopeBook, opts) {
             source: entityEntIdForGraph(ents[a], aliasMap, entityLabelLookup),
             target: entityEntIdForGraph(ents[b], aliasMap, entityLabelLookup),
             hint: "\u5171\u73B0",
-            dim: false,
+            dim: false
           });
         }
       }
@@ -5023,10 +4612,10 @@ function buildRelationGraphModel(book, scopeBook, opts) {
       var hs = highlights[k];
       for (var r = 0; r < (((_a = hs.relations) == null ? void 0 : _a.length) || 0); r++) {
         var rel = hs.relations[r];
-        var tgt = book.highlights.find(function (x) {
+        var tgt = book.highlights.find(function(x) {
           return x.id === rel.targetId;
         });
-        if (!tgt || !highlights.find(function (x) {
+        if (!tgt || !highlights.find(function(x) {
           return x.id === tgt.id;
         })) continue;
         addHl(hs);
@@ -5055,7 +4644,7 @@ function buildRelationGraphModel(book, scopeBook, opts) {
       for (var nk of [...nodeMap.keys()]) {
         if (!keep.has(nk)) nodeMap.delete(nk);
       }
-      edges = edges.filter(function (e2) {
+      edges = edges.filter(function(e2) {
         return nodeMap.has(e2.source) && nodeMap.has(e2.target);
       });
     }
@@ -5064,7 +4653,7 @@ function buildRelationGraphModel(book, scopeBook, opts) {
         var nd = nodeMap.get(nk);
         if (!nd || nd.kind !== "entity") nodeMap.delete(nk);
       }
-      edges = edges.filter(function (e3) {
+      edges = edges.filter(function(e3) {
         return e3.source.startsWith("ent:") && e3.target.startsWith("ent:");
       });
     }
@@ -5074,7 +4663,7 @@ function buildRelationGraphModel(book, scopeBook, opts) {
       for (var ri = 0; ri < (((_b = h2.relations) == null ? void 0 : _b.length) || 0); ri++) {
         var rel2 = h2.relations[ri];
         addHl(h2);
-        addHl(book.highlights.find(function (x) {
+        addHl(book.highlights.find(function(x) {
           return x.id === rel2.targetId;
         }));
         edges.push({ source: h2.id, target: rel2.targetId, hint: rel2.hint, dim: false });
@@ -5125,19 +4714,12 @@ function buildRelationGraphModel(book, scopeBook, opts) {
       }
     }
   }
-  var emptyMsg =
-    lens === "people"
-      ? "\u6682\u65E0\u4EBA\u7269\u6807\u7B7E\u3002\u8BF7\u7528\u300C\u89D2\u8272:\u540D\u5B57\u300D\u6807\u6CE8\u6458\u5F55\uFF0C\u5E76\u70B9\u300C\u65B0\u589E\u4EBA\u7269\u5173\u7CFB\u300D\u3002"
-      : lens === "ideas"
-        ? "\u6682\u65E0\u53EF\u68B3\u7406\u6458\u5F55\u3002\u5207\u6362\u5230\u300C\u5168\u4E66\u7ED3\u6784\u300D\u53EF\u67E5\u770B\u6240\u6709\u5185\u5BB9\u3002"
-        : base === "entity"
-          ? "\u6682\u65E0\u5B9E\u4F53\u6807\u7B7E\u3002\u8BF7\u5728\u6458\u5F55\u4E2D\u6DFB\u52A0 entities\uFF08\u5982\u4EBA\u540D\uFF09\u3002"
-          : "\u9009\u4E2D\u6458\u5F55 \u2192 \u5EFA\u7ACB\u5173\u7CFB\uFF0C\u6216\u8BBE\u7F6E\u76F8\u540C\u4E3B\u9898/\u5B9E\u4F53\u540E\u81EA\u52A8\u751F\u6210";
+  var emptyMsg = lens === "people" ? "\u6682\u65E0\u4EBA\u7269\u6807\u7B7E\u3002\u8BF7\u7528\u300C\u89D2\u8272:\u540D\u5B57\u300D\u6807\u6CE8\u6458\u5F55\uFF0C\u5E76\u70B9\u300C\u65B0\u589E\u4EBA\u7269\u5173\u7CFB\u300D\u3002" : lens === "ideas" ? "\u6682\u65E0\u53EF\u68B3\u7406\u6458\u5F55\u3002\u5207\u6362\u5230\u300C\u5168\u4E66\u7ED3\u6784\u300D\u53EF\u67E5\u770B\u6240\u6709\u5185\u5BB9\u3002" : base === "entity" ? "\u6682\u65E0\u5B9E\u4F53\u6807\u7B7E\u3002\u8BF7\u5728\u6458\u5F55\u4E2D\u6DFB\u52A0 entities\uFF08\u5982\u4EBA\u540D\uFF09\u3002" : "\u9009\u4E2D\u6458\u5F55 \u2192 \u5EFA\u7ACB\u5173\u7CFB\uFF0C\u6216\u8BBE\u7F6E\u76F8\u540C\u4E3B\u9898/\u5B9E\u4F53\u540E\u81EA\u52A8\u751F\u6210";
   return {
     nodes: [...nodeMap.values()],
-    edges: edges,
-    usingTopicFallback: usingTopicFallback,
-    emptyMsg: emptyMsg,
+    edges,
+    usingTopicFallback,
+    emptyMsg
   };
 }
 function renderRelationGraphCanvas(container, book, scopeBook, opts) {
@@ -5152,52 +4734,38 @@ function renderRelationGraphCanvas(container, book, scopeBook, opts) {
   var canvas = wrap.createEl("canvas", { cls: "readflow-graph-canvas" });
   var _gcr = wrap.getBoundingClientRect();
   var W = _gcr.width > 0 ? _gcr.width : container.getBoundingClientRect().width || 340;
-  var H =
-    expanded && _gcr.height > 0
-      ? _gcr.height
-      : expanded
-        ? Math.max(400, container.getBoundingClientRect().height - 40, 260)
-        : _gcr.height > 0
-          ? _gcr.height
-          : 260;
+  var H = expanded && _gcr.height > 0 ? _gcr.height : expanded ? Math.max(400, container.getBoundingClientRect().height - 40, 260) : _gcr.height > 0 ? _gcr.height : 260;
   canvas.width = W;
   canvas.height = H;
-  var nodes = model.nodes.map(function (n) {
+  var nodes = model.nodes.map(function(n2) {
     return {
-      id: n.id,
-      label: n.label,
-      kind: n.kind,
-      type: n.type,
-      status: n.status,
-      highlight: n.highlight,
+      id: n2.id,
+      label: n2.label,
+      kind: n2.kind,
+      type: n2.type,
+      status: n2.status,
+      highlight: n2.highlight,
       x: W / 2 + (Math.random() - 0.5) * W * 0.55,
       y: H / 2 + (Math.random() - 0.5) * H * 0.55,
       vx: 0,
-      vy: 0,
+      vy: 0
     };
   });
   var edges = model.edges.slice();
-  var nodeMap = new Map(nodes.map(function (n) {
-    return [n.id, n];
+  var nodeMap = new Map(nodes.map(function(n2) {
+    return [n2.id, n2];
   }));
-  var REPULSE = 2800,
-    SPRING = 0.025,
-    IDEAL = 75,
-    GRAV = 0.01;
-  var cx = W / 2,
-    cy = H / 2;
+  var REPULSE = 2800, SPRING = 0.025, IDEAL = 75, GRAV = 0.01;
+  var cx = W / 2, cy = H / 2;
   for (var iter = 0; iter < 280; iter++) {
     for (var i = 0; i < nodes.length; i++) {
       for (var j = i + 1; j < nodes.length; j++) {
-        var a = nodes[i],
-          b = nodes[j];
-        var dx = b.x - a.x,
-          dy = b.y - a.y;
+        var a = nodes[i], b = nodes[j];
+        var dx = b.x - a.x, dy = b.y - a.y;
         var dist2 = dx * dx + dy * dy + 1;
         var dist = Math.sqrt(dist2);
         var f = REPULSE / dist2;
-        var fx = (dx / dist) * f,
-          fy = (dy / dist) * f;
+        var fx = dx / dist * f, fy = dy / dist * f;
         a.vx -= fx;
         a.vy -= fy;
         b.vx += fx;
@@ -5206,15 +4774,12 @@ function renderRelationGraphCanvas(container, book, scopeBook, opts) {
     }
     for (var ei = 0; ei < edges.length; ei++) {
       var edge = edges[ei];
-      var s = nodeMap.get(edge.source),
-        t = nodeMap.get(edge.target);
+      var s = nodeMap.get(edge.source), t = nodeMap.get(edge.target);
       if (!s || !t) continue;
-      var dx2 = t.x - s.x,
-        dy2 = t.y - s.y;
+      var dx2 = t.x - s.x, dy2 = t.y - s.y;
       var dist3 = Math.sqrt(dx2 * dx2 + dy2 * dy2) || 1;
       var f2 = (dist3 - IDEAL) * SPRING;
-      var fx2 = (dx2 / dist3) * f2,
-        fy2 = (dy2 / dist3) * f2;
+      var fx2 = dx2 / dist3 * f2, fy2 = dy2 / dist3 * f2;
       s.vx += fx2;
       s.vy += fy2;
       t.vx -= fx2;
@@ -5235,7 +4800,7 @@ function renderRelationGraphCanvas(container, book, scopeBook, opts) {
     method: "#0891b2",
     example: "#059669",
     conclusion: "#dc2626",
-    question: "#d97706",
+    question: "#d97706"
   };
   var HINT_COLORS = {
     "\u8865\u5145": "#059669",
@@ -5252,22 +4817,19 @@ function renderRelationGraphCanvas(container, book, scopeBook, opts) {
     "\u5408\u4F5C": "#059669",
     "\u7ADE\u4E89": "#dc2626",
     "\u5BB6\u65CF": "#a855f7",
-    "\u5F15\u7528": "#6366f1",
+    "\u5F15\u7528": "#6366f1"
   };
-  var scale = 1,
-    tx = 0,
-    ty = 0;
-  var hoveredNode = null,
-    activeNode = null;
+  var scale = 1, tx = 0, ty = 0;
+  var hoveredNode = null, activeNode = null;
   var isPanning = false;
   var panOrigin = { x: 0, y: 0 };
-  var getColor = function (node) {
+  var getColor = function(node) {
     if (node.kind === "entity") return "#ec4899";
     if (node.status && STATUS_COLORS[node.status]) return STATUS_COLORS[node.status];
     if (!node.type) return "#94a3b8";
     return TYPE_COLORS[node.type] || "#6366f1";
   };
-  var drawRoundRect = function (ctx, x, y, w, h, r) {
+  var drawRoundRect = function(ctx, x, y, w, h, r) {
     ctx.beginPath();
     ctx.moveTo(x + r, y);
     ctx.lineTo(x + w - r, y);
@@ -5280,7 +4842,7 @@ function renderRelationGraphCanvas(container, book, scopeBook, opts) {
     ctx.quadraticCurveTo(x, y, x + r, y);
     ctx.closePath();
   };
-  var draw = function () {
+  var draw = function() {
     var ctx = canvas.getContext("2d");
     if (!ctx) return;
     var isDark = document.body.classList.contains("theme-dark");
@@ -5296,21 +4858,16 @@ function renderRelationGraphCanvas(container, book, scopeBook, opts) {
     ctx.scale(scale, scale);
     for (var ei2 = 0; ei2 < edges.length; ei2++) {
       var edge2 = edges[ei2];
-      var s2 = nodeMap.get(edge2.source),
-        t2 = nodeMap.get(edge2.target);
+      var s2 = nodeMap.get(edge2.source), t2 = nodeMap.get(edge2.target);
       if (!s2 || !t2) continue;
       var isConnected = activeNode && (activeNode.id === edge2.source || activeNode.id === edge2.target);
-      var dx4 = t2.x - s2.x,
-        dy4 = t2.y - s2.y;
+      var dx4 = t2.x - s2.x, dy4 = t2.y - s2.y;
       var dist4 = Math.sqrt(dx4 * dx4 + dy4 * dy4) || 1;
-      var nx = dx4 / dist4,
-        ny = dy4 / dist4;
+      var nx = dx4 / dist4, ny = dy4 / dist4;
       var R2 = s2.kind === "entity" ? 16 : 14;
       var R2t = t2.kind === "entity" ? 16 : 14;
-      var sx = s2.x + nx * R2,
-        sy = s2.y + ny * R2;
-      var ex = t2.x - nx * R2t,
-        ey = t2.y - ny * R2t;
+      var sx = s2.x + nx * R2, sy = s2.y + ny * R2;
+      var ex = t2.x - nx * R2t, ey = t2.y - ny * R2t;
       var color = isConnected ? HINT_COLORS[edge2.hint] || "#6366f1" : edge2.dim ? "#8b5cf6" : mutedEdge;
       ctx.strokeStyle = color;
       ctx.lineWidth = (isConnected ? 2 : 1.2) / scale;
@@ -5340,12 +4897,9 @@ function renderRelationGraphCanvas(container, book, scopeBook, opts) {
       var baseR = node.kind === "entity" ? 16 : 14;
       var nr = isHov || isActive ? baseR * 1.35 : baseR;
       var color2 = getColor(node);
-      var faded =
-        activeNode &&
-        !isActive &&
-        !edges.some(function (e) {
-          return (e.source === activeNode.id && e.target === node.id) || (e.target === activeNode.id && e.source === node.id);
-        });
+      var faded = activeNode && !isActive && !edges.some(function(e) {
+        return e.source === activeNode.id && e.target === node.id || e.target === activeNode.id && e.source === node.id;
+      });
       ctx.globalAlpha = faded ? 0.25 : 1;
       ctx.fillStyle = color2;
       ctx.beginPath();
@@ -5360,7 +4914,7 @@ function renderRelationGraphCanvas(container, book, scopeBook, opts) {
     ctx.globalAlpha = 1;
     ctx.restore();
   };
-  var reflowGraph = function () {
+  var reflowGraph = function() {
     var nw = wrap.getBoundingClientRect().width;
     var nh = wrap.getBoundingClientRect().height;
     var changed = false;
@@ -5379,34 +4933,33 @@ function renderRelationGraphCanvas(container, book, scopeBook, opts) {
     if (changed) draw();
   };
   draw();
-  requestAnimationFrame(function () {
-    requestAnimationFrame(function () {
+  requestAnimationFrame(function() {
+    requestAnimationFrame(function() {
       reflowGraph();
     });
   });
   canvas.addEventListener(
     "wheel",
-    function (e) {
+    function(e) {
       e.preventDefault();
-      var f = e.deltaY > 0 ? 0.88 : 1.14;
+      var f3 = e.deltaY > 0 ? 0.88 : 1.14;
       var rect = canvas.getBoundingClientRect();
-      var mx = e.clientX - rect.left,
-        my = e.clientY - rect.top;
-      tx = mx - (mx - tx) * f;
-      ty = my - (my - ty) * f;
-      scale = Math.max(0.15, Math.min(scale * f, 6));
+      var mx = e.clientX - rect.left, my = e.clientY - rect.top;
+      tx = mx - (mx - tx) * f3;
+      ty = my - (my - ty) * f3;
+      scale = Math.max(0.15, Math.min(scale * f3, 6));
       draw();
       if (opts && opts.onScaleChange) opts.onScaleChange(scale);
     },
-    { passive: false },
+    { passive: false }
   );
-  canvas.addEventListener("mousedown", function (e) {
+  canvas.addEventListener("mousedown", function(e) {
     if (e.button === 0) {
       isPanning = true;
       panOrigin = { x: e.clientX - tx, y: e.clientY - ty };
     }
   });
-  canvas.addEventListener("mousemove", function (e) {
+  canvas.addEventListener("mousemove", function(e) {
     var rect = canvas.getBoundingClientRect();
     var mx = (e.clientX - rect.left - tx) / scale;
     var my = (e.clientY - rect.top - ty) / scale;
@@ -5431,10 +4984,10 @@ function renderRelationGraphCanvas(container, book, scopeBook, opts) {
       draw();
     }
   });
-  canvas.addEventListener("mouseup", function () {
+  canvas.addEventListener("mouseup", function() {
     isPanning = false;
   });
-  canvas.addEventListener("mouseleave", function () {
+  canvas.addEventListener("mouseleave", function() {
     isPanning = false;
     hoveredNode = null;
     draw();
@@ -5442,23 +4995,23 @@ function renderRelationGraphCanvas(container, book, scopeBook, opts) {
   var ro = new ResizeObserver(reflowGraph);
   ro.observe(wrap);
   var controls = {
-    zoomIn: function () {
-      var f = 1.14;
-      tx = W / 2 - (W / 2 - tx) * f;
-      ty = H / 2 - (H / 2 - ty) * f;
-      scale = Math.min(scale * f, 6);
+    zoomIn: function() {
+      var f3 = 1.14;
+      tx = W / 2 - (W / 2 - tx) * f3;
+      ty = H / 2 - (H / 2 - ty) * f3;
+      scale = Math.min(scale * f3, 6);
       draw();
       if (opts && opts.onScaleChange) opts.onScaleChange(scale);
     },
-    zoomOut: function () {
-      var f = 0.88;
-      tx = W / 2 - (W / 2 - tx) * f;
-      ty = H / 2 - (H / 2 - ty) * f;
-      scale = Math.max(scale * f, 0.15);
+    zoomOut: function() {
+      var f3 = 0.88;
+      tx = W / 2 - (W / 2 - tx) * f3;
+      ty = H / 2 - (H / 2 - ty) * f3;
+      scale = Math.max(scale * f3, 0.15);
       draw();
       if (opts && opts.onScaleChange) opts.onScaleChange(scale);
     },
-    resetView: function () {
+    resetView: function() {
       scale = 1;
       tx = 0;
       ty = 0;
@@ -5466,9 +5019,9 @@ function renderRelationGraphCanvas(container, book, scopeBook, opts) {
       if (opts && opts.onScaleChange) opts.onScaleChange(scale);
     },
     reflow: reflowGraph,
-    getScale: function () {
+    getScale: function() {
       return scale;
-    },
+    }
   };
   wrap.readflowMmControls = controls;
   return controls;
@@ -5562,13 +5115,13 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       empty.createEl("p", { text: "\u6682\u65E0\u540C\u6B65\u6570\u636E", cls: "readflow-empty-title" });
       empty.createEl("p", {
         text: "\u8BF7\u5728\u8BBE\u7F6E\u4E2D\u914D\u7F6E\u5FAE\u4FE1\u8BFB\u4E66 Cookie\uFF0C\u5E76\u6267\u884C\u300C\u540C\u6B65\u5FAE\u4FE1\u8BFB\u4E66\u300D\u6216\u4F7F\u7528\u547D\u4EE4\u9762\u677F\u641C\u7D22 ReadFlow\u3002",
-        cls: "readflow-empty-desc",
+        cls: "readflow-empty-desc"
       });
       return;
     }
     const selectedId = localStorage.getItem("readflow.selectedBookId");
     const validBook = books.find((item) => item.bookId === selectedId);
-    const book = validBook ? validBook : (books[0] || null);
+    const book = validBook ? validBook : books[0] || null;
     if (!book) return;
     if (!validBook && selectedId) {
       console.warn("[ReadFlow] selectedBookId \u6307\u5411\u7684\u4E66\u7C4D\u5DF2\u4E0D\u5B58\u5728\uFF0C\u56DE\u9000\u5230\u7B2C\u4E00\u672C\u4E66\u3002", selectedId);
@@ -5592,9 +5145,6 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     this.renderWorkspace(workspace, book, tree);
     this.renderSidebar(sidebar, books, book, tree, inboxCount, reviewingCount, draftedCount, processedCount);
     this.renderVisibleList(book, tree);
-    // Guard: prevent Obsidian layout-change from collapsing content-grid.
-    // Strategy: observe contentEl (ItemView root) and detect extreme squish.
-    // Also observe the shell itself. If either signals collapse, pin the shell's height.
     const cg = this.contentEl.querySelector(".readflow-content-grid");
     if (cg instanceof HTMLElement) {
       if (this._shellRo) this._shellRo.disconnect();
@@ -5617,15 +5167,8 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
   }
   renderVisibleList(book, tree) {
     const visible = this.getVisibleHighlights(book, tree);
-    const listEl = this.listDetached
-      ? this.detachedPanel == null
-        ? null
-        : this.detachedPanel.querySelector(".readflow-card-list")
-      : this.listContainerEl;
-    const pct =
-      listEl instanceof HTMLElement && listEl.scrollHeight > listEl.clientHeight
-        ? listEl.scrollTop / (listEl.scrollHeight - listEl.clientHeight)
-        : 0;
+    const listEl = this.listDetached ? this.detachedPanel == null ? null : this.detachedPanel.querySelector(".readflow-card-list") : this.listContainerEl;
+    const pct = listEl instanceof HTMLElement && listEl.scrollHeight > listEl.clientHeight ? listEl.scrollTop / (listEl.scrollHeight - listEl.clientHeight) : 0;
     this._scrollRestoreEl = listEl instanceof HTMLElement ? listEl : null;
     this._scrollRestorePct = pct;
     this.shouldRestoreScroll = true;
@@ -5634,20 +5177,17 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     this.renderKnowledgeInspector(book, visible);
   }
   _updateSortBtnDirs() {
-    const header = this.listDetached
-      ? this.detachedPanel == null ? null : this.detachedPanel.querySelector(".readflow-detached-panel-header")
-      : this.contentEl == null ? null : this.contentEl.querySelector(".readflow-list-header");
+    var _a;
+    const header = this.listDetached ? this.detachedPanel == null ? null : this.detachedPanel.querySelector(".readflow-detached-panel-header") : this.contentEl == null ? null : this.contentEl.querySelector(".readflow-list-header");
     if (!header) return;
-    const timeBtn = header.querySelector(".readflow-book-sort-compound__icon")?.parentElement;
+    const timeBtn = (_a = header.querySelector(".readflow-book-sort-compound__icon")) == null ? void 0 : _a.parentElement;
     const topicBtn = timeBtn ? timeBtn.nextElementSibling : null;
     if (timeBtn) {
       const timeDir = timeBtn.querySelector(".readflow-book-sort-compound__dir");
       const isTimeActive = this.listOrderMode === "time";
       timeBtn.classList.toggle("readflow-btn--ghost", !isTimeActive);
       timeBtn.classList.toggle("readflow-book-sort-btn--active", isTimeActive);
-      timeBtn.title = isTimeActive
-        ? `\u65F6\u95F4\u6392\u5E8F \xB7 ${this.listTimeDir === "desc" ? "\u65B0\u2192\u65E7" : "\u65E7\u2192\u65B0"}\uFF0C\u518D\u70B9\u5207\u6362\u65B9\u5411`
-        : "\u6309\u65F6\u95F4\u6392\u5E8F";
+      timeBtn.title = isTimeActive ? `\u65F6\u95F4\u6392\u5E8F \xB7 ${this.listTimeDir === "desc" ? "\u65B0\u2192\u65E7" : "\u65E7\u2192\u65B0"}\uFF0C\u518D\u70B9\u5207\u6362\u65B9\u5411` : "\u6309\u65F6\u95F4\u6392\u5E8F";
       if (timeDir) {
         if (isTimeActive) {
           timeDir.textContent = sortDirArrow(this.listTimeDir);
@@ -5662,9 +5202,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       const isTopicActive = this.listOrderMode === "topic";
       topicBtn.classList.toggle("readflow-btn--ghost", !isTopicActive);
       topicBtn.classList.toggle("readflow-book-sort-btn--active", isTopicActive);
-      topicBtn.title = isTopicActive
-        ? `\u4E3B\u9898\u6392\u5E8F \xB7 ${this.listTopicDir === "asc" ? "A\u2192Z" : "Z\u2192A"}\uFF0C\u518D\u70B9\u5207\u6362\u65B9\u5411`
-        : "\u6309\u4E3B\u9898\u6392\u5E8F";
+      topicBtn.title = isTopicActive ? `\u4E3B\u9898\u6392\u5E8F \xB7 ${this.listTopicDir === "asc" ? "A\u2192Z" : "Z\u2192A"}\uFF0C\u518D\u70B9\u5207\u6362\u65B9\u5411` : "\u6309\u4E3B\u9898\u6392\u5E8F";
       if (topicDir) {
         if (isTopicActive) {
           topicDir.textContent = this.listTopicDir === "asc" ? "\u2191" : "\u2193";
@@ -5679,21 +5217,22 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     var _a, _b;
     console.log(
       "[ReadFlow] getVisibleHighlights",
-      "selectedChapter:", this.selectedChapter,
-      "selectedBoardFilter:", this.selectedBoardFilter,
-      "selectedTopic:", this.selectedTopic,
-      "onlyInbox:", this.onlyInbox,
-      "searchQuery:", this.searchQuery,
-      "tree.length:", tree.length,
-      "book.highlights.length:", book.highlights.length,
+      "selectedChapter:",
+      this.selectedChapter,
+      "selectedBoardFilter:",
+      this.selectedBoardFilter,
+      "selectedTopic:",
+      this.selectedTopic,
+      "onlyInbox:",
+      this.onlyInbox,
+      "searchQuery:",
+      this.searchQuery,
+      "tree.length:",
+      tree.length,
+      "book.highlights.length:",
+      book.highlights.length
     );
-    const source =
-      this.selectedChapter == null
-        ? book.highlights
-        : (_b = (_a = tree.find((node) => node.chapter === this.selectedChapter)) == null ? void 0 : _a.highlights) !=
-            null
-          ? _b
-          : [];
+    const source = this.selectedChapter == null ? book.highlights : (_b = (_a = tree.find((node) => node.chapter === this.selectedChapter)) == null ? void 0 : _a.highlights) != null ? _b : [];
     if (this.selectedBoardFilter != null) {
       const bf = this.selectedBoardFilter;
       if (STATUS_FLOW.includes(bf)) {
@@ -5713,14 +5252,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
   _matchesSearch(h) {
     if (!this.searchQuery) return true;
     const q = this.searchQuery.toLowerCase();
-    return (
-      (h.content || "").toLowerCase().includes(q) ||
-      (h.note || "").toLowerCase().includes(q) ||
-      (h.topic || "").toLowerCase().includes(q) ||
-      (h.highlightType || "").toLowerCase().includes(q) ||
-      (h.chapter || "").toLowerCase().includes(q) ||
-      (h.entities || []).some((e) => e.toLowerCase().includes(q))
-    );
+    return (h.content || "").toLowerCase().includes(q) || (h.note || "").toLowerCase().includes(q) || (h.topic || "").toLowerCase().includes(q) || (h.highlightType || "").toLowerCase().includes(q) || (h.chapter || "").toLowerCase().includes(q) || (h.entities || []).some((e) => e.toLowerCase().includes(q));
   }
   renderTopbar() {
     this.mountTopbar();
@@ -5731,7 +5263,8 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     this.mountTopbar();
   }
   mountTopbar() {
-    this.contentEl.querySelector(".readflow-topbar")?.remove();
+    var _a;
+    (_a = this.contentEl.querySelector(".readflow-topbar")) == null ? void 0 : _a.remove();
     const topbar = this.contentEl.createDiv("readflow-topbar");
     if (this.contentEl.firstChild !== topbar) {
       this.contentEl.insertBefore(topbar, this.contentEl.firstChild);
@@ -5755,7 +5288,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     brand.createEl("h2", { text: "ReadFlow", cls: "readflow-brand-title" });
     brand.createEl("p", {
       text: "\u5FAE\u4FE1\u8BFB\u4E66\u540C\u6B65 \xB7 \u6458\u5F55\u6574\u7406 \xB7 Vault \u843D\u76D8",
-      cls: "readflow-brand-sub",
+      cls: "readflow-brand-sub"
     });
     const toolbar = topbar.createDiv("readflow-toolbar");
     const actions = toolbar.createDiv("readflow-toolbar-actions");
@@ -5769,7 +5302,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     importMdBtn.addEventListener("click", async () => {
       try {
         const result = await this.plugin.importFromVaultMd();
-        new import_obsidian5.Notice(`\u5BFC\u5165\u5B8C\u6210\uFF1A\u66F4\u65B0 ${result.imported} \u672C\uFF0C\u8DF3\u8FC7 ${result.skipped} \u672C${result.errors ? '\uFF0C\u9519\u8BEF ' + result.errors + ' \u4E2A' : ''}`);
+        new import_obsidian5.Notice(`\u5BFC\u5165\u5B8C\u6210\uFF1A\u66F4\u65B0 ${result.imported} \u672C\uFF0C\u8DF3\u8FC7 ${result.skipped} \u672C${result.errors ? "\uFF0C\u9519\u8BEF " + result.errors + " \u4E2A" : ""}`);
         this.render();
       } catch (e) {
         new import_obsidian5.Notice(`\u5BFC\u5165\u5931\u8D25: ${e && e.message}`);
@@ -5777,15 +5310,14 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     });
     const writeVaultBtn = actions.createEl("button", { text: "\u5199\u5165 Vault", type: "button" });
     writeVaultBtn.classList.add("readflow-btn", "readflow-btn--secondary");
-    writeVaultBtn.title =
-      "\u5C06\u5F53\u524D\u4E66\u7C4D\u6458\u5F55\u5199\u5165/\u66F4\u65B0 Vault Markdown\uFF08\u9ED8\u8BA4\u76EE\u5F55\u8BBE\u7F6E\u91CC\u7684\u4E66\u7C4D\u8DEF\u5F84\uFF09";
+    writeVaultBtn.title = "\u5C06\u5F53\u524D\u4E66\u7C4D\u6458\u5F55\u5199\u5165/\u66F4\u65B0 Vault Markdown\uFF08\u9ED8\u8BA4\u76EE\u5F55\u8BBE\u7F6E\u91CC\u7684\u4E66\u7C4D\u8DEF\u5F84\uFF09";
     writeVaultBtn.addEventListener("click", () => void this.writeCurrentBookToVault(writeVaultBtn));
     const searchArea = toolbar.createDiv("readflow-toolbar-search");
     const searchWrap = searchArea.createDiv("readflow-search-wrap");
     const searchInput = searchWrap.createEl("input", {
       type: "text",
       placeholder: "\u2710 \u641C\u7D22\u6458\u5F55/\u60F3\u6CD5...",
-      cls: "readflow-search-input",
+      cls: "readflow-search-input"
     });
     searchInput.value = this.searchQuery;
     searchInput.addEventListener("input", () => {
@@ -5797,7 +5329,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       const clearSearch = searchWrap.createEl("button", {
         text: "\u2715",
         type: "button",
-        cls: "readflow-search-clear",
+        cls: "readflow-search-clear"
       });
       clearSearch.addEventListener("click", () => {
         this.searchQuery = "";
@@ -5810,7 +5342,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     reloadBtn.classList.add("readflow-btn", "readflow-btn--secondary", "readflow-btn--sm");
     reloadBtn.setAttribute(
       "title",
-      "\u91CD\u65B0\u52A0\u8F7D ReadFlow\uFF08\u7B49\u540C\u5728\u300C\u7B2C\u4E09\u65B9\u63D2\u4EF6\u300D\u4E2D\u5173\u95ED\u518D\u5F00\u542F\uFF09",
+      "\u91CD\u65B0\u52A0\u8F7D ReadFlow\uFF08\u7B49\u540C\u5728\u300C\u7B2C\u4E09\u65B9\u63D2\u4EF6\u300D\u4E2D\u5173\u95ED\u518D\u5F00\u542F\uFF09"
     );
     reloadBtn.addEventListener("click", () => void this.plugin.reloadSelf());
     const moreBtn = util.createEl("button", { type: "button" });
@@ -5821,13 +5353,10 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     moreBtn.addEventListener("click", (e) => {
       const menu = new import_obsidian5.Menu();
       menu.addItem((item) => {
-        item
-          .setTitle("\u91CD\u5EFA\u7D22\u5F15")
-          .setIcon("database")
-          .onClick(async () => {
-            await this.plugin.linker.rebuildIndexAsync();
-            new import_obsidian5.Notice("\u5173\u8054\u7D22\u5F15\u5DF2\u66F4\u65B0");
-          });
+        item.setTitle("\u91CD\u5EFA\u7D22\u5F15").setIcon("database").onClick(async () => {
+          await this.plugin.linker.rebuildIndexAsync();
+          new import_obsidian5.Notice("\u5173\u8054\u7D22\u5F15\u5DF2\u66F4\u65B0");
+        });
       });
       menu.addItem((item) => {
         item.setTitle("\u624B\u52A8\u6458\u5F55").setIcon("square-pen").onClick(() => {
@@ -5854,7 +5383,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     toggleBtn.classList.add("readflow-btn", "readflow-btn--ghost", "readflow-btn--sm", "readflow-sidebar-toggle-btn");
     toggleBtn.setAttribute(
       "title",
-      this.sidebarCollapsed ? "\u5C55\u5F00\u5BFC\u822A\u4FA7\u680F" : "\u6536\u8D77\u5BFC\u822A\u4FA7\u680F",
+      this.sidebarCollapsed ? "\u5C55\u5F00\u5BFC\u822A\u4FA7\u680F" : "\u6536\u8D77\u5BFC\u822A\u4FA7\u680F"
     );
     toggleBtn.setText(this.sidebarCollapsed ? "\u25B6" : "\u25C0");
     toggleBtn.addEventListener("click", () => {
@@ -5875,13 +5404,13 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     const bookSearchInput = bookSearchWrap.createEl("input", {
       type: "search",
       placeholder: "\u641C\u7D22\u4E66\u540D / \u4F5C\u8005...",
-      cls: "readflow-search-input readflow-book-search-input",
+      cls: "readflow-search-input readflow-book-search-input"
     });
     bookSearchInput.value = this.bookSearchQuery || "";
     const clearBookSearch = bookSearchWrap.createEl("button", {
       text: "\u2715",
       type: "button",
-      cls: "readflow-search-clear",
+      cls: "readflow-search-clear"
     });
     const syncBookSearchClearVisibility = () => {
       clearBookSearch.classList.toggle("readflow-search-clear--hidden", !this.bookSearchQuery);
@@ -5894,19 +5423,14 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       "readflow-btn",
       "readflow-btn--sm",
       "readflow-book-sort-btn",
-      "readflow-book-sort-compound",
+      "readflow-book-sort-compound"
     );
     sortRecentBtn.classList.toggle("readflow-btn--ghost", this.bookSortMode !== "recent");
     sortRecentBtn.classList.toggle("readflow-book-sort-btn--active", this.bookSortMode === "recent");
-    sortRecentBtn.title =
-      this.bookSortMode === "recent"
-        ? `\u65F6\u95F4\u6392\u5E8F \xB7 ${this.bookSortTimeDir === "asc" ? "\u5347\u5E8F\uFF08\u65E7\u2192\u65B0\uFF09" : "\u964D\u5E8F\uFF08\u65B0\u2192\u65E7\uFF09"}\uFF0C\u518D\u70B9\u5207\u6362\u65B9\u5411`
-        : "\u6309\u540C\u6B65/\u6458\u5F55\u65F6\u95F4\u6392\u5E8F";
+    sortRecentBtn.title = this.bookSortMode === "recent" ? `\u65F6\u95F4\u6392\u5E8F \xB7 ${this.bookSortTimeDir === "asc" ? "\u5347\u5E8F\uFF08\u65E7\u2192\u65B0\uFF09" : "\u964D\u5E8F\uFF08\u65B0\u2192\u65E7\uFF09"}\uFF0C\u518D\u70B9\u5207\u6362\u65B9\u5411` : "\u6309\u540C\u6B65/\u6458\u5F55\u65F6\u95F4\u6392\u5E8F";
     sortRecentBtn.setAttribute(
       "aria-label",
-      this.bookSortMode === "recent"
-        ? `\u65F6\u95F4\u6392\u5E8F\uFF0C${this.bookSortTimeDir === "asc" ? "\u5347\u5E8F" : "\u964D\u5E8F"}`
-        : "\u5207\u6362\u5230\u65F6\u95F4\u6392\u5E8F",
+      this.bookSortMode === "recent" ? `\u65F6\u95F4\u6392\u5E8F\uFF0C${this.bookSortTimeDir === "asc" ? "\u5347\u5E8F" : "\u964D\u5E8F"}` : "\u5207\u6362\u5230\u65F6\u95F4\u6392\u5E8F"
     );
     const recentIconSlot = sortRecentBtn.createSpan({ cls: "readflow-book-sort-compound__icon" });
     const recentDirEl = sortRecentBtn.createSpan({ cls: "readflow-book-sort-compound__dir" });
@@ -5922,19 +5446,14 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       "readflow-btn",
       "readflow-btn--sm",
       "readflow-book-sort-btn",
-      "readflow-book-sort-compound",
+      "readflow-book-sort-compound"
     );
     sortNameBtn.classList.toggle("readflow-btn--ghost", this.bookSortMode !== "name");
     sortNameBtn.classList.toggle("readflow-book-sort-btn--active", this.bookSortMode === "name");
-    sortNameBtn.title =
-      this.bookSortMode === "name"
-        ? `\u4E66\u540D\u6392\u5E8F \xB7 ${this.bookSortNameDir === "asc" ? "A\u2192Z" : "Z\u2192A"}\uFF0C\u518D\u70B9\u5207\u6362\u65B9\u5411`
-        : "\u6309\u4E66\u540D\u5B57\u6BCD\u6392\u5E8F";
+    sortNameBtn.title = this.bookSortMode === "name" ? `\u4E66\u540D\u6392\u5E8F \xB7 ${this.bookSortNameDir === "asc" ? "A\u2192Z" : "Z\u2192A"}\uFF0C\u518D\u70B9\u5207\u6362\u65B9\u5411` : "\u6309\u4E66\u540D\u5B57\u6BCD\u6392\u5E8F";
     sortNameBtn.setAttribute(
       "aria-label",
-      this.bookSortMode === "name"
-        ? `\u4E66\u540D\u6392\u5E8F\uFF0C${this.bookSortNameDir === "asc" ? "A-Z" : "Z-A"}`
-        : "\u5207\u6362\u5230\u4E66\u540D\u6392\u5E8F",
+      this.bookSortMode === "name" ? `\u4E66\u540D\u6392\u5E8F\uFF0C${this.bookSortNameDir === "asc" ? "A-Z" : "Z-A"}` : "\u5207\u6362\u5230\u4E66\u540D\u6392\u5E8F"
     );
     const nameIconSlot = sortNameBtn.createSpan({ cls: "readflow-book-sort-compound__icon" });
     const nameDirEl = sortNameBtn.createSpan({ cls: "readflow-book-sort-compound__dir" });
@@ -5950,19 +5469,14 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       "readflow-btn",
       "readflow-btn--sm",
       "readflow-book-sort-btn",
-      "readflow-book-sort-compound",
+      "readflow-book-sort-compound"
     );
     sortCountBtn.classList.toggle("readflow-btn--ghost", this.bookSortMode !== "count");
     sortCountBtn.classList.toggle("readflow-book-sort-btn--active", this.bookSortMode === "count");
-    sortCountBtn.title =
-      this.bookSortMode === "count"
-        ? `\u5212\u7EBF\u6570\u6392\u5E8F \xB7 ${this.bookSortCountDir === "asc" ? "\u5C11\u2192\u591A" : "\u591A\u2192\u5C11"}\uFF0C\u518D\u70B9\u5207\u6362\u65B9\u5411`
-        : "\u6309\u5212\u7EBF\u6570\u91CF\u6392\u5E8F";
+    sortCountBtn.title = this.bookSortMode === "count" ? `\u5212\u7EBF\u6570\u6392\u5E8F \xB7 ${this.bookSortCountDir === "asc" ? "\u5C11\u2192\u591A" : "\u591A\u2192\u5C11"}\uFF0C\u518D\u70B9\u5207\u6362\u65B9\u5411` : "\u6309\u5212\u7EBF\u6570\u91CF\u6392\u5E8F";
     sortCountBtn.setAttribute(
       "aria-label",
-      this.bookSortMode === "count"
-        ? `\u5212\u7EBF\u6570\u6392\u5E8F\uFF0C${this.bookSortCountDir === "asc" ? "\u5C11\u2192\u591A" : "\u591A\u2192\u5C11"}`
-        : "\u5207\u6362\u5230\u5212\u7EBF\u6570\u6392\u5E8F",
+      this.bookSortMode === "count" ? `\u5212\u7EBF\u6570\u6392\u5E8F\uFF0C${this.bookSortCountDir === "asc" ? "\u5C11\u2192\u591A" : "\u591A\u2192\u5C11"}` : "\u5207\u6362\u5230\u5212\u7EBF\u6570\u6392\u5E8F"
     );
     const countIconSlot = sortCountBtn.createSpan({ cls: "readflow-book-sort-compound__icon" });
     const countDirEl = sortCountBtn.createSpan({ cls: "readflow-book-sort-compound__dir" });
@@ -6056,7 +5570,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     overview.createEl("h4", { text: book.title, cls: "readflow-sidebar-title" });
     overview.createEl("p", {
       text: book.author ? `\u4F5C\u8005\uFF1A${book.author}` : "\u4F5C\u8005\u4FE1\u606F\u672A\u540C\u6B65",
-      cls: "readflow-sidebar-subtitle",
+      cls: "readflow-sidebar-subtitle"
     });
     const stats = overview.createDiv("readflow-stat-grid");
     this.renderStat(stats, "\u6458\u5F55", String(book.highlights.length));
@@ -6083,10 +5597,10 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       { key: "inbox", label: "\u5F85\u6574\u7406", count: inboxCount },
       { key: "reviewing", label: "\u5DF2\u9605\u8BFB", count: reviewingCount },
       { key: "drafted", label: "\u8349\u7A3F\u5B8C\u6210", count: draftedCount },
-      { key: "processed", label: "\u5DF2\u5904\u7406", count: processedCount },
+      { key: "processed", label: "\u5DF2\u5904\u7406", count: processedCount }
     ];
     for (const step of flowSteps) {
-      const pct = total > 0 ? Math.round((step.count / total) * 100) : 0;
+      const pct = total > 0 ? Math.round(step.count / total * 100) : 0;
       const row = statusBar.createDiv("readflow-status-row");
       row.createEl("span", { text: step.label, cls: "readflow-status-label" });
       const bar = row.createDiv("readflow-status-bar-bg");
@@ -6098,12 +5612,10 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     sidebar.createEl("h3", { text: "\u7AE0\u8282", cls: "readflow-section-label" });
     const nav = sidebar.createDiv("readflow-nav-list");
     const allItem = nav.createDiv(
-      `readflow-nav-item${this.selectedChapter == null ? " readflow-nav-item--active" : ""}`,
+      `readflow-nav-item${this.selectedChapter == null ? " readflow-nav-item--active" : ""}`
     );
     allItem.setAttribute("role", "button");
-    allItem.setAttribute("aria-label", this.selectedChapter == null
-      ? `\u5DF2\u9009\u4E2D\u5168\u90E8 \xB7 ${book.highlights.length}`
-      : `\u9009\u4E2D\u5168\u90E8 \xB7 ${book.highlights.length}`);
+    allItem.setAttribute("aria-label", this.selectedChapter == null ? `\u5DF2\u9009\u4E2D\u5168\u90E8 \xB7 ${book.highlights.length}` : `\u9009\u4E2D\u5168\u90E8 \xB7 ${book.highlights.length}`);
     allItem.setText(`\u5168\u90E8 \xB7 ${book.highlights.length}`);
     allItem.addEventListener("click", () => {
       this.selectedChapter = null;
@@ -6113,12 +5625,10 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     });
     for (const node of tree) {
       const item = nav.createDiv(
-        `readflow-nav-item${this.selectedChapter === node.chapter ? " readflow-nav-item--active" : ""}`,
+        `readflow-nav-item${this.selectedChapter === node.chapter ? " readflow-nav-item--active" : ""}`
       );
       item.setAttribute("role", "button");
-      item.setAttribute("aria-label", this.selectedChapter === node.chapter
-        ? `\u5DF2\u9009\u4E2D\u7B2C ${node.chapter} \xB7 ${node.highlights.length}`
-        : `\u9009\u4E2D\u7B2C ${node.chapter} \xB7 ${node.highlights.length}`);
+      item.setAttribute("aria-label", this.selectedChapter === node.chapter ? `\u5DF2\u9009\u4E2D\u7B2C ${node.chapter} \xB7 ${node.highlights.length}` : `\u9009\u4E2D\u7B2C ${node.chapter} \xB7 ${node.highlights.length}`);
       item.setText(`${node.chapter} \xB7 ${node.highlights.length}`);
       this.makeChapterDropTarget(item, book, node.chapter, node.chapterUid);
       item.addEventListener("click", () => {
@@ -6154,7 +5664,10 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       const allChip = topicRow.createEl("button", { text: `\u5168\u90E8 ${book.highlights.length}`, type: "button" });
       allChip.classList.add("readflow-chip-button");
       if (this.selectedTopic == null) allChip.classList.add("readflow-chip-button--active");
-      allChip.addEventListener("click", () => { this.selectedTopic = null; this.render(); });
+      allChip.addEventListener("click", () => {
+        this.selectedTopic = null;
+        this.render();
+      });
       for (const [topic, count] of [...topics.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))) {
         const chip = topicRow.createEl("button", { text: `${topic} ${count}`, type: "button" });
         chip.classList.add("readflow-chip-button");
@@ -6179,17 +5692,20 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       if (this.selectedBoardFilter) {
         const clearBtn = boardHead.createEl("button", { text: "\xD7", type: "button" });
         clearBtn.classList.add("readflow-btn", "readflow-btn--ghost", "readflow-btn--sm");
-        clearBtn.addEventListener("click", () => { this.selectedBoardFilter = null; this.render(); });
+        clearBtn.addEventListener("click", () => {
+          this.selectedBoardFilter = null;
+          this.render();
+        });
       }
       const board = boardSec.createDiv("readflow-board");
       const lanes = [
         { key: "inbox", label: "\u5F85\u6574\u7406" },
         { key: "reviewing", label: "\u5DF2\u9605\u8BFB" },
         { key: "drafted", label: "\u8349\u7A3F" },
-        { key: "processed", label: "\u5DF2\u5904\u7406" },
+        { key: "processed", label: "\u5DF2\u5904\u7406" }
       ];
       for (const lane of lanes) {
-        const count = book.highlights.filter(h => h.status === lane.key).length;
+        const count = book.highlights.filter((h) => h.status === lane.key).length;
         const isActive = this.selectedBoardFilter === lane.key;
         const item = board.createDiv("readflow-board-nav-item");
         if (isActive) item.classList.add("readflow-board-nav-item--active");
@@ -6210,21 +5726,18 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     const titleBlock = header.createDiv("readflow-workspace-titleblock");
     titleBlock.createEl("h3", { text: book.title, cls: "readflow-workspace-title" });
     titleBlock.createEl("p", {
-      text: book.author
-        ? `\u4F5C\u8005 ${book.author} \xB7 \u5F53\u524D\u5DE5\u4F5C\u533A\u5C55\u793A\u8BE5\u4E66\u6458\u5F55`
-        : "\u5F53\u524D\u5DE5\u4F5C\u533A\u5C55\u793A\u8BE5\u4E66\u6458\u5F55",
-      cls: "readflow-workspace-subtitle",
+      text: book.author ? `\u4F5C\u8005 ${book.author} \xB7 \u5F53\u524D\u5DE5\u4F5C\u533A\u5C55\u793A\u8BE5\u4E66\u6458\u5F55` : "\u5F53\u524D\u5DE5\u4F5C\u533A\u5C55\u793A\u8BE5\u4E66\u6458\u5F55",
+      cls: "readflow-workspace-subtitle"
     });
     const headerActions = header.createDiv("readflow-workspace-actions");
     const pushableCount = book.highlights.filter((h) => canPushHighlightToWeread(h)).length;
     if (pushableCount > 0) {
       const batchPush = headerActions.createEl("button", {
         text: `\u2191 \u63A8\u9001\u60F3\u6CD5 (${pushableCount})`,
-        type: "button",
+        type: "button"
       });
       batchPush.classList.add("readflow-btn", "readflow-btn--accent", "readflow-btn--sm");
-      batchPush.title =
-        "\u5C06\u6240\u6709\u672C\u5730\u60F3\u6CD5\u6279\u91CF\u63A8\u9001\u5230\u5FAE\u4FE1\u8BFB\u4E66";
+      batchPush.title = "\u5C06\u6240\u6709\u672C\u5730\u60F3\u6CD5\u6279\u91CF\u63A8\u9001\u5230\u5FAE\u4FE1\u8BFB\u4E66";
       batchPush.addEventListener("click", async () => {
         batchPush.disabled = true;
         batchPush.textContent = "\u63A8\u9001\u4E2D\u2026";
@@ -6237,7 +5750,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     const chips = header.createDiv("readflow-card-meta");
     chips.createSpan({
       cls: "readflow-chip readflow-chip--accent",
-      text: `${book.highlights.length} \u6761\u6458\u5F55`,
+      text: `${book.highlights.length} \u6761\u6458\u5F55`
     });
     chips.createSpan({ cls: "readflow-chip", text: `${tree.length} \u7AE0\u8282` });
     if (this.selectedTopic) {
@@ -6256,13 +5769,13 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       const listHeaderRight = listHeader.createDiv("readflow-list-header-right");
       this.listSummaryEl = listHeaderRight.createEl("p", {
         text: "\u5168\u90E8\u7AE0\u8282 \xB7 0 \u6761",
-        cls: "readflow-list-summary",
+        cls: "readflow-list-summary"
       });
       const detachBtn = listHeaderRight.createEl("button", { text: "\u6D6E\u52A8\u7A97\u53E3", type: "button" });
       detachBtn.classList.add("readflow-btn", "readflow-btn--ghost", "readflow-btn--sm");
       detachBtn.setAttribute(
         "title",
-        "\u5C06\u6458\u5F55\u5217\u8868\u4EE5\u6D6E\u52A8\u7A97\u53E3\u663E\u793A\uFF0C\u4FBF\u4E8E\u540E\u7EED\u62D6\u62FD\u64CD\u4F5C",
+        "\u5C06\u6458\u5F55\u5217\u8868\u4EE5\u6D6E\u52A8\u7A97\u53E3\u663E\u793A\uFF0C\u4FBF\u4E8E\u540E\u7EED\u62D6\u62FD\u64CD\u4F5C"
       );
       detachBtn.addEventListener("click", () => {
         this.listDetached = true;
@@ -6273,19 +5786,14 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
         "readflow-btn",
         "readflow-btn--sm",
         "readflow-book-sort-btn",
-        "readflow-book-sort-compound",
+        "readflow-book-sort-compound"
       );
       sortTimeBtn.classList.toggle("readflow-btn--ghost", this.listOrderMode !== "time");
       sortTimeBtn.classList.toggle("readflow-book-sort-btn--active", this.listOrderMode === "time");
-      sortTimeBtn.title =
-        this.listOrderMode === "time"
-          ? `\u65F6\u95F4\u6392\u5E8F \xB7 ${this.listTimeDir === "desc" ? "\u65B0\u2192\u65E7" : "\u65E7\u2192\u65B0"}\uFF0C\u518D\u70B9\u5207\u6362\u65B9\u5411`
-          : "\u6309\u65F6\u95F4\u6392\u5E8F";
+      sortTimeBtn.title = this.listOrderMode === "time" ? `\u65F6\u95F4\u6392\u5E8F \xB7 ${this.listTimeDir === "desc" ? "\u65B0\u2192\u65E7" : "\u65E7\u2192\u65B0"}\uFF0C\u518D\u70B9\u5207\u6362\u65B9\u5411` : "\u6309\u65F6\u95F4\u6392\u5E8F";
       sortTimeBtn.setAttribute(
         "aria-label",
-        this.listOrderMode === "time"
-          ? `\u65F6\u95F4\u6392\u5E8F\uFF0C${this.listTimeDir === "desc" ? "\u964D\u5E8F" : "\u5347\u5E8F"}`
-          : "\u5207\u6362\u5230\u65F6\u95F4\u6392\u5E8F",
+        this.listOrderMode === "time" ? `\u65F6\u95F4\u6392\u5E8F\uFF0C${this.listTimeDir === "desc" ? "\u964D\u5E8F" : "\u5347\u5E8F"}` : "\u5207\u6362\u5230\u65F6\u95F4\u6392\u5E8F"
       );
       const timeIconSlot = sortTimeBtn.createSpan({ cls: "readflow-book-sort-compound__icon" });
       const timeDirEl = sortTimeBtn.createSpan({ cls: "readflow-book-sort-compound__dir" });
@@ -6310,16 +5818,12 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
         "readflow-btn",
         "readflow-btn--sm",
         "readflow-book-sort-btn",
-        "readflow-book-sort-compound",
+        "readflow-book-sort-compound"
       );
       sortTopicBtn.classList.toggle("readflow-btn--ghost", this.listOrderMode !== "topic");
       sortTopicBtn.classList.toggle("readflow-book-sort-btn--active", this.listOrderMode === "topic");
-      sortTopicBtn.title = this.listOrderMode === "topic"
-        ? `\u4E3B\u9898\u6392\u5E8F \xB7 ${this.listTopicDir === "asc" ? "A\u2192Z" : "Z\u2192A"}\uFF0C\u518D\u70B9\u5207\u6362\u65B9\u5411`
-        : "\u6309\u4E3B\u9898\u6392\u5E8F";
-      sortTopicBtn.setAttribute("aria-label", this.listOrderMode === "topic"
-        ? `\u4E3B\u9898\u6392\u5E8F\uFF0C${this.listTopicDir === "asc" ? "A-Z" : "Z-A"}`
-        : "\u5207\u6362\u5230\u4E3B\u9898\u6392\u5E8F");
+      sortTopicBtn.title = this.listOrderMode === "topic" ? `\u4E3B\u9898\u6392\u5E8F \xB7 ${this.listTopicDir === "asc" ? "A\u2192Z" : "Z\u2192A"}\uFF0C\u518D\u70B9\u5207\u6362\u65B9\u5411` : "\u6309\u4E3B\u9898\u6392\u5E8F";
+      sortTopicBtn.setAttribute("aria-label", this.listOrderMode === "topic" ? `\u4E3B\u9898\u6392\u5E8F\uFF0C${this.listTopicDir === "asc" ? "A-Z" : "Z-A"}` : "\u5207\u6362\u5230\u4E3B\u9898\u6392\u5E8F");
       const topicIconSlot = sortTopicBtn.createSpan({ cls: "readflow-book-sort-compound__icon" });
       const topicDirEl = sortTopicBtn.createSpan({ cls: "readflow-book-sort-compound__dir" });
       if (this.listOrderMode === "topic") {
@@ -6373,7 +5877,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     const titleBtn = head.createDiv("readflow-section-title-btn");
     titleBtn.createEl("span", {
       text: this.topicSectionCollapsed ? "\u25B6" : "\u25BC",
-      cls: "readflow-section-chevron",
+      cls: "readflow-section-chevron"
     });
     titleBtn.createEl("h4", { text: "\u4E3B\u9898\u7BA1\u7406", cls: "readflow-list-title" });
     titleBtn.addEventListener("click", () => {
@@ -6448,14 +5952,14 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       { key: "method", label: HIGHLIGHT_TYPE_LABELS.method },
       { key: "example", label: HIGHLIGHT_TYPE_LABELS.example },
       { key: "conclusion", label: HIGHLIGHT_TYPE_LABELS.conclusion },
-      { key: "question", label: HIGHLIGHT_TYPE_LABELS.question },
+      { key: "question", label: HIGHLIGHT_TYPE_LABELS.question }
     ];
     const sec = container.createDiv("readflow-board-section");
     const sectionHead = sec.createDiv("readflow-section-inline-head");
     const titleBtn = sectionHead.createDiv("readflow-section-title-btn");
     titleBtn.createEl("span", {
       text: this.boardSectionCollapsed ? "\u25B6" : "\u25BC",
-      cls: "readflow-section-chevron",
+      cls: "readflow-section-chevron"
     });
     titleBtn.createEl("h4", { text: "\u5206\u7C7B\u7CFB\u7EDF", cls: "readflow-list-title" });
     titleBtn.addEventListener("click", () => {
@@ -6470,7 +5974,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
         "readflow-btn",
         "readflow-btn--ghost",
         "readflow-btn--sm",
-        "readflow-board-clear-btn",
+        "readflow-board-clear-btn"
       );
       clearFilterBtn.addEventListener("click", () => {
         this.selectedBoardFilter = null;
@@ -6479,12 +5983,12 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     }
     sec.createEl("p", {
       text: "\u70B9\u51FB\u5206\u7C7B\u67E5\u770B\u6458\u5F55\xB7\u62D6\u52A8\u6458\u5F55\u5230\u5206\u7C7B\u5217\u5B8C\u6210\u5F52\u7C7B",
-      cls: "readflow-empty-desc readflow-board-hint",
+      cls: "readflow-empty-desc readflow-board-hint"
     });
     const board = sec.createDiv("readflow-board");
     for (const lane of lanes) {
-      const items = book.highlights.filter((h) =>
-        lane.key === "inbox" ? h.status === "inbox" || !h.highlightType : h.highlightType === lane.key,
+      const items = book.highlights.filter(
+        (h) => lane.key === "inbox" ? h.status === "inbox" || !h.highlightType : h.highlightType === lane.key
       );
       const isActive = this.selectedBoardFilter === lane.key;
       const laneEl = board.createDiv("readflow-board-lane");
@@ -6518,7 +6022,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     const bar = container.createDiv("readflow-batch-bar");
     bar.createEl("span", {
       text: `\u5DF2\u9009\u62E9 ${this.selectedHighlightIds.size} \u6761\u6458\u5F55`,
-      cls: "readflow-batch-label",
+      cls: "readflow-batch-label"
     });
     const selectAllBtn = bar.createEl("button", { text: "\u5168\u9009", type: "button" });
     selectAllBtn.classList.add("readflow-btn", "readflow-btn--ghost", "readflow-btn--sm");
@@ -6540,7 +6044,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       impBtn.classList.add("readflow-btn", "readflow-btn--ghost", "readflow-btn--sm");
       impBtn.title = `\u5C06\u9009\u4E2D\u6458\u5F55\u91CD\u8981\u5EA6\u8BBE\u4E3A ${imp}`;
       impBtn.addEventListener("click", () => {
-        this.updateManyHighlights(book, (h) => (this.selectedHighlightIds.has(h.id) ? { ...h, importance: imp } : h));
+        this.updateManyHighlights(book, (h) => this.selectedHighlightIds.has(h.id) ? { ...h, importance: imp } : h);
       });
     }
     const sep1 = actions.createEl("span", { cls: "readflow-batch-sep" });
@@ -6548,13 +6052,14 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       const btn = actions.createEl("button", { text: HIGHLIGHT_TYPE_LABELS[type], type: "button" });
       btn.classList.add("readflow-btn", "readflow-btn--ghost", "readflow-btn--sm");
       btn.addEventListener("click", () => {
-        this.updateManyHighlights(book, (h) =>
-          this.selectedHighlightIds.has(h.id) ? { ...h, highlightType: type, status: "processed" } : h,
+        this.updateManyHighlights(
+          book,
+          (h) => this.selectedHighlightIds.has(h.id) ? { ...h, highlightType: type, status: "processed" } : h
         );
       });
     }
     const sep2 = actions.createEl("span", { cls: "readflow-batch-sep" });
-    const nextStatus = STATUS_FLOW[1]; // default to "reviewing"
+    const nextStatus = STATUS_FLOW[1];
     const nextLabel = STATUS_LABELS[nextStatus] || "\u5DF2\u9605\u8BFB";
     const advanceBtn = actions.createEl("button", { text: `\u2192 ${nextLabel}`, type: "button" });
     advanceBtn.classList.add("readflow-btn", "readflow-btn--ghost", "readflow-btn--sm");
@@ -6574,8 +6079,9 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     topicBtn.addEventListener("click", () => {
       const topic = window.prompt("\u4E3A\u9009\u4E2D\u7684\u6458\u5F55\u8BBE\u7F6E\u4E3B\u9898");
       if (!(topic == null ? void 0 : topic.trim())) return;
-      this.updateManyHighlights(book, (h) =>
-        this.selectedHighlightIds.has(h.id) ? { ...h, topic: topic.trim(), status: "processed" } : h,
+      this.updateManyHighlights(
+        book,
+        (h) => this.selectedHighlightIds.has(h.id) ? { ...h, topic: topic.trim(), status: "processed" } : h
       );
       this.createTopic(book, topic.trim());
     });
@@ -6584,13 +6090,13 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     relationBtn.addEventListener("click", () => {
       if (this.selectedHighlightIds.size < 2) {
         new import_obsidian5.Notice(
-          "\u81F3\u5C11\u9009\u62E9 2 \u6761\u6458\u5F55\u624D\u80FD\u5EFA\u7ACB\u5173\u7CFB",
+          "\u81F3\u5C11\u9009\u62E9 2 \u6761\u6458\u5F55\u624D\u80FD\u5EFA\u7ACB\u5173\u7CFB"
         );
         return;
       }
       const relation = window.prompt(
         "\u8F93\u5165\u5173\u7CFB\u7C7B\u578B\uFF08\u9884\u8BBE\uFF1A\u8865\u5145/\u91CD\u590D/\u56E0\u679C/\u5BF9\u6BD4\uFF0C\u6216\u81EA\u5B9A\u4E49\u5982\uFF1A\u5E08\u627F/\u7ADE\u4E89/\u5BB6\u65CF\uFF09",
-        "\u8865\u5145",
+        "\u8865\u5145"
       );
       if (!relation) return;
       this.linkSelectedHighlights(book, relation);
@@ -6608,9 +6114,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       listEl = this.listContainerEl;
     }
     if (!(listEl instanceof HTMLElement)) return;
-    const summaryText = filterChapter
-      ? `${filterChapter} \xB7 ${items.length} \u6761`
-      : `\u5168\u90E8\u7AE0\u8282 \xB7 ${items.length} \u6761`;
+    const summaryText = filterChapter ? `${filterChapter} \xB7 ${items.length} \u6761` : `\u5168\u90E8\u7AE0\u8282 \xB7 ${items.length} \u6761`;
     if (this.listSummaryEl) this.listSummaryEl.setText(summaryText);
     if (this.detachedPanel) {
       const detachedSummary = this.detachedPanel.querySelector(".readflow-detached-summary");
@@ -6639,20 +6143,20 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       if (isStaleChapter) {
         empty.createEl("p", {
           text: `\u300A${this.selectedChapter}\u300B\u7B2C\u8282\u6682\u65E0\u6458\u5F55`,
-          cls: "readflow-empty-title",
+          cls: "readflow-empty-title"
         });
         empty.createEl("p", {
           text: "\u6B64\u7AE0\u8282\u7684\u6458\u5F55\u5DF2\u5168\u90E8\u79FB\u8D70\u6216\u5220\u9664\uFF0C\u70B9\u51FB\u4E0B\u65B9\u300C\u5168\u90E8\u300D\u91CD\u7F6E",
-          cls: "readflow-empty-desc",
+          cls: "readflow-empty-desc"
         });
       } else {
         empty.createEl("p", {
           text: "\u5F53\u524D\u7B5B\u9009\u4E0B\u6CA1\u6709\u6458\u5F55",
-          cls: "readflow-empty-title",
+          cls: "readflow-empty-title"
         });
         empty.createEl("p", {
           text: "\u53EF\u4EE5\u5207\u6362\u7AE0\u8282\u3001\u5173\u95ED\u300C\u4EC5\u672A\u6574\u7406\u300D\uFF0C\u6216\u624B\u52A8\u8865\u5145\u6458\u5F55\u3002",
-          cls: "readflow-empty-desc",
+          cls: "readflow-empty-desc"
         });
       }
       return;
@@ -6672,7 +6176,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
         topicHead.createEl("span", { text: topicLabel, cls: "readflow-topic-divider-label" });
         topicHead.createEl("span", {
           text: `${(_b = topicCounts.get(topicLabel)) != null ? _b : 0} \u6761`,
-          cls: "readflow-topic-divider-count",
+          cls: "readflow-topic-divider-count"
         });
         lastTopicLabel = topicLabel;
       }
@@ -6697,7 +6201,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       const statusColor = STATUS_COLORS[h.status] || "#94a3b8";
       const statusChip = headerRight.createEl("span", {
         cls: "readflow-chip readflow-chip--status-led",
-        text: statusLabel,
+        text: statusLabel
       });
       statusChip.style.setProperty("--rf-status-led", statusColor);
       headerRight.createSpan({ cls: "readflow-chip", text: `\u91CD\u8981\u5EA6 ${h.importance}` });
@@ -6721,7 +6225,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
         const ctxBtn = meta.createEl("button", {
           text: "\u2605 \u4E0A\u4E0B\u6587",
           type: "button",
-          cls: "readflow-chip readflow-chip--context-btn",
+          cls: "readflow-chip readflow-chip--context-btn"
         });
         ctxBtn.addEventListener("click", (e) => {
           e.stopPropagation();
@@ -6742,7 +6246,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
           const target = book.highlights.find((row) => row.id === relation.targetId);
           rel.createEl("p", {
             text: `${relation.hint} \u2192 ${(target == null ? void 0 : target.content.slice(0, 48)) || relation.targetId}`,
-            cls: "readflow-card-note-text",
+            cls: "readflow-card-note-text"
           });
         }
       }
@@ -6769,18 +6273,18 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
           if (ctx.wereadRange) {
             const rangeEl = ctxFooter.createEl("span", {
               text: "\u7B2C" + ctx.wereadRange + "\u8282",
-              cls: "readflow-chip readflow-chip--soft",
+              cls: "readflow-chip readflow-chip--soft"
             });
             const wereadLink = ctxFooter.createEl("button", {
               text: "\u5728\u5FAE\u4FE1\u8BFB\u4E66\u4E2D\u6253\u5F00",
               type: "button",
-              cls: "readflow-btn readflow-btn--ghost readflow-btn--xs",
+              cls: "readflow-btn readflow-btn--ghost readflow-btn--xs"
             });
             wereadLink.addEventListener("click", (e) => {
+              var _a2;
               e.stopPropagation();
               const rawId = book.bookId.replace(/^weread-/, "");
-              const reviewId = h.wereadReviewId ? (h.wereadReviewId.split("_")[1] ?? h.wereadReviewId) : "";
-              // weread:// 协议直接拉起 App 并定位到划线
+              const reviewId = h.wereadReviewId ? (_a2 = h.wereadReviewId.split("_")[1]) != null ? _a2 : h.wereadReviewId : "";
               const appUrl = `weread://reader/${rawId}#r=${reviewId}`;
               window.open(appUrl, "_blank");
             });
@@ -6788,7 +6292,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
           const collapseBtn = ctxFooter.createEl("button", {
             text: "\u220F \u6536\u8D77",
             type: "button",
-            cls: "readflow-btn readflow-btn--ghost readflow-btn--xs",
+            cls: "readflow-btn readflow-btn--ghost readflow-btn--xs"
           });
           collapseBtn.addEventListener("click", (e) => {
             e.stopPropagation();
@@ -6842,8 +6346,8 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
         if (!cached) return;
         this.plugin.diskData.books[book.bookId] = {
           ...cached,
-          highlights: cached.highlights.map((x) => (x.id === h.id ? { ...h, status: nextStatus } : x)),
-          lastSync: Date.now(),
+          highlights: cached.highlights.map((x) => x.id === h.id ? { ...h, status: nextStatus } : x),
+          lastSync: Date.now()
         };
         void this.plugin.persistDisk();
         this.render();
@@ -6863,7 +6367,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
           } else {
             new import_obsidian4.Notice(
               "\u274C \u63A8\u9001\u5931\u8D25\uFF1A" + formatPushNoteError(result),
-              12e3,
+              12e3
             );
             console.error("[ReadFlow] push failed", result);
             push.textContent = "\u2191 \u63A8\u9001\u60F3\u6CD5";
@@ -6888,16 +6392,11 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       scopeBook = {
         ...scopeBook,
         title: `${scopeBook.title} - ${this.selectedKnowledgeTopic}`,
-        highlights: scopeBook.highlights.filter((h) => (h.topic || "").trim() === this.selectedKnowledgeTopic),
+        highlights: scopeBook.highlights.filter((h) => (h.topic || "").trim() === this.selectedKnowledgeTopic)
       };
     }
     const selectedCount = book.highlights.filter((h) => this.selectedHighlightIds.has(h.id)).length;
-    let scopeLabel =
-      selectedCount > 0
-        ? `\u5F53\u524D\u8303\u56F4\uFF1A\u5DF2\u9009 ${scopeBook.highlights.length} \u6761`
-        : visible.length !== book.highlights.length
-          ? `\u5F53\u524D\u8303\u56F4\uFF1A\u7B5B\u9009 ${scopeBook.highlights.length} \u6761`
-          : `\u5F53\u524D\u8303\u56F4\uFF1A\u5168\u4E66 ${scopeBook.highlights.length} \u6761`;
+    let scopeLabel = selectedCount > 0 ? `\u5F53\u524D\u8303\u56F4\uFF1A\u5DF2\u9009 ${scopeBook.highlights.length} \u6761` : visible.length !== book.highlights.length ? `\u5F53\u524D\u8303\u56F4\uFF1A\u7B5B\u9009 ${scopeBook.highlights.length} \u6761` : `\u5F53\u524D\u8303\u56F4\uFF1A\u5168\u4E66 ${scopeBook.highlights.length} \u6761`;
     if (this.selectedKnowledgeTopic) scopeLabel += ` \xB7 \u4E3B\u9898 ${this.selectedKnowledgeTopic}`;
     const head = pane.createDiv("readflow-section-inline-head");
     head.createEl("h4", { text: "\u77E5\u8BC6\u7ED3\u6784", cls: "readflow-list-title" });
@@ -6913,7 +6412,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
             this.app,
             this.plugin.settings,
             book,
-            this.selectedKnowledgeTopic,
+            this.selectedKnowledgeTopic
           );
           new import_obsidian5.Notice(`\u5DF2\u5BFC\u51FA\u4E3B\u9898\u9875\uFF1A${path}`);
         } catch (error) {
@@ -6931,7 +6430,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     if (scopeBook.highlights.length === 0) {
       pane.createEl("p", {
         text: "\u5F53\u524D\u8303\u56F4\u4E0B\u6CA1\u6709\u53EF\u5206\u6790\u7684\u6458\u5F55\u3002",
-        cls: "readflow-muted",
+        cls: "readflow-muted"
       });
       return;
     }
@@ -6964,19 +6463,15 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
   renderGraphSection(container, book, scopeBook) {
     const sec = container.createDiv("readflow-knowledge-section readflow-graph-section");
     const head = sec.createDiv("readflow-section-inline-head");
-    const graphTitle =
-      this.mindmapLens === "people"
-        ? "\u4EBA\u7269\u5173\u7CFB\u56FE"
-        : this.mindmapLens === "ideas"
-          ? "\u89C2\u70B9\u5173\u7CFB\u56FE"
-          : "\u5173\u7CFB\u56FE\u8C31";
+    const graphTitle = this.mindmapLens === "people" ? "\u4EBA\u7269\u5173\u7CFB\u56FE" : this.mindmapLens === "ideas" ? "\u89C2\u70B9\u5173\u7CFB\u56FE" : "\u5173\u7CFB\u56FE\u8C31";
     head.createEl("h5", { text: graphTitle, cls: "readflow-knowledge-title" });
     const headActions = head.createDiv("readflow-inline-actions");
     if (this.mindmapLens === "people" || this.mindmapBase === "entity") {
       const addRelBtn = headActions.createEl("button", { text: "+\u4EBA\u7269\u5173\u7CFB", type: "button" });
       addRelBtn.classList.add("readflow-btn", "readflow-btn--secondary", "readflow-btn--sm");
-      addRelBtn.addEventListener("click", () =>
-        this.promptAddEntityRelation(book, scopeBook, () => this.refreshKnowledgePane(book)),
+      addRelBtn.addEventListener(
+        "click",
+        () => this.promptAddEntityRelation(book, scopeBook, () => this.refreshKnowledgePane(book))
       );
     }
     const model = buildRelationGraphModel(book, scopeBook, this.getMindMapOpts(scopeBook));
@@ -7007,12 +6502,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     const scoped = scopedBookForMindMap(scopeBook, opts);
     const meta = MINDMAP_MODE_META[this.mindmapMode] || MINDMAP_MODE_META.structure;
     const wb = WORKBENCH_META[this.mindmapWorkbench] || WORKBENCH_META.ideas;
-    const viewLabel =
-      this.mindmapView === "graph"
-        ? "\u5173\u7CFB\u56FE"
-        : this.mindmapView === "timeline"
-          ? "\u7AE0\u8282\u65F6\u95F4\u8F74"
-          : "\u6811\u5F62\u56FE";
+    const viewLabel = this.mindmapView === "graph" ? "\u5173\u7CFB\u56FE" : this.mindmapView === "timeline" ? "\u7AE0\u8282\u65F6\u95F4\u8F74" : "\u6811\u5F62\u56FE";
     const parts = [wb.label, meta.label, viewLabel, scoped.highlights.length + " \u6761"];
     if (this.mindmapMode === "people") {
       parts.push(collectEntityStats(scoped).length + " \u4E2A\u4EBA\u7269");
@@ -7026,7 +6516,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       parts.push(buildNarrativeTimelineModel(scoped).chapters.length + " \u7AE0");
     }
     if (this.mindmapMode === "topic" && opts.topic) parts.push(opts.topic);
-    return parts.join(" \u00B7 ");
+    return parts.join(" \xB7 ");
   }
   renderMindMapWorkbench(parent, book, scopeBook, onChange, onModeChange) {
     const self = this;
@@ -7080,7 +6570,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       const viewHost = row2.createDiv("readflow-mm-preset-group");
       for (const v of [
         { id: "tree", label: "\u6811\u5F62" },
-        { id: "graph", label: "\u5173\u7CFB\u56FE" },
+        { id: "graph", label: "\u5173\u7CFB\u56FE" }
       ]) {
         const vbtn = viewHost.createEl("button", { text: v.label, type: "button" });
         vbtn.classList.add("readflow-mm-preset-btn", "readflow-mm-preset-btn--sub");
@@ -7128,7 +6618,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
         }
         if (self.mindmapEntity) {
           var focusName = entityDisplayLabel(self.mindmapEntity);
-          var focusMatch = people.find(function (p) {
+          var focusMatch = people.find(function(p) {
             return entityCanonicalKey(p.value) === entityCanonicalKey(focusName);
           });
           if (focusMatch) sel2.value = focusMatch.value;
@@ -7166,16 +6656,16 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     if (this.mindmapMode === "narrative") view = "timeline";
     return {
       base: this.mindmapBase || "book",
-      view: view,
+      view,
       lens: this.mindmapLens || "all",
-      topic: topic,
+      topic,
       entity: (this.mindmapEntity || "").trim(),
-      expanded: !!expanded,
+      expanded: !!expanded
     };
   }
   renderMindMapVisual(host, book, scopeBook, opts, onScaleChange) {
     host.empty();
-    var fullOpts = Object.assign({}, opts, { onScaleChange: onScaleChange, sourceBook: book });
+    var fullOpts = Object.assign({}, opts, { onScaleChange, sourceBook: book });
     if (opts.view === "timeline" || opts.lens === "narrative") {
       return renderNarrativeTimeline(host, book, scopeBook, fullOpts);
     }
@@ -7193,11 +6683,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       parts.push(entityDisplayLabel(opts.entity));
     }
     parts.push(
-      opts.view === "graph"
-        ? "\u5173\u7CFB\u56FE\u8C31"
-        : opts.view === "timeline"
-          ? "\u7AE0\u8282\u65F6\u95F4\u8F74"
-          : "\u77E5\u8BC6\u8111\u56FE",
+      opts.view === "graph" ? "\u5173\u7CFB\u56FE\u8C31" : opts.view === "timeline" ? "\u7AE0\u8282\u65F6\u95F4\u8F74" : "\u77E5\u8BC6\u8111\u56FE"
     );
     return parts.join(" \u2014 ");
   }
@@ -7215,7 +6701,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     if (rels.length === 0) {
       sec.createEl("p", {
         text: "\u6682\u65E0\u624B\u52A8\u5EFA\u7ACB\u7684\u4EBA\u7269\u5173\u7CFB\u3002\u5171\u73B0\u4E0E\u624B\u52A8\u5173\u7CFB\u5747\u4F1A\u663E\u793A\u5728\u5173\u7CFB\u56FE\u8C31\u4E2D\u3002",
-        cls: "readflow-muted",
+        cls: "readflow-muted"
       });
       return;
     }
@@ -7227,12 +6713,12 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       const anchor = relationAnchorMeta(liveBook, rel.sinceHighlightId);
       copy.createEl("p", {
         text: `${entityGraphLabel(rel.source, lookup)} \u2194 ${entityGraphLabel(rel.target, lookup)}`,
-        cls: "readflow-card-note-text",
+        cls: "readflow-card-note-text"
       });
       if (anchor) {
         copy.createEl("p", {
-          text: `\u8D77\u59CB\uFF1A${anchor.chapter} \u00B7 ${anchor.excerpt}`,
-          cls: "readflow-muted readflow-entity-rel-anchor",
+          text: `\u8D77\u59CB\uFF1A${anchor.chapter} \xB7 ${anchor.excerpt}`,
+          cls: "readflow-muted readflow-entity-rel-anchor"
         });
       }
       const actions = row.createDiv("readflow-inline-actions");
@@ -7258,13 +6744,9 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     if (!cached) return;
     const srcName = entityDisplayLabel(source);
     const tgtName = entityDisplayLabel(target);
-    const relations = [...(cached.entityRelations || [])];
-    const duplicate = relations.some(function (r) {
-      var samePair =
-        (entityCanonicalKey(r.source) === entityCanonicalKey(srcName) &&
-          entityCanonicalKey(r.target) === entityCanonicalKey(tgtName)) ||
-        (entityCanonicalKey(r.source) === entityCanonicalKey(tgtName) &&
-          entityCanonicalKey(r.target) === entityCanonicalKey(srcName));
+    const relations = [...cached.entityRelations || []];
+    const duplicate = relations.some(function(r) {
+      var samePair = entityCanonicalKey(r.source) === entityCanonicalKey(srcName) && entityCanonicalKey(r.target) === entityCanonicalKey(tgtName) || entityCanonicalKey(r.source) === entityCanonicalKey(tgtName) && entityCanonicalKey(r.target) === entityCanonicalKey(srcName);
       return samePair && r.hint === hint;
     });
     const rel = { source: srcName, target: tgtName, hint };
@@ -7280,7 +6762,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     this.plugin.diskData.books[book.bookId] = {
       ...cached,
       entityRelations: relations,
-      lastSync: Date.now(),
+      lastSync: Date.now()
     };
     void this.plugin.persistDisk();
     if (!duplicate) {
@@ -7301,17 +6783,13 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
   removeEntityRelation(book, source, target, hint) {
     const cached = this.plugin.diskData.books[book.bookId];
     if (!cached) return;
-    const relations = (cached.entityRelations || []).filter(function (r) {
-      return !(
-        entityCanonicalKey(r.source) === entityCanonicalKey(source) &&
-        entityCanonicalKey(r.target) === entityCanonicalKey(target) &&
-        r.hint === hint
-      );
+    const relations = (cached.entityRelations || []).filter(function(r) {
+      return !(entityCanonicalKey(r.source) === entityCanonicalKey(source) && entityCanonicalKey(r.target) === entityCanonicalKey(target) && r.hint === hint);
     });
     this.plugin.diskData.books[book.bookId] = {
       ...cached,
       entityRelations: relations.length ? relations : void 0,
-      lastSync: Date.now(),
+      lastSync: Date.now()
     };
     void this.plugin.persistDisk();
     this.refreshKnowledgePane(book);
@@ -7325,7 +6803,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     if (suggestions.length === 0) {
       sec.createEl("p", {
         text: "\u6682\u65E0\u65B0\u7684\u5171\u73B0\u5EFA\u8BAE\u3002\u540C\u4E00\u6458\u5F55\u5185\u591A\u4EBA\u51FA\u73B0\u65F6\u4F1A\u81EA\u52A8\u63A8\u8350\u3002",
-        cls: "readflow-muted",
+        cls: "readflow-muted"
       });
       return;
     }
@@ -7335,7 +6813,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       copy.createEl("span", { text: "\u5171\u73B0 " + sug.count + "\u6B21", cls: "readflow-chip readflow-chip--accent" });
       copy.createEl("p", {
         text: `${sug.source} \u2194 ${sug.target}`,
-        cls: "readflow-card-note-text",
+        cls: "readflow-card-note-text"
       });
       const actions = row.createDiv("readflow-inline-actions");
       const adoptBtn = actions.createEl("button", { text: "\u91C7\u7EB3", type: "button" });
@@ -7343,7 +6821,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       adoptBtn.addEventListener("click", () => {
         this.addEntityRelation(book, sug.source, sug.target, "\u5171\u73B0", () => this.refreshKnowledgePane(book), {
           sinceHighlightId: sug.sinceHighlightId,
-          chapterUid: sug.chapterUid,
+          chapterUid: sug.chapterUid
         });
       });
     }
@@ -7363,7 +6841,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     if (keys.length === 0) {
       sec.createEl("p", {
         text: "\u540C\u4E00\u4EBA\u7269\u591A\u4E2A\u540D\u5B57\u65F6\uFF0C\u53EF\u5408\u5E76\u5230\u540C\u4E00\u8282\u70B9\u3002",
-        cls: "readflow-muted",
+        cls: "readflow-muted"
       });
       return;
     }
@@ -7427,7 +6905,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       new import_obsidian5.Notice("\u8BF7\u9009\u62E9\u4E0D\u540C\u7684\u4E24\u4E2A\u4EBA\u7269");
       return;
     }
-    const next = { ...(cached.entityAliases || {}) };
+    const next = { ...cached.entityAliases || {} };
     const existing = next[canon];
     const list = Array.isArray(existing) ? [...existing] : existing ? [existing] : [];
     if (!list.some((x) => entityCanonicalKey(x) === entityCanonicalKey(ali))) list.push(ali);
@@ -7448,7 +6926,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     this.plugin.diskData.books[book.bookId] = {
       ...cached,
       entityAliases: Object.keys(next).length ? next : void 0,
-      lastSync: Date.now(),
+      lastSync: Date.now()
     };
     void this.plugin.persistDisk();
     this.refreshKnowledgePane(book);
@@ -7467,7 +6945,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     if (events.length === 0) {
       sec.createEl("p", {
         text: "\u6807\u8BB0\u5173\u952E\u60C5\u8282\u8282\u70B9\uFF0C\u5C06\u663E\u793A\u5728\u7AE0\u8282\u65F6\u95F4\u8F74\u7684\u300C\u60C5\u8282\u7EBF\u300D\u884C\u3002",
-        cls: "readflow-muted",
+        cls: "readflow-muted"
       });
       return;
     }
@@ -7479,14 +6957,14 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       copy.createEl("span", { text: ev.hint || "\u4E8B\u4EF6", cls: "readflow-chip readflow-chip--plot" });
       if (hl) {
         copy.createEl("p", {
-          text: `${chapterLabel(hl)} \u00B7 ${shortLabel(hl.content, 32)}`,
-          cls: "readflow-card-note-text",
+          text: `${chapterLabel(hl)} \xB7 ${shortLabel(hl.content, 32)}`,
+          cls: "readflow-card-note-text"
         });
       }
       if ((ev.participants || []).length > 0) {
         copy.createEl("p", {
           text: ev.participants.join("\u3001"),
-          cls: "readflow-muted",
+          cls: "readflow-muted"
         });
       }
       const actions = row.createDiv("readflow-inline-actions");
@@ -7503,13 +6981,13 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
   addPlotEvent(book, payload) {
     const cached = this.plugin.diskData.books[book.bookId];
     if (!cached) return;
-    const events = [...(cached.plotEvents || [])];
+    const events = [...cached.plotEvents || []];
     events.push({
       id: newPlotEventId(),
       hint: payload.hint,
       atHighlightId: payload.atHighlightId,
       participants: payload.participants || [],
-      chapterUid: payload.chapterUid,
+      chapterUid: payload.chapterUid
     });
     this.plugin.diskData.books[book.bookId] = { ...cached, plotEvents: events, lastSync: Date.now() };
     void this.plugin.persistDisk();
@@ -7523,7 +7001,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     this.plugin.diskData.books[book.bookId] = {
       ...cached,
       plotEvents: events.length ? events : void 0,
-      lastSync: Date.now(),
+      lastSync: Date.now()
     };
     void this.plugin.persistDisk();
     this.refreshKnowledgePane(book);
@@ -7549,9 +7027,8 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       }
       const rowActions = row.createDiv("readflow-inline-actions");
       const scopeBtn = rowActions.createEl("button", {
-        text:
-          this.selectedKnowledgeTopic === summary.topic ? "\u53D6\u6D88\u805A\u7126" : "\u53EA\u770B\u6B64\u4E3B\u9898",
-        type: "button",
+        text: this.selectedKnowledgeTopic === summary.topic ? "\u53D6\u6D88\u805A\u7126" : "\u53EA\u770B\u6B64\u4E3B\u9898",
+        type: "button"
       });
       scopeBtn.classList.add("readflow-btn", "readflow-btn--ghost", "readflow-btn--sm");
       scopeBtn.addEventListener("click", () => {
@@ -7574,7 +7051,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     if (edges.length === 0) {
       sec.createEl("p", {
         text: "\u5F53\u524D\u8303\u56F4\u4E0B\u6682\u65E0\u5173\u7CFB\u5EFA\u8BAE\u3002",
-        cls: "readflow-muted",
+        cls: "readflow-muted"
       });
       return;
     }
@@ -7586,11 +7063,11 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       const copy = row.createDiv("readflow-edge-copy");
       copy.createEl("span", {
         text: edge.explicit ? "\u5DF2\u786E\u8BA4" : "\u63A8\u65AD",
-        cls: `readflow-chip ${edge.explicit ? "readflow-chip--soft" : "readflow-chip--accent"}`,
+        cls: `readflow-chip ${edge.explicit ? "readflow-chip--soft" : "readflow-chip--accent"}`
       });
       copy.createEl("p", {
         text: `${source.content.slice(0, 24)}${source.content.length > 24 ? "\u2026" : ""} \u2192 ${target.content.slice(0, 24)}${target.content.length > 24 ? "\u2026" : ""}`,
-        cls: "readflow-card-note-text",
+        cls: "readflow-card-note-text"
       });
       const actions = row.createDiv("readflow-inline-actions");
       const hintWrap = actions.createDiv("readflow-hint-input-wrap");
@@ -7604,25 +7081,26 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       const customInput = hintWrap.createEl("input", {
         cls: "readflow-input readflow-input--sm",
         type: "text",
-        placeholder: "\u5173\u7CFB\u7C7B\u578B\uFF08\u5982\uFF1A\u5E08\u627F\uFF09",
+        placeholder: "\u5173\u7CFB\u7C7B\u578B\uFF08\u5982\uFF1A\u5E08\u627F\uFF09"
       });
       customInput.value = RELATION_HINT_OPTIONS.includes(edge.hint) ? "" : edge.hint;
       customInput.style.display = hintSelect.value === "__custom__" ? "block" : "none";
       hintSelect.addEventListener("change", () => {
         customInput.style.display = hintSelect.value === "__custom__" ? "block" : "none";
       });
-      const getHintValue = () =>
-        hintSelect.value === "__custom__" ? customInput.value.trim() || "\u81EA\u5B9A\u4E49" : hintSelect.value;
+      const getHintValue = () => hintSelect.value === "__custom__" ? customInput.value.trim() || "\u81EA\u5B9A\u4E49" : hintSelect.value;
       if (edge.explicit) {
         const updateBtn = actions.createEl("button", { text: "\u66F4\u65B0", type: "button" });
         updateBtn.classList.add("readflow-btn", "readflow-btn--secondary", "readflow-btn--sm");
-        updateBtn.addEventListener("click", () =>
-          this.updateKnowledgeEdge(book, edge.sourceId, edge.targetId, getHintValue()),
+        updateBtn.addEventListener(
+          "click",
+          () => this.updateKnowledgeEdge(book, edge.sourceId, edge.targetId, getHintValue())
         );
         const deleteBtn = actions.createEl("button", { text: "\u5220\u9664", type: "button" });
         deleteBtn.classList.add("readflow-btn", "readflow-btn--ghost", "readflow-btn--sm");
-        deleteBtn.addEventListener("click", () =>
-          this.removeKnowledgeEdge(book, edge.sourceId, edge.targetId, edge.hint),
+        deleteBtn.addEventListener(
+          "click",
+          () => this.removeKnowledgeEdge(book, edge.sourceId, edge.targetId, edge.hint)
         );
       } else {
         const adoptBtn = actions.createEl("button", { text: "\u91C7\u7EB3", type: "button" });
@@ -7651,16 +7129,16 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
         liveBook,
         scopeBook,
         refreshMindMapInline,
-        onWorkbenchModeChange,
+        onWorkbenchModeChange
       );
       vizHost.empty();
       const mmOpts = Object.assign({}, self.getMindMapOpts(scopeBook), {
-        onHighlightSelect: function (id) {
+        onHighlightSelect: function(id) {
           self.expandedHighlightId = id;
           if (self.currentBook && self.currentTree) {
             self.renderVisibleList(self.currentBook, self.currentTree);
           }
-        },
+        }
       });
       self.renderMindMapVisual(vizHost, liveBook, scopeBook, mmOpts);
     };
@@ -7698,19 +7176,19 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
           mermaidBody,
           "\u4E3B\u9898\u8111\u56FE",
           buildTopicMindmap(scopeBook),
-          "\u6682\u65E0",
+          "\u6682\u65E0"
         );
         await this.renderMarkdownCard(
           mermaidBody,
           "\u903B\u8F91\u5173\u7CFB",
           buildRelationsMermaid(scopeBook),
-          "\u6682\u65E0",
+          "\u6682\u65E0"
         );
         await this.renderMarkdownCard(
           mermaidBody,
           "\u6838\u5FC3\u89C2\u70B9",
           buildCoreInsights(scopeBook),
-          "\u6682\u65E0",
+          "\u6682\u65E0"
         );
       }
     });
@@ -7727,7 +7205,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     const hint = contentEl.createDiv("readflow-mm-modal-hint");
     hint.createEl("span", {
       text: "\u70B9\u51FB\u5C55\u5F00/\u6536\u8D77 \xB7 \u6EDA\u8F6E\u7F29\u653E\u5185\u5BB9 \xB7 \u62D6\u62FD\u5E73\u79FB \xB7 \u53F3\u4E0B\u89D2\u8C03\u6574\u7A97\u53E3",
-      cls: "readflow-muted",
+      cls: "readflow-muted"
     });
     const actions = hint.createDiv("readflow-mm-modal-actions");
     const zoomOutBtn = actions.createEl("button", { text: "\u2212", type: "button" });
@@ -7743,22 +7221,31 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     const vizHost = contentEl.createDiv("readflow-mm-viz-host readflow-mm-modal-viz");
     const getMmControls = () => {
       const wrap = vizHost.querySelector(".readflow-mm-wrap, .readflow-graph-wrap, .readflow-narrative-wrap");
-      return wrap?.readflowMmControls;
+      return wrap == null ? void 0 : wrap.readflowMmControls;
     };
     const updateZoomLabel = (s) => zoomLabel.setText(Math.round(s * 100) + "%");
-    zoomOutBtn.addEventListener("click", () => getMmControls()?.zoomOut());
-    zoomInBtn.addEventListener("click", () => getMmControls()?.zoomIn());
-    fitBtn.addEventListener("click", () => getMmControls()?.resetView());
+    zoomOutBtn.addEventListener("click", () => {
+      var _a;
+      return (_a = getMmControls()) == null ? void 0 : _a.zoomOut();
+    });
+    zoomInBtn.addEventListener("click", () => {
+      var _a;
+      return (_a = getMmControls()) == null ? void 0 : _a.zoomIn();
+    });
+    fitBtn.addEventListener("click", () => {
+      var _a;
+      return (_a = getMmControls()) == null ? void 0 : _a.resetView();
+    });
     const refreshModalMindMap = () => {
       const liveBook = getLiveBook();
       const opts = Object.assign({}, self.getMindMapOpts(scopeBook, true), {
-        onHighlightSelect: function (id) {
+        onHighlightSelect: function(id) {
           self.expandedHighlightId = id;
           modal.close();
           if (self.currentBook && self.currentTree) {
             self.renderVisibleList(self.currentBook, self.currentTree);
           }
-        },
+        }
       });
       modal.titleEl.setText(self.mindMapModalTitle(scopeBook, opts));
       toolbarHost.empty();
@@ -7766,13 +7253,14 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       vizHost.empty();
       self.renderMindMapVisual(vizHost, liveBook, scopeBook, opts, updateZoomLabel);
     };
-    requestAnimationFrame(function () {
+    requestAnimationFrame(function() {
       modal.open();
-      requestAnimationFrame(function () {
+      requestAnimationFrame(function() {
         var modalBox = attachMindMapModalResize(modal);
         if (modalBox) {
-          modalBox.addEventListener("readflow-mm-resize", function () {
-            getMmControls()?.reflow();
+          modalBox.addEventListener("readflow-mm-resize", function() {
+            var _a;
+            (_a = getMmControls()) == null ? void 0 : _a.reflow();
           });
         }
         requestAnimationFrame(refreshModalMindMap);
@@ -7786,7 +7274,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     const body = sec.createDiv("readflow-reader-entry-body");
     body.createEl("p", {
       text: "\u5C06\u672C\u5730 EPUBTXT \u6587\u4EF6\u4EEC\u5F15\u5165 Obsidian\uFF0C\u5373\u53EF\u5728\u8BFB\u8BFA\u6A21\u5F0F\u4E2D\u9605\u8BFB\u5E76\u76F4\u63A5\u6458\u5F55\u3002\u73B0\u6709\u300C\u624B\u52A8\u6458\u5F55\u300D\u6309\u94AE\u5DF2\u652F\u6301\u4ECE\u5F53\u524D\u6587\u6863\u63D0\u53D6\u4E0A\u4E0B\u6587\u3002",
-      cls: "readflow-muted",
+      cls: "readflow-muted"
     });
     const actions = head.createDiv("readflow-inline-actions");
     const readLocalBtn = actions.createEl("button", { text: "\u5F00\u542F\u8BFB\u8BFA\u6A21\u5F0F", type: "button" });
@@ -7807,14 +7295,14 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     for (const ch of chapters) {
       chapterSelect.createEl("option", {
         value: String(ch.chapterUid || ch.chapter),
-        text: ch.chapter + " (" + ch.highlights.length + "\u6761)",
+        text: ch.chapter + " (" + ch.highlights.length + "\u6761)"
       });
     }
     const contentArea = contentEl.createDiv("readflow-reader-content");
     const hint = contentArea.createDiv("readflow-reader-hint");
     hint.createEl("p", {
       text: "\u9009\u62E9\u4E0A\u65B9\u7AE0\u8282\u540E\uFF0C\u7CFB\u7EDF\u4F1A\u81EA\u52A8\u641C\u7D22\u672C\u5730\u6587\u4EF6\u4E2D\u7684\u7AE0\u8282\u5185\u5BB9\uFF0C\u5E76\u5728\u6B63\u6587\u4E2D\u9AD8\u4EAE\u60A8\u7684\u6458\u5F55\u3002",
-      cls: "readflow-muted",
+      cls: "readflow-muted"
     });
     const hlHighlight = contentArea.createDiv("readflow-reader-highlights");
     const hlHead = hlHighlight.createDiv("readflow-reader-hl-head");
@@ -7840,7 +7328,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
         const captureBtn = row.createDiv("readflow-card-actions").createEl("button", {
           text: "\u523A\u4E3E\u6458\u5F55",
           type: "button",
-          cls: "readflow-btn readflow-btn--primary readflow-btn--sm",
+          cls: "readflow-btn readflow-btn--primary readflow-btn--sm"
         });
         captureBtn.addEventListener("click", () => {
           new QuickCaptureModal(
@@ -7849,12 +7337,12 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
             {
               book: scopeBook,
               highlight: h,
-              compactMode: false,
+              compactMode: false
             },
             () => {
               void this.plugin.persistDisk();
               this.render();
-            },
+            }
           ).open();
         });
       }
@@ -7892,12 +7380,12 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
         main.createEl("strong", { text: card.title, cls: "readflow-crystallize-title" });
         main.createEl("p", {
           text: card.insight.slice(0, 80) + (card.insight.length > 80 ? "\u2026" : ""),
-          cls: "readflow-crystallize-insight",
+          cls: "readflow-crystallize-insight"
         });
         const meta = row.createDiv("readflow-card-meta");
         meta.createSpan({
           cls: "readflow-chip readflow-chip--soft",
-          text: card.sourceHighlightIds.length + " \u6761\u6765\u6E90",
+          text: card.sourceHighlightIds.length + " \u6761\u6765\u6E90"
         });
         if (card.tags.length > 0) {
           meta.createSpan({ cls: "readflow-chip", text: card.tags.slice(0, 3).join(", ") });
@@ -7932,17 +7420,14 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     } else {
       sec.createEl("p", {
         text: "\u52FE\u9009\u6458\u5F55 \u2192 \u65B0\u5EFA\u77E5\u8BC6\u5361 \u2192 \u5BFC\u51FA Vault",
-        cls: "readflow-muted readflow-crystallize-oneliner",
+        cls: "readflow-muted readflow-crystallize-oneliner"
       });
     }
   }
   openCrystallizeDialog(scopeBook) {
     var _a;
     const selectedIds = [...this.selectedHighlightIds];
-    const sourceHighlights =
-      selectedIds.length > 0
-        ? scopeBook.highlights.filter((h) => this.selectedHighlightIds.has(h.id))
-        : scopeBook.highlights.filter((h) => h.status === "processed" && h.importance >= 4).slice(0, 5);
+    const sourceHighlights = selectedIds.length > 0 ? scopeBook.highlights.filter((h) => this.selectedHighlightIds.has(h.id)) : scopeBook.highlights.filter((h) => h.status === "processed" && h.importance >= 4).slice(0, 5);
     const modal = new import_obsidian5.Modal(this.app);
     modal.titleEl.setText("\u521B\u5EFA\u77E5\u8BC6\u5361");
     modal.modalEl.addClass("readflow-modal-root");
@@ -7956,7 +7441,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     if (sourceHighlights.length === 0) {
       sourceSec.createEl("p", {
         text: "\u8BF7\u5148\u5728\u5DE6\u4FA7\u5217\u8868\u52FE\u9009\u6458\u5F55\uFF0C\u6216\u786E\u4FDD\u5DF2\u6709\u91CD\u8981\u5EA6 \u2265 4 \u7684\u5DF2\u5904\u7406\u6458\u5F55\u3002",
-        cls: "readflow-muted",
+        cls: "readflow-muted"
       });
     } else {
       for (const h of sourceHighlights.slice(0, 6)) {
@@ -7967,35 +7452,26 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     }
     const inputSec = contentEl.createDiv("readflow-modal-section");
     inputSec.createEl("h4", { text: "\u77E5\u8BC6\u63D0\u70BC" });
-    new import_obsidian5.Setting(inputSec)
-      .setName("\u77E5\u8BC6\u70B9\u6807\u9898")
-      .setDesc("\u7528\u4E00\u53E5\u8BDD\u6982\u62EC\u8FD9\u4E2A\u77E5\u8BC6\u70B9")
-      .addText((t) => {
-        t.setPlaceholder("\u4F8B\uFF1A\u590D\u5229\u7684\u529B\u91CF\u4E0E\u957F\u671F\u4E3B\u4E49").onChange(
-          (v) => (cardTitle = v),
-        );
-        t.inputEl.style.width = "100%";
-      });
-    new import_obsidian5.Setting(inputSec)
-      .setName("\u6838\u5FC3\u89C1\u89E3")
-      .setDesc(
-        "\u7528\u81EA\u5DF1\u7684\u8BDD\u603B\u7ED3\u2014\u2014\u8FD9\u662F\u4ECE\u6458\u5F55\u5230\u77E5\u8BC6\u7684\u5173\u952E\u4E00\u6B65",
-      )
-      .addTextArea((ta) => {
-        ta.setPlaceholder("\u6211\u4ECE\u8FD9\u4E9B\u6458\u5F55\u4E2D\u7406\u89E3\u5230\u2026").onChange(
-          (v) => (cardInsight = v),
-        );
-        ta.inputEl.rows = 4;
-        ta.inputEl.style.width = "100%";
-      });
-    new import_obsidian5.Setting(inputSec)
-      .setName("\u6807\u7B7E\uFF08\u53EF\u9009\uFF09")
-      .setDesc("\u9017\u53F7\u5206\u9694\uFF0C\u7528\u4E8E\u8DE8\u4E66\u77E5\u8BC6\u5173\u8054")
-      .addText((t) => {
-        t.setPlaceholder("\u4F8B\uFF1A\u6295\u8D44, \u590D\u5229, \u957F\u671F\u4E3B\u4E49").onChange(
-          (v) => (cardTags = v),
-        );
-      });
+    new import_obsidian5.Setting(inputSec).setName("\u77E5\u8BC6\u70B9\u6807\u9898").setDesc("\u7528\u4E00\u53E5\u8BDD\u6982\u62EC\u8FD9\u4E2A\u77E5\u8BC6\u70B9").addText((t) => {
+      t.setPlaceholder("\u4F8B\uFF1A\u590D\u5229\u7684\u529B\u91CF\u4E0E\u957F\u671F\u4E3B\u4E49").onChange(
+        (v) => cardTitle = v
+      );
+      t.inputEl.style.width = "100%";
+    });
+    new import_obsidian5.Setting(inputSec).setName("\u6838\u5FC3\u89C1\u89E3").setDesc(
+      "\u7528\u81EA\u5DF1\u7684\u8BDD\u603B\u7ED3\u2014\u2014\u8FD9\u662F\u4ECE\u6458\u5F55\u5230\u77E5\u8BC6\u7684\u5173\u952E\u4E00\u6B65"
+    ).addTextArea((ta) => {
+      ta.setPlaceholder("\u6211\u4ECE\u8FD9\u4E9B\u6458\u5F55\u4E2D\u7406\u89E3\u5230\u2026").onChange(
+        (v) => cardInsight = v
+      );
+      ta.inputEl.rows = 4;
+      ta.inputEl.style.width = "100%";
+    });
+    new import_obsidian5.Setting(inputSec).setName("\u6807\u7B7E\uFF08\u53EF\u9009\uFF09").setDesc("\u9017\u53F7\u5206\u9694\uFF0C\u7528\u4E8E\u8DE8\u4E66\u77E5\u8BC6\u5173\u8054").addText((t) => {
+      t.setPlaceholder("\u4F8B\uFF1A\u6295\u8D44, \u590D\u5229, \u957F\u671F\u4E3B\u4E49").onChange(
+        (v) => cardTags = v
+      );
+    });
     const actionSec = contentEl.createDiv("readflow-modal-actions");
     const cancelBtn = actionSec.createEl("button", { text: "\u53D6\u6D88", type: "button" });
     cancelBtn.classList.add("readflow-btn", "readflow-btn--ghost");
@@ -8015,12 +7491,9 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
         scopeBook,
         sourceHighlights.map((h) => h.id),
         cardTitle.trim(),
-        cardInsight.trim(),
+        cardInsight.trim()
       );
-      card.tags = cardTags
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean);
+      card.tags = cardTags.split(",").map((s) => s.trim()).filter(Boolean);
       if (!this.plugin.diskData.knowledgeCards) this.plugin.diskData.knowledgeCards = [];
       this.plugin.diskData.knowledgeCards.push(card);
       await this.plugin.persistDisk();
@@ -8049,21 +7522,21 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     const selected = book.highlights.filter((h) => this.selectedHighlightIds.has(h.id));
     return {
       ...book,
-      highlights: selected.length > 0 ? selected : visible,
+      highlights: selected.length > 0 ? selected : visible
     };
   }
   applyKnowledgeEdge(book, edge) {
     this.updateManyHighlights(book, (highlight) => {
       var _a, _b;
       if (highlight.id !== edge.sourceId) return highlight;
-      const relations = [...((_a = highlight.relations) != null ? _a : [])];
+      const relations = [...(_a = highlight.relations) != null ? _a : []];
       const exists = relations.some((row) => row.targetId === edge.targetId && row.hint === edge.hint);
       if (!exists) relations.push({ targetId: edge.targetId, hint: edge.hint });
       return {
         ...highlight,
         relations,
-        relationHints: [.../* @__PURE__ */ new Set([...((_b = highlight.relationHints) != null ? _b : []), edge.hint])],
-        status: "processed",
+        relationHints: [.../* @__PURE__ */ new Set([...(_b = highlight.relationHints) != null ? _b : [], edge.hint])],
+        status: "processed"
       };
     });
   }
@@ -8071,14 +7544,14 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     this.updateManyHighlights(book, (highlight) => {
       var _a, _b;
       if (highlight.id !== sourceId) return highlight;
-      const nextRelations = ((_a = highlight.relations) != null ? _a : []).map((row) =>
-        row.targetId === targetId ? { ...row, hint: nextHint } : row,
+      const nextRelations = ((_a = highlight.relations) != null ? _a : []).map(
+        (row) => row.targetId === targetId ? { ...row, hint: nextHint } : row
       );
       return {
         ...highlight,
         relations: nextRelations,
-        relationHints: [.../* @__PURE__ */ new Set([...((_b = highlight.relationHints) != null ? _b : []), nextHint])],
-        status: "processed",
+        relationHints: [.../* @__PURE__ */ new Set([...(_b = highlight.relationHints) != null ? _b : [], nextHint])],
+        status: "processed"
       };
     });
   }
@@ -8087,11 +7560,11 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       var _a;
       if (highlight.id !== sourceId) return highlight;
       const nextRelations = ((_a = highlight.relations) != null ? _a : []).filter(
-        (row) => !(row.targetId === targetId && row.hint === hint),
+        (row) => !(row.targetId === targetId && row.hint === hint)
       );
       return {
         ...highlight,
-        relations: nextRelations.length > 0 ? nextRelations : void 0,
+        relations: nextRelations.length > 0 ? nextRelations : void 0
       };
     });
   }
@@ -8125,9 +7598,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     const sortTimeBtn = document.createElement("button");
     sortTimeBtn.className = "readflow-btn readflow-btn--ghost readflow-btn--sm readflow-book-sort-btn readflow-book-sort-compound";
     sortTimeBtn.classList.toggle("readflow-book-sort-btn--active", this.listOrderMode === "time");
-    sortTimeBtn.title = this.listOrderMode === "time"
-      ? `\u65F6\u95F4\u6392\u5E8F \xB7 ${this.listTimeDir === "desc" ? "\u65B0\u2192\u65E7" : "\u65E7\u2192\u65B0"}\uFF0C\u518D\u70B9\u5207\u6362\u65B9\u5411`
-      : "\u6309\u65F6\u95F4\u6392\u5E8F";
+    sortTimeBtn.title = this.listOrderMode === "time" ? `\u65F6\u95F4\u6392\u5E8F \xB7 ${this.listTimeDir === "desc" ? "\u65B0\u2192\u65E7" : "\u65E7\u2192\u65B0"}\uFF0C\u518D\u70B9\u5207\u6362\u65B9\u5411` : "\u6309\u65F6\u95F4\u6392\u5E8F";
     const timeIconSlot = document.createElement("span");
     timeIconSlot.className = "readflow-book-sort-compound__icon";
     sortTimeBtn.appendChild(timeIconSlot);
@@ -8154,9 +7625,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     const sortTopicBtn = document.createElement("button");
     sortTopicBtn.className = "readflow-btn readflow-btn--ghost readflow-btn--sm readflow-book-sort-btn readflow-book-sort-compound";
     sortTopicBtn.classList.toggle("readflow-book-sort-btn--active", this.listOrderMode === "topic");
-    sortTopicBtn.title = this.listOrderMode === "topic"
-      ? `\u4E3B\u9898\u6392\u5E8F \xB7 ${this.listTopicDir === "asc" ? "A\u2192Z" : "Z\u2192A"}\uFF0C\u518D\u70B9\u5207\u6362\u65B9\u5411`
-      : "\u6309\u4E3B\u9898\u6392\u5E8F";
+    sortTopicBtn.title = this.listOrderMode === "topic" ? `\u4E3B\u9898\u6392\u5E8F \xB7 ${this.listTopicDir === "asc" ? "A\u2192Z" : "Z\u2192A"}\uFF0C\u518D\u70B9\u5207\u6362\u65B9\u5411` : "\u6309\u4E3B\u9898\u6392\u5E8F";
     const topicIconSlot = document.createElement("span");
     topicIconSlot.className = "readflow-book-sort-compound__icon";
     sortTopicBtn.appendChild(topicIconSlot);
@@ -8228,8 +7697,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       panel.style.left = `${rect.left}px`;
       panel.style.top = `${rect.top}px`;
       panel.style.right = "auto";
-      let lastX = e.clientX,
-        lastY = e.clientY;
+      let lastX = e.clientX, lastY = e.clientY;
       const onMove = (ev) => {
         const newLeft = parseFloat(panel.style.left) + ev.clientX - lastX;
         const newTop = parseFloat(panel.style.top) + ev.clientY - lastY;
@@ -8297,16 +7765,16 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
           return {
             ...h,
             status: "inbox",
-            highlightType: void 0,
+            highlightType: void 0
           };
         }
         return {
           ...h,
           status: "processed",
-          highlightType: lane,
+          highlightType: lane
         };
       }),
-      lastSync: Date.now(),
+      lastSync: Date.now()
     };
     void this.plugin.persistDisk();
   }
@@ -8317,15 +7785,15 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     let nextBook = {
       ...cached,
       highlights: cached.highlights.map(update),
-      lastSync: Date.now(),
+      lastSync: Date.now()
     };
     const topics = [
-      ...((_a = nextBook.topicCatalog) != null ? _a : []),
-      ...nextBook.highlights.map((h) => (h.topic || "").trim()).filter(Boolean),
+      ...(_a = nextBook.topicCatalog) != null ? _a : [],
+      ...nextBook.highlights.map((h) => (h.topic || "").trim()).filter(Boolean)
     ];
     nextBook = {
       ...nextBook,
-      topicCatalog: [...new Set(topics)],
+      topicCatalog: [...new Set(topics)]
     };
     this.plugin.diskData.books[book.bookId] = nextBook;
     void this.plugin.persistDisk();
@@ -8343,12 +7811,12 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
         const exists = nextRelations.some((row) => row.targetId === targetId && row.hint === hint);
         if (!exists) nextRelations.push({ targetId, hint });
       }
-      const hints = [.../* @__PURE__ */ new Set([...((_b = h.relationHints) != null ? _b : []), hint])];
+      const hints = [.../* @__PURE__ */ new Set([...(_b = h.relationHints) != null ? _b : [], hint])];
       return {
         ...h,
         relations: nextRelations,
         relationHints: hints,
-        status: "processed",
+        status: "processed"
       };
     });
   }
@@ -8357,16 +7825,14 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     if (!cached) return;
     this.plugin.diskData.books[book.bookId] = {
       ...cached,
-      highlights: cached.highlights.map((h) =>
-        h.id === highlightId
-          ? {
-              ...h,
-              chapter,
-              chapterUid,
-            }
-          : h,
+      highlights: cached.highlights.map(
+        (h) => h.id === highlightId ? {
+          ...h,
+          chapter,
+          chapterUid
+        } : h
       ),
-      lastSync: Date.now(),
+      lastSync: Date.now()
     };
     void this.plugin.persistDisk();
   }
@@ -8389,11 +7855,11 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     var _a;
     const cached = this.plugin.diskData.books[book.bookId];
     if (!cached) return;
-    const catalog = [.../* @__PURE__ */ new Set([...((_a = cached.topicCatalog) != null ? _a : []), topic])];
+    const catalog = [.../* @__PURE__ */ new Set([...(_a = cached.topicCatalog) != null ? _a : [], topic])];
     this.plugin.diskData.books[book.bookId] = {
       ...cached,
       topicCatalog: catalog,
-      lastSync: Date.now(),
+      lastSync: Date.now()
     };
     void this.plugin.persistDisk();
   }
@@ -8404,13 +7870,13 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     if (!cached) return;
     this.plugin.diskData.books[book.bookId] = {
       ...cached,
-      highlights: cached.highlights.map((h) => ((h.topic || "").trim() === from ? { ...h, topic: to } : h)),
+      highlights: cached.highlights.map((h) => (h.topic || "").trim() === from ? { ...h, topic: to } : h),
       topicCatalog: [
         ...new Set(
-          ((_a = cached.topicCatalog) != null ? _a : []).map((topic) => (topic === from ? to : topic)).concat(to),
-        ),
+          ((_a = cached.topicCatalog) != null ? _a : []).map((topic) => topic === from ? to : topic).concat(to)
+        )
       ],
-      lastSync: Date.now(),
+      lastSync: Date.now()
     };
     void this.plugin.persistDisk();
   }
@@ -8420,11 +7886,11 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     if (!cached) return;
     this.plugin.diskData.books[book.bookId] = {
       ...cached,
-      highlights: cached.highlights.map((h) => ((h.topic || "").trim() === from ? { ...h, topic: to } : h)),
+      highlights: cached.highlights.map((h) => (h.topic || "").trim() === from ? { ...h, topic: to } : h),
       topicCatalog: [
-        ...new Set(((_a = cached.topicCatalog) != null ? _a : []).filter((topic) => topic !== from).concat(to)),
+        ...new Set(((_a = cached.topicCatalog) != null ? _a : []).filter((topic) => topic !== from).concat(to))
       ],
-      lastSync: Date.now(),
+      lastSync: Date.now()
     };
     void this.plugin.persistDisk();
   }
@@ -8440,7 +7906,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
         month: "2-digit",
         day: "2-digit",
         hour: "2-digit",
-        minute: "2-digit",
+        minute: "2-digit"
       });
     } catch (e) {
       return "-";
@@ -8480,8 +7946,6 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     }
   }
 };
-
-// src/ui/WereadLoginWindow.ts
 var import_obsidian6 = require("obsidian");
 var WEREAD_LOGIN = "https://weread.qq.com/#login";
 var WEREAD_HOME = "https://weread.qq.com/";
@@ -8516,7 +7980,8 @@ function getRequire() {
       const w = window;
       if (typeof w.require === "function") return w.require;
     }
-  } catch (e) {}
+  } catch (e) {
+  }
   try {
     return require;
   } catch (e) {
@@ -8529,14 +7994,16 @@ function getElectronRemote() {
   try {
     const er = req("@electron/remote");
     if ((er == null ? void 0 : er.BrowserWindow) && er.getCurrentWindow) return er;
-  } catch (e) {}
+  } catch (e) {
+  }
   try {
     const electron = req("electron");
     const r = electron.remote;
     if ((r == null ? void 0 : r.BrowserWindow) && r.getCurrentWindow) {
       return r;
     }
-  } catch (e) {}
+  } catch (e) {
+  }
   return null;
 }
 function getChromeLikeUA() {
@@ -8548,7 +8015,8 @@ function getChromeLikeUA() {
         return "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
       }
     }
-  } catch (e) {}
+  } catch (e) {
+  }
   return "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
 }
 var WereadLoginWindow = class {
@@ -8562,7 +8030,8 @@ var WereadLoginWindow = class {
     var _a;
     try {
       (_a = this.modal) == null ? void 0 : _a.close();
-    } catch (e) {}
+    } catch (e) {
+    }
     this.modal = null;
     this.handled = false;
     this._hooksAttached = false;
@@ -8585,16 +8054,17 @@ var WereadLoginWindow = class {
     return this.modal.webContents;
   }
   async open() {
+    var _a, _b;
     if (!import_obsidian6.Platform.isDesktopApp) {
       new import_obsidian6.Notice(
-        "\u79FB\u52A8\u7AEF\u8BF7\u624B\u52A8\u7C98\u8D34 Cookie\uFF08\u8BBE\u7F6E \u2192 ReadFlow\uFF09",
+        "\u79FB\u52A8\u7AEF\u8BF7\u624B\u52A8\u7C98\u8D34 Cookie\uFF08\u8BBE\u7F6E \u2192 ReadFlow\uFF09"
       );
       return;
     }
     const remote = getElectronRemote();
     if (!remote) {
       new import_obsidian6.Notice(
-        "\u5F53\u524D Obsidian/Electron \u65E0\u6CD5\u4F7F\u7528\u5185\u7F6E\u767B\u5F55\uFF0C\u8BF7\u624B\u52A8\u7C98\u8D34 Cookie",
+        "\u5F53\u524D Obsidian/Electron \u65E0\u6CD5\u4F7F\u7528\u5185\u7F6E\u767B\u5F55\uFF0C\u8BF7\u624B\u52A8\u7C98\u8D34 Cookie"
       );
       return;
     }
@@ -8609,7 +8079,7 @@ var WereadLoginWindow = class {
     }
     try {
       this.modal = new BrowserWindow({
-        ...(parent ? { parent } : {}),
+        ...parent ? { parent } : {},
         width: 960,
         height: 540,
         show: false,
@@ -8617,14 +8087,14 @@ var WereadLoginWindow = class {
         webPreferences: {
           nodeIntegration: false,
           contextIsolation: true,
-          sandbox: false,
-        },
+          sandbox: false
+        }
       });
     } catch (e) {
       console.error("[ReadFlow] \u521B\u5EFA\u767B\u5F55\u7A97\u53E3\u5931\u8D25", e);
       new import_obsidian6.Notice(
         `\u65E0\u6CD5\u521B\u5EFA\u767B\u5F55\u7A97\u53E3\uFF1A${e instanceof Error ? e.message : String(e)}\u3002\u8BF7\u5C1D\u8BD5\u624B\u52A8\u7C98\u8D34 Cookie\u3002`,
-        8e3,
+        8e3
       );
       return;
     }
@@ -8671,13 +8141,14 @@ var WereadLoginWindow = class {
         }
       });
       session.webRequest.onSendHeaders({ urls: ["https://weread.qq.com/web/user?userVid=*"] }, (details) => {
-        const raw = details.requestHeaders["Cookie"] ?? details.requestHeaders["cookie"];
+        var _a2;
+        const raw = (_a2 = details.requestHeaders["Cookie"]) != null ? _a2 : details.requestHeaders["cookie"];
         if (raw === void 0) return;
         const cookieArr = parseCookieHeader(raw);
         const wrName = cookieArr.find((c) => c.name === "wr_name");
         const wrVid = cookieArr.find((c) => c.name === "wr_vid");
         const wrSkey = cookieArr.find((c) => c.name === "wr_skey");
-        if ((wrName && wrName.value !== "") || (wrVid && wrVid.value !== "") || (wrSkey && wrSkey.value !== "")) {
+        if (wrName && wrName.value !== "" || wrVid && wrVid.value !== "" || wrSkey && wrSkey.value !== "") {
           void finishOk(pairsToHeaderString(cookieArr));
         } else if (this.isModalAlive()) {
           void this.modal.loadURL(WEREAD_LOGIN);
@@ -8707,7 +8178,7 @@ var WereadLoginWindow = class {
       } catch (e) {
         console.warn("[ReadFlow] loadURL", target, e);
       }
-      const url = this.getWebContents()?.getURL?.() || "";
+      const url = ((_b = (_a = this.getWebContents()) == null ? void 0 : _a.getURL) == null ? void 0 : _b.call(_a)) || "";
       if (url.includes("weread.qq.com")) {
         loaded = true;
         break;
@@ -8719,7 +8190,7 @@ var WereadLoginWindow = class {
       const hint = loadErr || url.slice(0, 80) || "\u672A\u77E5\u9519\u8BEF";
       new import_obsidian6.Notice(
         `\u52A0\u8F7D\u5FAE\u4FE1\u8BFB\u4E66\u5931\u8D25\u3002\u53EF\u6539\u7528\u624B\u52A8\u7C98\u8D34 Cookie\u3002\u8BE6\u60C5\uFF1A${hint.slice(0, 200)}`,
-        12e3,
+        12e3
       );
       this.dispose();
       return;
@@ -8732,8 +8203,8 @@ async function readSessionCookieString(win) {
   try {
     const cookieStore = win.webContents.session.cookies;
     const sessionCookies = [
-      ...(await cookieStore.get({ domain: ".weread.qq.com" })),
-      ...(await cookieStore.get({ domain: "weread.qq.com" })),
+      ...await cookieStore.get({ domain: ".weread.qq.com" }),
+      ...await cookieStore.get({ domain: "weread.qq.com" })
     ];
     const unique = /* @__PURE__ */ new Map();
     for (const c of sessionCookies) {
@@ -8742,10 +8213,12 @@ async function readSessionCookieString(win) {
         let value = c.value;
         try {
           name = decodeURIComponent(c.name);
-        } catch (e) {}
+        } catch (e) {
+        }
         try {
           value = decodeURIComponent(c.value);
-        } catch (e) {}
+        } catch (e) {
+        }
         unique.set(c.name, { name, value });
       }
     }
@@ -8754,7 +8227,7 @@ async function readSessionCookieString(win) {
     const wrVid = cookieArr.find((c) => c.name === "wr_vid");
     const wrName = cookieArr.find((c) => c.name === "wr_name");
     const wrSkey = cookieArr.find((c) => c.name === "wr_skey");
-    if (!wrVid || ((!wrName || wrName.value === "") && (!wrSkey || wrSkey.value === ""))) {
+    if (!wrVid || (!wrName || wrName.value === "") && (!wrSkey || wrSkey.value === "")) {
       return null;
     }
     return pairsToHeaderString(cookieArr);
@@ -8766,8 +8239,6 @@ async function readSessionCookieString(win) {
 async function verifyCookieRough(cookieStr) {
   return verifyWereadCookieSilent(cookieStr);
 }
-
-// src/main.ts
 var ReadFlowPlugin = class extends import_obsidian7.Plugin {
   constructor(app, manifest) {
     super(app, manifest);
@@ -8787,13 +8258,13 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
     this.addCommand({
       id: "readflow-open-panel",
       name: "\u6253\u5F00\u9605\u8BFB\u9762\u677F\uFF08\u4E3B\u5DE5\u4F5C\u533A\u6807\u7B7E\uFF09",
-      callback: () => void this.openPanel(),
+      callback: () => void this.openPanel()
     });
     this.addCommand({
       id: "readflow-sync-weread",
       name: "\u540C\u6B65\u5FAE\u4FE1\u8BFB\u4E66",
       hotkeys: [{ modifiers: ["Mod", "Shift"], key: "s" }],
-      callback: () => void this.syncWereadAll(),
+      callback: () => void this.syncWereadAll()
     });
     this.addCommand({
       id: "readflow-rebuild-link-index",
@@ -8802,7 +8273,7 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
       callback: async () => {
         await this.linker.rebuildIndexAsync();
         new import_obsidian7.Notice("\u5173\u8054\u7D22\u5F15\u5DF2\u66F4\u65B0");
-      },
+      }
     });
     this.addCommand({
       id: "readflow-manual-capture",
@@ -8813,19 +8284,19 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
           void this.persistDisk();
           this.refreshReadFlowViews();
         }).open();
-      },
+      }
     });
     this.addCommand({
       id: "readflow-capture-selection",
       name: "\u6458\u5F55\u5F53\u524D\u9009\u4E2D\u6587\u672C\u5230 ReadFlow",
       editorCallback: (editor) => {
         void this.captureFromEditorSelection(editor);
-      },
+      }
     });
     this.addCommand({
       id: "readflow-weread-login",
       name: "\u5FAE\u4FE1\u8BFB\u4E66\u767B\u5F55\uFF08\u684C\u9762\uFF09",
-      callback: () => this.openWereadLogin(),
+      callback: () => this.openWereadLogin()
     });
     this.addCommand({
       id: "readflow-export-data",
@@ -8835,51 +8306,46 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
         const path = this.app.vault.getAvailablePath("readflow-export.json", ".");
         await this.app.vault.create(path, json);
         new import_obsidian7.Notice(`\u5DF2\u5BFC\u51FA\uFF1A${path}`);
-      },
+      }
     });
     this.addCommand({
       id: "readflow-import-vault-md",
       name: "\u4ECE Vault MD \u6587\u4EF6\u5BFC\u5165\u66F4\u65B0",
       callback: async () => {
+        var _a, _b;
         const result = await this.importFromVaultMd();
         new import_obsidian7.Notice(
-          `\u5BFC\u5165\u5B8C\u6210\uFF1A\u66F4\u65B0 ${result.imported} \u672C\uFF0C\u8DF3\u8FC7 ${result.skipped} \u672C\uFF0C\u626B\u63CF ${result.files ?? 0} \u4E2A MD\u6587\u4EF6\uFF08${result.scannedPaths ?? 0} \u4E2A\u76EE\u5F55\uFF09${result.errors ? "\uFF0C\u9519\u8BEF " + result.errors + " \u4E2A" : ""}`,
+          `\u5BFC\u5165\u5B8C\u6210\uFF1A\u66F4\u65B0 ${result.imported} \u672C\uFF0C\u8DF3\u8FC7 ${result.skipped} \u672C\uFF0C\u626B\u63CF ${(_a = result.files) != null ? _a : 0} \u4E2A MD\u6587\u4EF6\uFF08${(_b = result.scannedPaths) != null ? _b : 0} \u4E2A\u76EE\u5F55\uFF09${result.errors ? "\uFF0C\u9519\u8BEF " + result.errors + " \u4E2A" : ""}`
         );
         this.refreshReadFlowViews();
-      },
+      }
     });
     this.addCommand({
       id: "readflow-push-vault-note-weread",
       name: "\u5C06\u5F53\u524D\u7B14\u8BB0\u63A8\u9001\u5230\u5FAE\u4FE1\u8BFB\u4E66",
       editorCallback: () => {
         void this.pushCurrentVaultNoteToWeread();
-      },
+      }
     });
     this.registerEvent(
       this.app.workspace.on("editor-menu", (menu, editor) => {
         const selected = editor.getSelection().trim();
         if (selected) {
           menu.addItem((item) => {
-            item
-              .setTitle("\u6458\u5F55\u5230 ReadFlow")
-              .setIcon("highlighter")
-              .onClick(() => {
-                void this.captureFromEditorSelection(editor);
-              });
+            item.setTitle("\u6458\u5F55\u5230 ReadFlow").setIcon("highlighter").onClick(() => {
+              void this.captureFromEditorSelection(editor);
+            });
           });
         }
         const file = this.app.workspace.getActiveFile();
         if (file && file.extension === "md") {
           menu.addItem((item) => {
-            item
-              .setTitle("\u63A8\u9001\u5230\u5FAE\u4FE1\u8BFB\u4E66")
-              .setIcon("upload")
-              .onClick(() => {
-                void this.pushCurrentVaultNoteToWeread();
-              });
+            item.setTitle("\u63A8\u9001\u5230\u5FAE\u4FE1\u8BFB\u4E66").setIcon("upload").onClick(() => {
+              void this.pushCurrentVaultNoteToWeread();
+            });
           });
         }
-      }),
+      })
     );
     this.registerDomEvent(document, "selectionchange", () => this.updateSelectionCaptureButton());
     this.registerDomEvent(document, "mouseup", () => this.updateSelectionCaptureButton());
@@ -8891,8 +8357,6 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
     });
     this.registerDomEvent(window, "scroll", () => this.hideSelectionCaptureButton(), { capture: true });
     this.registerDomEvent(window, "resize", () => this.hideSelectionCaptureButton());
-
-    // 初始化心跳管理器
     this.heartbeatManager = new HeartbeatManager(this);
     if (this.settings.heartbeatEnabled) {
       this.heartbeatManager.start(this.settings.heartbeatInterval || 30);
@@ -8901,7 +8365,6 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
     if (this.settings.autoSyncEnabled) {
       this.autoSyncManager.start();
     }
-    // 初始化模拟阅读管理器
     this.simulatedReadingManager = new SimulatedReadingManager(this);
     if (this.settings.simulatedReadingEnabled) {
       this.simulatedReadingManager.start();
@@ -8942,10 +8405,10 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
     this.settings = Object.assign({}, DEFAULT_SETTINGS, (_b = raw.settings) != null ? _b : {});
     this.diskData = {
       version: 1,
-      books: { ...((_c = raw.books) != null ? _c : {}) },
+      books: { ...(_c = raw.books) != null ? _c : {} },
       lastSyncAt: raw.lastSyncAt,
-      knowledgeCards: [...((_d = raw.knowledgeCards) != null ? _d : [])],
-      simulatedReadingStats: raw.simulatedReadingStats || { todayMinutes: 0, todayDate: "" },
+      knowledgeCards: [...(_d = raw.knowledgeCards) != null ? _d : []],
+      simulatedReadingStats: raw.simulatedReadingStats || { todayMinutes: 0, todayDate: "" }
     };
     var migrated = false;
     for (var bid in this.diskData.books) {
@@ -8977,7 +8440,7 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
       version: 1,
       books: this.diskData.books,
       lastSyncAt: this.diskData.lastSyncAt,
-      knowledgeCards: this.diskData.knowledgeCards || [],
+      knowledgeCards: this.diskData.knowledgeCards || []
     };
     await this.saveData(payload);
   }
@@ -8985,7 +8448,6 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
   async saveSettings() {
     await this.persistDisk();
   }
-
   /** 从 Vault MD 文件导入书籍和划线（支持多目录） */
   async importFromVaultMd() {
     const importPaths = getMdImportPaths(this.settings);
@@ -9001,11 +8463,7 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
         mdFileSet.set(f.path, f);
       }
     }
-
-    let imported = 0,
-      skipped = 0,
-      errors = 0;
-
+    let imported = 0, skipped = 0, errors = 0;
     for (const file of mdFileSet.values()) {
       try {
         const content = await this.app.vault.read(file);
@@ -9014,7 +8472,6 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
           skipped++;
           continue;
         }
-
         const existing = this.diskData.books[parsed.bookId];
         if (existing) {
           const existingIds = new Set(existing.highlights.map((h) => h.id));
@@ -9031,7 +8488,7 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
             author: parsed.author,
             cover: parsed.cover,
             highlights: parsed.highlights,
-            lastSync: Date.now(),
+            lastSync: Date.now()
           };
         }
         imported++;
@@ -9040,61 +8497,49 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
         console.error("[ReadFlow] import md error", file.path, e);
       }
     }
-
     if (imported > 0) {
       this.diskData.lastSyncAt = Date.now();
       await this.persistDisk();
     }
-
     return { imported, skipped, errors, scannedPaths: importPaths.length, files: mdFileSet.size };
   }
-
   /** 心跳数据同步 - 获取书架有进度的书（有笔记/摘录的书） */
   async syncHeartbeatData() {
     const cookie = this.settings.wereadCookie;
-    if (!cookie) return { success: false, error: "请先配置 Cookie" };
-
+    if (!cookie) return { success: false, error: "\u8BF7\u5148\u914D\u7F6E Cookie" };
     try {
       const cookieRef = { value: cookie };
       const rawBooks = await fetchNotebookBooksRaw(cookieRef);
-
-      // 有笔记/noteCount > 0 或有想法/reviewCount > 0 的书视为"有进度"
       const booksWithProgress = rawBooks.filter((b) => (b.noteCount || 0) + (b.reviewCount || 0) > 0);
-
-      this.heartbeatBooks = booksWithProgress
-        .map((book) => {
-          const info = book.book || {};
-          return {
-            bookId: info.bookId || book.bookId || "",
-            title: info.title || book.title || "未知",
-            author: info.author || book.author || "",
-            noteCount: book.noteCount || 0,
-            reviewCount: book.reviewCount || 0,
-            readUpdateTime: info.readUpdateTime || 0,
-            updateTime: info.updateTime || 0,
-            cover: info.cover || "",
-          };
-        })
-        .sort((a, b) => (b.readUpdateTime || 0) - (a.readUpdateTime || 0));
-
-      // 如果是桌面端，同步 cookie（有些 API 会更新 wr_skey）
+      this.heartbeatBooks = booksWithProgress.map((book) => {
+        const info = book.book || {};
+        return {
+          bookId: info.bookId || book.bookId || "",
+          title: info.title || book.title || "\u672A\u77E5",
+          author: info.author || book.author || "",
+          noteCount: book.noteCount || 0,
+          reviewCount: book.reviewCount || 0,
+          readUpdateTime: info.readUpdateTime || 0,
+          updateTime: info.updateTime || 0,
+          cover: info.cover || ""
+        };
+      }).sort((a, b) => (b.readUpdateTime || 0) - (a.readUpdateTime || 0));
       if (cookieRef.value !== this.settings.wereadCookie) {
         this.settings.wereadCookie = cookieRef.value;
       }
-
-      // 若模拟阅读正在运行，重新从更新后的书单中选书
-      if (this.settings.simulatedReadingEnabled && this.simulatedReadingManager && this.simulatedReadingManager.state === "running") {
+      if (this.settings.simulatedReadingEnabled && this.simulatedReadingManager) {
+        if (this.simulatedReadingManager.state !== "running") {
+          await this.simulatedReadingManager.start();
+        }
         await this.simulatedReadingManager.pickNextBook();
       }
-
-      console.log("[ReadFlow] 心跳数据同步完成", this.heartbeatBooks.length, "本有进度");
+      console.log("[ReadFlow] \u5FC3\u8DF3\u6570\u636E\u540C\u6B65\u5B8C\u6210", this.heartbeatBooks.length, "\u672C\u6709\u8FDB\u5EA6");
       return { success: true, books: this.heartbeatBooks, booksWithProgress: this.heartbeatBooks.length };
     } catch (e) {
-      console.error("[ReadFlow] 心跳数据同步失败:", e);
+      console.error("[ReadFlow] \u5FC3\u8DF3\u6570\u636E\u540C\u6B65\u5931\u8D25:", e);
       return { success: false, error: e.message };
     }
   }
-
   /**
    * 在中间主工作区打开新标签（与普通笔记同级），不使用左侧 Ribbon、不占用右侧边栏。
    */
@@ -9129,7 +8574,7 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
     } catch (e) {
       console.error("[ReadFlow] reloadSelf", e);
       new import_obsidian7.Notice(
-        "\u91CD\u8F7D\u5931\u8D25\uFF1A\u8BF7\u5728\u300C\u8BBE\u7F6E \u2192 \u7B2C\u4E09\u65B9\u63D2\u4EF6\u300D\u4E2D\u624B\u52A8\u5173\u95ED\u518D\u5F00\u542F ReadFlow",
+        "\u91CD\u8F7D\u5931\u8D25\uFF1A\u8BF7\u5728\u300C\u8BBE\u7F6E \u2192 \u7B2C\u4E09\u65B9\u63D2\u4EF6\u300D\u4E2D\u624B\u52A8\u5173\u95ED\u518D\u5F00\u542F ReadFlow"
       );
     }
   }
@@ -9152,9 +8597,9 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
       if (cached) {
         this.diskData.books[bookId] = {
           ...cached,
-          highlights: cached.highlights.map((h) =>
-            h.id === highlight.id ? { ...h, wereadReviewId: result.reviewId } : h,
-          ),
+          highlights: cached.highlights.map(
+            (h) => h.id === highlight.id ? { ...h, wereadReviewId: result.reviewId } : h
+          )
         };
         await this.persistDisk();
       }
@@ -9175,8 +8620,7 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
       return { pushed: 0, failed: 0, skipped: 0 };
     }
     const cookieRef = { value: cookie };
-    let pushed = 0,
-      failed = 0;
+    let pushed = 0, failed = 0;
     const progress = new import_obsidian7.Notice(`\u63A8\u9001\u4E2D 0/${pushable.length}\u2026`, 18e4);
     for (let i = 0; i < pushable.length; i++) {
       const h = pushable[i];
@@ -9185,8 +8629,8 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
       if (res.ok) {
         pushed++;
         if (res.reviewId) {
-          cached.highlights = cached.highlights.map((x) =>
-            x.id === h.id ? { ...x, wereadReviewId: res.reviewId } : x,
+          cached.highlights = cached.highlights.map(
+            (x) => x.id === h.id ? { ...x, wereadReviewId: res.reviewId } : x
           );
         }
       } else {
@@ -9204,7 +8648,7 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
     await this.persistDisk();
     progress.hide();
     new import_obsidian7.Notice(
-      `\u63A8\u9001\u5B8C\u6210\uFF1A\u6210\u529F ${pushed}\uFF0C\u5931\u8D25 ${failed}\uFF0C\u5171 ${pushable.length} \u6761`,
+      `\u63A8\u9001\u5B8C\u6210\uFF1A\u6210\u529F ${pushed}\uFF0C\u5931\u8D25 ${failed}\uFF0C\u5171 ${pushable.length} \u6761`
     );
     return { pushed, failed, skipped: cached.highlights.length - pushable.length };
   }
@@ -9224,7 +8668,7 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
     if (!bookId) {
       new import_obsidian7.Notice(
         "\u8BF7\u5728 frontmatter \u8BBE\u7F6E readflow-book-id\uFF08\u6216 book_id\uFF09\uFF0C\u6216\u628A\u7B14\u8BB0\u653E\u5728\u4E0E ReadFlow \u4E66\u540D\u5339\u914D\u7684\u76EE\u5F55\u4E0B",
-        1e4,
+        1e4
       );
       return { ok: false, reason: "no_book" };
     }
@@ -9235,18 +8679,18 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
     }
     const highlight = {
       id: "vault-note-" + file.path,
-      bookId: bookId,
+      bookId,
       content: body.slice(0, 120),
-      note: body.slice(0, 4000),
+      note: body.slice(0, 4e3),
       chapterUid: meta.chapterUid,
       wereadRange: meta.wereadRange || void 0,
       wereadReviewId: meta.wereadReviewId ? meta.wereadReviewId.replace(/-/g, "_") : void 0,
-      sourceType: meta.wereadReviewId ? "weread" : "manual",
+      sourceType: meta.wereadReviewId ? "weread" : "manual"
     };
     if (!canPushHighlightToWeread(highlight)) {
       new import_obsidian7.Notice(
         "\u65E0\u6CD5\u63A8\u9001\uFF1A\u8BF7\u786E\u4FDD\u6709\u5185\u5BB9\uFF0C\u5E76\u914D\u7F6E readflow-weread-review-id\uFF08\u66F4\u65B0\uFF09\u6216 readflow-weread-range / chapter-uid\uFF08\u65B0\u5EFA\uFF09",
-        1e4,
+        1e4
       );
       return { ok: false, reason: "not_pushable" };
     }
@@ -9268,7 +8712,7 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
     const cookie = this.settings.wereadCookie.trim();
     if (!cookie) {
       new import_obsidian7.Notice(
-        "\u8BF7\u5148\u5728 ReadFlow \u8BBE\u7F6E\u4E2D\u586B\u5199\u5FAE\u4FE1\u8BFB\u4E66 Cookie\uFF08\u6216\u4F7F\u7528\u767B\u5F55\u7A97\u53E3\uFF09",
+        "\u8BF7\u5148\u5728 ReadFlow \u8BBE\u7F6E\u4E2D\u586B\u5199\u5FAE\u4FE1\u8BFB\u4E66 Cookie\uFF08\u6216\u4F7F\u7528\u767B\u5F55\u7A97\u53E3\uFF09"
       );
       return;
     }
@@ -9276,19 +8720,17 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
     if (!cookieValid) {
       new import_obsidian7.Notice(
         "\u5FAE\u4FE1\u8BFB\u4E66 Cookie \u5DF2\u5931\u6548\uFF08errcode -2012\uFF09\u3002\u8BF7\u91CD\u65B0\u767B\u5F55\u6216\u4ECE\u6D4F\u89C8\u5668\u7C98\u8D34 Cookie\u3002",
-        1e4,
+        1e4
       );
       this.setSyncStatus("ReadFlow\uFF1ACookie \u5931\u6548");
       return;
     }
     const progress = new import_obsidian7.Notice(
-      forceFull
-        ? "\u5FAE\u4FE1\u8BFB\u4E66\u5168\u91CF\u91CD\u5237\u4E2D\uFF0C\u8BF7\u7A0D\u5019\u2026"
-        : "\u5FAE\u4FE1\u8BFB\u4E66\u540C\u6B65\u4E2D\uFF0C\u8BF7\u7A0D\u5019\u2026",
-      18e4,
+      forceFull ? "\u5FAE\u4FE1\u8BFB\u4E66\u5168\u91CF\u91CD\u5237\u4E2D\uFF0C\u8BF7\u7A0D\u5019\u2026" : "\u5FAE\u4FE1\u8BFB\u4E66\u540C\u6B65\u4E2D\uFF0C\u8BF7\u7A0D\u5019\u2026",
+      18e4
     );
     this.setSyncStatus(
-      forceFull ? "ReadFlow\uFF1A\u5168\u91CF\u91CD\u5237\u4E2D\u2026" : "ReadFlow\uFF1A\u540C\u6B65\u4E2D\u2026",
+      forceFull ? "ReadFlow\uFF1A\u5168\u91CF\u91CD\u5237\u4E2D\u2026" : "ReadFlow\uFF1A\u540C\u6B65\u4E2D\u2026"
     );
     try {
       const cookieRef = { value: cookie };
@@ -9296,7 +8738,7 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
         cookieRef,
         (id) => this.diskData.books[id],
         forceFull,
-        (event) => this.updateSyncProgress(progress, event, forceFull),
+        (event) => this.updateSyncProgress(progress, event, forceFull)
       );
       const books = result.books;
       if (cookieRef.value !== this.settings.wereadCookie) {
@@ -9323,29 +8765,21 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
       if (result.scanned === 0) {
         this.setSyncStatus("ReadFlow\uFF1A\u672A\u53D1\u73B0\u53EF\u540C\u6B65\u4E66\u7C4D");
         new import_obsidian7.Notice(
-          `ReadFlow\uFF1A\u672A\u62C9\u53D6\u5230\u6709\u5212\u7EBF/\u60F3\u6CD5\u7684\u4E66\uFF08\u5FAE\u4FE1\u8BFB\u4E66\u91CC noteCount \u4E3A 0 \u7684\u4F1A\u8DF3\u8FC7\uFF09\u3002\u53EF\u5728\u9762\u677F\u624B\u52A8\u6458\u5F55\u3002`,
+          `ReadFlow\uFF1A\u672A\u62C9\u53D6\u5230\u6709\u5212\u7EBF/\u60F3\u6CD5\u7684\u4E66\uFF08\u5FAE\u4FE1\u8BFB\u4E66\u91CC noteCount \u4E3A 0 \u7684\u4F1A\u8DF3\u8FC7\uFF09\u3002\u53EF\u5728\u9762\u677F\u624B\u52A8\u6458\u5F55\u3002`
         );
       } else if (books.length === 0) {
         this.setSyncStatus(
-          forceFull
-            ? "ReadFlow\uFF1A\u672C\u6B21\u5168\u91CF\u91CD\u5237\u76EE\u6807\u4E3A\u7A7A"
-            : `ReadFlow\uFF1A\u540C\u6B65\u5B8C\u6210\uFF0C\u626B\u63CF ${result.scanned} \u672C\uFF0C\u8DF3\u8FC7 ${result.skipped} \u672C`,
+          forceFull ? "ReadFlow\uFF1A\u672C\u6B21\u5168\u91CF\u91CD\u5237\u76EE\u6807\u4E3A\u7A7A" : `ReadFlow\uFF1A\u540C\u6B65\u5B8C\u6210\uFF0C\u626B\u63CF ${result.scanned} \u672C\uFF0C\u8DF3\u8FC7 ${result.skipped} \u672C`
         );
         new import_obsidian7.Notice(
-          forceFull
-            ? `ReadFlow\uFF1A\u672A\u5237\u65B0\u4EFB\u4F55\u4E66\uFF0C\u5F53\u524D\u76EE\u6807\u4E3A\u7A7A\u3002`
-            : `ReadFlow\uFF1A\u672C\u6B21\u672A\u53D1\u73B0\u53D8\u5316\uFF0C\u5171\u626B\u63CF ${result.scanned} \u672C\uFF0C\u5DF2\u8DF3\u8FC7 ${result.skipped} \u672C\u3002`,
+          forceFull ? `ReadFlow\uFF1A\u672A\u5237\u65B0\u4EFB\u4F55\u4E66\uFF0C\u5F53\u524D\u76EE\u6807\u4E3A\u7A7A\u3002` : `ReadFlow\uFF1A\u672C\u6B21\u672A\u53D1\u73B0\u53D8\u5316\uFF0C\u5171\u626B\u63CF ${result.scanned} \u672C\uFF0C\u5DF2\u8DF3\u8FC7 ${result.skipped} \u672C\u3002`
         );
       } else {
         this.setSyncStatus(
-          forceFull
-            ? `ReadFlow\uFF1A\u5168\u91CF\u91CD\u5237\u5B8C\u6210\uFF0C\u66F4\u65B0 ${result.synced} \u672C`
-            : `ReadFlow\uFF1A\u540C\u6B65\u5B8C\u6210\uFF0C\u66F4\u65B0 ${result.synced} \u672C\uFF0C\u8DF3\u8FC7 ${result.skipped} \u672C`,
+          forceFull ? `ReadFlow\uFF1A\u5168\u91CF\u91CD\u5237\u5B8C\u6210\uFF0C\u66F4\u65B0 ${result.synced} \u672C` : `ReadFlow\uFF1A\u540C\u6B65\u5B8C\u6210\uFF0C\u66F4\u65B0 ${result.synced} \u672C\uFF0C\u8DF3\u8FC7 ${result.skipped} \u672C`
         );
         new import_obsidian7.Notice(
-          forceFull
-            ? `ReadFlow\uFF1A\u5DF2\u5168\u91CF\u91CD\u5237 ${books.length} \u672C\uFF1B\u5DF2\u5199\u5165\u300C${base}/\u300D\uFF1A${written} \u672C${failed ? `\uFF0C\u5931\u8D25 ${failed} \u672C\uFF08\u770B\u63A7\u5236\u53F0\uFF09` : ""}`
-            : `ReadFlow\uFF1A\u5DF2\u540C\u6B65 ${result.synced} \u672C\uFF0C\u8DF3\u8FC7 ${result.skipped} \u672C\uFF1B\u5DF2\u5199\u5165\u300C${base}/\u300D\uFF1A${written} \u672C${failed ? `\uFF0C\u5931\u8D25 ${failed} \u672C\uFF08\u770B\u63A7\u5236\u53F0\uFF09` : ""}`,
+          forceFull ? `ReadFlow\uFF1A\u5DF2\u5168\u91CF\u91CD\u5237 ${books.length} \u672C\uFF1B\u5DF2\u5199\u5165\u300C${base}/\u300D\uFF1A${written} \u672C${failed ? `\uFF0C\u5931\u8D25 ${failed} \u672C\uFF08\u770B\u63A7\u5236\u53F0\uFF09` : ""}` : `ReadFlow\uFF1A\u5DF2\u540C\u6B65 ${result.synced} \u672C\uFF0C\u8DF3\u8FC7 ${result.skipped} \u672C\uFF1B\u5DF2\u5199\u5165\u300C${base}/\u300D\uFF1A${written} \u672C${failed ? `\uFF0C\u5931\u8D25 ${failed} \u672C\uFF08\u770B\u63A7\u5236\u53F0\uFF09` : ""}`
         );
       }
       this.refreshReadFlowViews();
@@ -9363,10 +8797,7 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
   updateSyncProgress(progress, event, forceFull) {
     var _a;
     const modeLabel = forceFull ? "\u5168\u91CF" : "\u5E38\u89C4";
-    const text =
-      event.phase === "scan"
-        ? `ReadFlow\uFF1A${modeLabel}\u540C\u6B65\u51C6\u5907\u5B8C\u6210\uFF0C\u626B\u63CF ${event.scanned} \u672C\uFF0C\u5F85\u540C\u6B65 ${event.total} \u672C\uFF0C\u8DF3\u8FC7 ${event.skipped} \u672C`
-        : `ReadFlow\uFF1A${modeLabel}\u540C\u6B65\u5DF2\u5B8C\u6210 ${event.synced}/${event.total} \xB7 ${(_a = event.title) != null ? _a : "\u672A\u547D\u540D\u4E66\u7C4D"}`;
+    const text = event.phase === "scan" ? `ReadFlow\uFF1A${modeLabel}\u540C\u6B65\u51C6\u5907\u5B8C\u6210\uFF0C\u626B\u63CF ${event.scanned} \u672C\uFF0C\u5F85\u540C\u6B65 ${event.total} \u672C\uFF0C\u8DF3\u8FC7 ${event.skipped} \u672C` : `ReadFlow\uFF1A${modeLabel}\u540C\u6B65\u5DF2\u5B8C\u6210 ${event.synced}/${event.total} \xB7 ${(_a = event.title) != null ? _a : "\u672A\u547D\u540D\u4E66\u7C4D"}`;
     this.setSyncStatus(text);
     this.setNoticeMessage(progress, text.replace(/^ReadFlow：/, ""));
   }
@@ -9414,10 +8845,7 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
         const selEnd = selStart + selected.length;
         const before = rawContext.slice(0, rawContext.indexOf(selected)).trim();
         const after = rawContext.slice(rawContext.indexOf(selected) + selected.length).trim();
-        initialContextAbstract =
-          (before ? "\u2026" + before.slice(-120) + "\n" : "") +
-          selected +
-          (after ? "\n" + after.slice(0, 120) + "\u2026" : "");
+        initialContextAbstract = (before ? "\u2026" + before.slice(-120) + "\n" : "") + selected + (after ? "\n" + after.slice(0, 120) + "\u2026" : "");
       } catch (_) {
         initialContextAbstract = "";
       }
@@ -9430,7 +8858,7 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
         initialContent: selected,
         manualBookTitle,
         initialContextAbstract,
-        compactMode: true,
+        compactMode: true
       },
       (h) => {
         const latestBook = this.diskData.books[h.bookId];
@@ -9440,7 +8868,7 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
           });
         }
         this.refreshReadFlowViews();
-      },
+      }
     ).open();
   }
   updateSelectionCaptureButton() {
@@ -9486,10 +8914,7 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
       var _a, _b;
       evt.preventDefault();
       evt.stopPropagation();
-      const text =
-        ((_a = button.dataset.captureText) == null ? void 0 : _a.trim()) ||
-        ((_b = window.getSelection()) == null ? void 0 : _b.toString().trim()) ||
-        "";
+      const text = ((_a = button.dataset.captureText) == null ? void 0 : _a.trim()) || ((_b = window.getSelection()) == null ? void 0 : _b.toString().trim()) || "";
       if (!text) {
         this.hideSelectionCaptureButton();
         return;
@@ -9519,9 +8944,7 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
     var _a, _b, _c;
     if (!file) return void 0;
     const frontmatter = (_a = this.app.metadataCache.getFileCache(file)) == null ? void 0 : _a.frontmatter;
-    const readflowBookId = (frontmatter == null ? void 0 : frontmatter["readflow-book-id"])
-      ? String(frontmatter["readflow-book-id"]).trim()
-      : "";
+    const readflowBookId = (frontmatter == null ? void 0 : frontmatter["readflow-book-id"]) ? String(frontmatter["readflow-book-id"]).trim() : "";
     if (readflowBookId && this.diskData.books[readflowBookId]) {
       return this.diskData.books[readflowBookId];
     }
@@ -9546,8 +8969,8 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
         body: JSON.stringify({
           model,
           prompt: "\u56DE\u7B54: ok",
-          stream: false,
-        }),
+          stream: false
+        })
       });
       return { ok: true, data: resp.json };
     } catch (e) {
@@ -9557,16 +8980,22 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
   async classifyHighlightWithLlm(highlight, bookTitle) {
     const llm = this.settings.llmClassifier || {};
     if (!llm.enabled || !llm.endpoint) return null;
-    const prompt = `根据以下阅读摘录，判断其类型，只能回答一个词：idea（观点）、method（方法）、example（例子）、conclusion（结论）或 question（疑问）。\n\n书籍：《${bookTitle}》\n摘录：${highlight.content.slice(0, 500)}\n${highlight.note ? `笔记：${highlight.note.slice(0, 200)}` : ""}\n\n类型：`;
+    const prompt = `\u6839\u636E\u4EE5\u4E0B\u9605\u8BFB\u6458\u5F55\uFF0C\u5224\u65AD\u5176\u7C7B\u578B\uFF0C\u53EA\u80FD\u56DE\u7B54\u4E00\u4E2A\u8BCD\uFF1Aidea\uFF08\u89C2\u70B9\uFF09\u3001method\uFF08\u65B9\u6CD5\uFF09\u3001example\uFF08\u4F8B\u5B50\uFF09\u3001conclusion\uFF08\u7ED3\u8BBA\uFF09\u6216 question\uFF08\u7591\u95EE\uFF09\u3002
+
+\u4E66\u7C4D\uFF1A\u300A${bookTitle}\u300B
+\u6458\u5F55\uFF1A${highlight.content.slice(0, 500)}
+${highlight.note ? `\u7B14\u8BB0\uFF1A${highlight.note.slice(0, 200)}` : ""}
+
+\u7C7B\u578B\uFF1A`;
     try {
       const resp = await this.app.requestUrl({
         url: llm.endpoint,
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(llm.apiKey ? { Authorization: `Bearer ${llm.apiKey}` } : {}),
+          ...llm.apiKey ? { Authorization: `Bearer ${llm.apiKey}` } : {}
         },
-        body: JSON.stringify({ model: llm.model, prompt, stream: false }),
+        body: JSON.stringify({ model: llm.model, prompt, stream: false })
       });
       const json = resp.json;
       const raw = (json.response || json.text || json.content || "").trim();

@@ -9082,8 +9082,11 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
         this.settings.wereadCookie = cookieRef.value;
       }
 
-      // 若模拟阅读正在运行，重新从更新后的书单中选书
-      if (this.settings.simulatedReadingEnabled && this.simulatedReadingManager && this.simulatedReadingManager.state === "running") {
+      // 若模拟阅读已启用，自动启动并从中选书（避免用户先点开关再点同步）
+      if (this.settings.simulatedReadingEnabled && this.simulatedReadingManager) {
+        if (this.simulatedReadingManager.state !== "running") {
+          await this.simulatedReadingManager.start();
+        }
         await this.simulatedReadingManager.pickNextBook();
       }
 
