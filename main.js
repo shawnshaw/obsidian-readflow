@@ -10117,7 +10117,11 @@ var ReadFlowPlugin = class extends import_obsidian7.Plugin {
       version: 1,
       books: this.diskData.books,
       lastSyncAt: this.diskData.lastSyncAt,
-      knowledgeCards: this.diskData.knowledgeCards || []
+      knowledgeCards: this.diskData.knowledgeCards || [],
+      simulatedReadingStats: this.diskData.simulatedReadingStats || {
+        todayMinutes: 0,
+        todayDate: ""
+      }
     };
     await this.saveData(payload);
   }
