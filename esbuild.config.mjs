@@ -7,7 +7,7 @@ const manifest = JSON.parse(readFileSync(resolve(root, "manifest.json"), "utf8")
 const watch = process.argv.includes("--watch");
 
 const buildOptions = {
-  entryPoints: [resolve(root, "src/main.js")],
+  entryPoints: [resolve(root, "src/index.js")],
   bundle: true,
   format: "cjs",
   platform: "browser",
@@ -18,7 +18,7 @@ const buildOptions = {
   banner: {
     js: `/*
  * ${manifest.name} v${manifest.version}
- * GENERATED FILE — DO NOT EDIT. Edit src/main.js and run: npm run build
+ * GENERATED FILE — DO NOT EDIT. Edit src/index.js and run: npm run build
  * Author: ${manifest.author} | License: MIT
  */`,
   },

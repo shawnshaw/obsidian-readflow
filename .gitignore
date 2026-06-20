@@ -8,10 +8,8 @@ main.js.backup_*
 main.js.today_broken
 *.rebuilt_*
 
-# TypeScript source files — version controlled
-!src/
-src/**/*.js
-!src/main.js
+# Source of truth (previously src/main.js, now src/index.js)
+# DO NOT add src/index.js here — it's the hand-edited source.
 
 # IDE
 .idea/
@@ -21,3 +19,6 @@ src/**/*.js
 
 # Local package installation
 node_modules/
+
+# Archived legacy files
+archive/
