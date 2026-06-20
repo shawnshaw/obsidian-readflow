@@ -590,7 +590,7 @@ async function sendHeartbeat(cookie, payload) {
   // 使用与 weread.ts 一致的 API 端点
   const url = `${BASE}/book/updateReadingProgress`;
   try {
-    const resp = await requestUrl({
+    const resp = await import_obsidian7.requestUrl({
       url,
       method: "POST",
       headers: buildJsonPostHeaders(cookie),

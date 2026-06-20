@@ -459,7 +459,7 @@ var HeartbeatManager = class {
 async function sendHeartbeat(cookie, payload) {
   const url = `${BASE}/book/updateReadingProgress`;
   try {
-    const resp = await requestUrl({
+    const resp = await import_obsidian7.requestUrl({
       url,
       method: "POST",
       headers: buildJsonPostHeaders(cookie),
