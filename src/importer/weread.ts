@@ -181,17 +181,20 @@ function normalizeTs(t) {
   return t * 1e3;
 }
 function normalizeNotebookRow(raw) {
-  var _a, _b, _c, _d, _e, _f;
   const book = raw.book;
-  const bookId = String((_b = (_a = book == null ? void 0 : book.bookId) != null ? _a : raw.bookId) != null ? _b : "").trim();
+  const rawBookId =
+    book != null && book.bookId != null ? book.bookId : raw.bookId;
+  const bookId = String(rawBookId != null ? rawBookId : "").trim();
   if (!bookId) return null;
-  const title = (_c = book == null ? void 0 : book.title) != null ? _c : raw.title;
-  const authorRaw = (_d = book == null ? void 0 : book.author) != null ? _d : raw.author;
+  const title = book != null && book.title != null ? book.title : raw.title;
+  const authorRaw =
+    book != null && book.author != null ? book.author : raw.author;
   const author = authorRaw == null ? void 0 : authorRaw.replace(/\[(.*?)\]/g, "\u3010$1\u3011");
-  const noteCount = Number((_e = raw.noteCount) != null ? _e : 0);
-  const reviewCount = Number((_f = raw.reviewCount) != null ? _f : 0);
+  const noteCount = Number(raw.noteCount != null ? raw.noteCount : 0);
+  const reviewCount = Number(raw.reviewCount != null ? raw.reviewCount : 0);
+  const bookmarkCount = Number(raw.bookmarkCount != null ? raw.bookmarkCount : 0);
   const bookType = book == null ? void 0 : book.type;
-  return { bookId, title, author, noteCount, reviewCount, bookType };
+  return { bookId, title, author, noteCount, reviewCount, bookmarkCount, bookType };
 }
 function titleFromBookDetail(detail) {
   var _a, _b;
@@ -602,7 +605,7 @@ function mergeHighlights(existing, incoming) {
   }
   return [...map.values()];
 }
-async function syncOneBook(cookieRef, bookId, existing, metaTitle, metaAuthor, metaNoteCount, metaReviewCount) {
+async function syncOneBook(cookieRef, bookId, existing, metaTitle, metaAuthor, metaNoteCount, metaReviewCount, metaBookmarkCount) {
   var _a, _b, _c, _d, _e, _f;
   const bmJson = await fetchBookmarkList(cookieRef, bookId);
   const rvJson = await fetchReviews(cookieRef, bookId);
@@ -648,14 +651,15 @@ async function syncOneBook(cookieRef, bookId, existing, metaTitle, metaAuthor, m
     chapterTitleByUid,
     topicCatalog: existing == null ? void 0 : existing.topicCatalog,
     notebookNoteCount: metaNoteCount,
-    notebookReviewCount: metaReviewCount
+    notebookReviewCount: metaReviewCount,
+    notebookBookmarkCount: metaBookmarkCount
   };
 }
 function shouldSyncBook(row, existing, forceFull) {
   var _a, _b, _c, _d, _e;
   if (forceFull) return true;
   if (!existing) return true;
-  const hasNotebookSnapshot = typeof existing.notebookNoteCount === "number" && typeof existing.notebookReviewCount === "number";
+  const hasNotebookSnapshot = typeof existing.notebookNoteCount === "number" && typeof existing.notebookReviewCount === "number" && typeof existing.notebookBookmarkCount === "number";
   if (!hasNotebookSnapshot) return true;
   const nextNoteCount = (_a = row.noteCount) != null ? _a : 0;
   const nextReviewCount = (_b = row.reviewCount) != null ? _b : 0;
@@ -668,8 +672,8 @@ function shouldSyncBook(row, existing, forceFull) {
 async function syncAllBooksWithNotes(cookieRef, getExisting, forceFull = false, onProgress) {
   const rows = await fetchNotebookBooks(cookieRef);
   const candidates = rows.filter((r) => {
-    var _a, _b;
-    return ((_a = r.noteCount) != null ? _a : 0) + ((_b = r.reviewCount) != null ? _b : 0) > 0;
+    var _a, _b, _c;
+    return ((_a = r.noteCount) != null ? _a : 0) + ((_b = r.reviewCount) != null ? _b : 0) + ((_c = r.bookmarkCount) != null ? _c : 0) > 0;
   });
   const targets = candidates.filter((r) => shouldSyncBook(r, getExisting(r.bookId), forceFull));
   if (targets.length > 0) {
@@ -700,7 +704,8 @@ async function syncAllBooksWithNotes(cookieRef, getExisting, forceFull = false, 
         r.title,
         r.author,
         r.noteCount,
-        r.reviewCount
+        r.reviewCount,
+        r.bookmarkCount
       );
       out[currentIndex] = cached;
       completed++;
