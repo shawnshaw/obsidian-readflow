@@ -1577,6 +1577,12 @@
 	color: #a78bfa;
 }
 
+.readflow-chip--character {
+	background: color-mix(in srgb, var(--rf-primary) 12%, var(--rf-surface));
+	color: var(--rf-primary);
+	border-color: transparent;
+}
+
 .readflow-card-note {
 	margin: 0 0 var(--rf-space-3);
 	padding: var(--rf-space-3);

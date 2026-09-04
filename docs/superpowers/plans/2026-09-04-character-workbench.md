@@ -26,10 +26,10 @@
 **Interfaces:**
 - Produces `normalizeCharacterNames(value)` and `characterNamesOfHighlight(highlight)`.
 
-- [ ] Write tests for comma-separated normalization, case-insensitive de-duplication, explicit empty `characters`, and legacy `entities` fallback.
-- [ ] Run `node --test test/character-model.test.js` and verify the tests fail because the module does not exist.
-- [ ] Implement the two exported helpers in `src/character-model.js`.
-- [ ] Re-run `node --test test/character-model.test.js` and verify all tests pass.
+- [x] Write tests for comma-separated normalization, case-insensitive de-duplication, explicit empty `characters`, and legacy `entities` fallback.
+- [x] Run `node --test test/character-model.test.js` and verify the tests fail because the module does not exist.
+- [x] Implement the two exported helpers in `src/character-model.js`.
+- [x] Re-run `node --test test/character-model.test.js` and verify all tests pass.
 
 ### Task 2: Capture and profile synchronization
 
@@ -40,10 +40,10 @@
 **Interfaces:**
 - Consumes `normalizeCharacterNames(value)` and `characterNamesOfHighlight(highlight)`.
 
-- [ ] Add a separate `characters` capture field with copy explaining that it is used by the people workbench.
-- [ ] Persist `characters` with a saved highlight.
-- [ ] Change profile synchronization and person collection to use `characterNamesOfHighlight`.
-- [ ] Build with `npm run build` and run the Node tests.
+- [x] Add a separate `characters` capture field with copy explaining that it is used by the people workbench.
+- [x] Persist `characters` with a saved highlight.
+- [x] Change profile synchronization and person collection to use `characterNamesOfHighlight`.
+- [x] Build with `npm run build` and run the Node tests.
 
 ### Task 3: Workbench consistency
 
@@ -54,7 +54,7 @@
 **Interfaces:**
 - Consumes person entries collected from explicit characters or legacy data.
 
-- [ ] Use the same character source in the people graph and the relation anchor picker.
-- [ ] Update empty-state and capture copy to say “人物” rather than generic entity tags where appropriate.
-- [ ] Ensure summary cards show explicit character chips separately from ordinary entity chips.
-- [ ] Build the plugin and run the Node tests.
+- [x] Use the same character source in the people graph and the relation anchor picker.
+- [x] Update empty-state and capture copy to say “人物” rather than generic entity tags where appropriate.
+- [x] Ensure summary cards show explicit character chips separately from ordinary entity chips.
+- [x] Build the plugin and run the Node tests.

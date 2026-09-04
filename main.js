@@ -4,11 +4,51 @@
  * Author: Oscar Shao | License: MIT
  */
 "use strict";
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __commonJS = (cb, mod) => function __require() {
+  return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+};
+
+// src/character-model.js
+var require_character_model = __commonJS({
+  "src/character-model.js"(exports2, module2) {
+    "use strict";
+    function normalizeCharacterNames(value) {
+      const source = Array.isArray(value) ? value : String(value || "").split(",");
+      const seen = /* @__PURE__ */ new Set();
+      const names = [];
+      for (const item of source) {
+        const name = String(item || "").trim();
+        const key = name.toLocaleLowerCase();
+        if (!name || seen.has(key)) continue;
+        seen.add(key);
+        names.push(name);
+      }
+      return names;
+    }
+    function displayCharacterName(value) {
+      const label = String(value || "").trim();
+      const separator = label.search(/[:：]/);
+      return separator > 0 ? label.slice(separator + 1).trim() || label : label;
+    }
+    function characterNamesOfHighlight(highlight) {
+      if (Array.isArray(highlight == null ? void 0 : highlight.characters)) {
+        return normalizeCharacterNames(highlight.characters);
+      }
+      return normalizeCharacterNames((highlight == null ? void 0 : highlight.entities) || []);
+    }
+    module2.exports = {
+      displayCharacterName,
+      normalizeCharacterNames,
+      characterNamesOfHighlight
+    };
+  }
+});
 
 // src/index.js
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getOwnPropNames2 = Object.getOwnPropertyNames;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __export = (target, all) => {
   for (var name in all)
@@ -16,7 +56,7 @@ var __export = (target, all) => {
 };
 var __copyProps = (to, from, except, desc) => {
   if (from && typeof from === "object" || typeof from === "function") {
-    for (let key of __getOwnPropNames(from))
+    for (let key of __getOwnPropNames2(from))
       if (!__hasOwnProp.call(to, key) && key !== except)
         __defProp(to, key, {
           get: () => from[key],
@@ -32,6 +72,7 @@ __export(main_exports, {
 });
 module.exports = __toCommonJS(main_exports);
 var import_obsidian7 = require("obsidian");
+var import_character_model = require_character_model();
 var import_obsidian = require("obsidian");
 var DEFAULT_SETTINGS = {
   wereadCookie: "",
@@ -2264,7 +2305,7 @@ function inferEntityCooccurrenceSuggestions(scopeBook) {
   var pairMap = /* @__PURE__ */ new Map();
   for (var i = 0; i < scopeBook.highlights.length; i++) {
     var h = scopeBook.highlights[i];
-    var ents = (h.entities || []).map(function(e) {
+    var ents = import_character_model.characterNamesOfHighlight(h).map(function(e) {
       return entityDisplayLabel(e);
     }).filter(Boolean);
     for (var a2 = 0; a2 < ents.length; a2++) {
@@ -2314,7 +2355,8 @@ function inferBookWorkbenchProfile(book) {
   var chapterSet = /* @__PURE__ */ new Set();
   for (var i = 0; i < highlights.length; i++) {
     var h = highlights[i];
-    if ((h.entities || []).length > 0) withEntities++;
+    if (import_character_model.characterNamesOfHighlight(h).length > 0)
+      withEntities++;
     if (h.highlightType && MINDMAP_IDEA_TYPES[h.highlightType]) withIdeas++;
     chapterSet.add(chapterSortKey(h));
   }
@@ -2365,7 +2407,7 @@ function applyMindMapLens(highlights, lens) {
   if (!lens || lens === "all") return highlights;
   if (lens === "people") {
     return highlights.filter(function(h) {
-      return (h.entities || []).length > 0;
+      return import_character_model.characterNamesOfHighlight(h).length > 0;
     });
   }
   if (lens === "ideas") {
@@ -2449,7 +2491,7 @@ function buildNarrativeTimelineModel(scopeBook, book) {
   });
   for (var ui = 0; ui < scopeBook.highlights.length; ui++) {
     var uh = scopeBook.highlights[ui];
-    if ((uh.entities || []).some(function(e) {
+    if (import_character_model.characterNamesOfHighlight(uh).some(function(e) {
       return String(e || "").trim();
     }))
       continue;
@@ -2584,7 +2626,7 @@ function scopedBookForMindMap(scopeBook, opts) {
 function appendEntityLeaves(en, st, ei) {
   for (var hi = 0; hi < Math.min(st.items.length, 10); hi++) {
     var h = st.items[hi];
-    var co = (h.entities || []).filter(function(e) {
+    var co = import_character_model.characterNamesOfHighlight(h).filter(function(e) {
       return e.trim() && entityCanonicalKey(e) !== entityCanonicalKey(st.label);
     });
     var coText = co.length ? "\n\u5171\u73B0: " + co.map(entityDisplayLabel).join("\u3001") : "";
@@ -2741,7 +2783,7 @@ function collectEntityStats(scopeBook) {
     if (!map.has(ck)) {
       map.set(ck, {
         label: tag,
-        displayName: entityDisplayLabel(tag),
+        displayName: import_character_model.displayCharacterName(tag),
         items: []
       });
     }
@@ -2749,7 +2791,7 @@ function collectEntityStats(scopeBook) {
   };
   for (var i = 0; i < scopeBook.highlights.length; i++) {
     var h = scopeBook.highlights[i];
-    var ents = h.entities || [];
+    var ents = import_character_model.characterNamesOfHighlight(h);
     for (var j = 0; j < ents.length; j++) {
       var row = addEntStat(ents[j]);
       if (row) row.items.push(h);
@@ -2759,9 +2801,6 @@ function collectEntityStats(scopeBook) {
     if (!er) continue;
     addEntStat(er.source);
     addEntStat(er.target);
-  }
-  for (var _v of map.values()) {
-    _v.displayName = resolveEntityDisplayName(_v.label, _v.items);
   }
   return [...map.values()].sort(function(a, b) {
     return b.items.length - a.items.length || a.displayName.localeCompare(b.displayName, "zh-CN");
@@ -3014,7 +3053,7 @@ function buildEntityMindMapTree(scopeBook, focusEntity, groupByRole, entityRelat
     appendManualEntityRelationNodes(root, entityRelations, lookup);
     if (!focus) {
       var untagged = scopeBook.highlights.filter(function(h) {
-        return !(h.entities || []).some(function(e) {
+        return !import_character_model.characterNamesOfHighlight(h).some(function(e) {
           return String(e || "").trim();
         });
       });
@@ -3167,7 +3206,7 @@ function mmNodeH(node) {
 function renderMindMapCanvas(container, scopeBook, onCrystallize, opts) {
   var expanded = opts && opts.expanded;
   var root = buildMindMapTreeFromOptions(scopeBook, opts);
-  var emptyMsg = opts && opts.lens === "people" ? "\u6682\u65E0\u4EBA\u7269\u6807\u7B7E\u3002\u8BF7\u7528\u300C\u89D2\u8272:\u540D\u5B57\u300D\u6807\u6CE8\u6458\u5F55\u3002" : opts && opts.lens === "ideas" ? "\u6682\u65E0\u89C2\u70B9\u7C7B\u6458\u5F55\u3002\u8BF7\u8BBE\u7F6E\u6458\u5F55\u7C7B\u578B\uFF08\u89C2\u70B9/\u65B9\u6CD5/\u7ED3\u8BBA\u7B49\uFF09\u3002" : opts && opts.base === "entity" ? "\u6682\u65E0\u5B9E\u4F53\u6807\u7B7E\u3002\u8BF7\u5728\u6458\u5F55\u4E2D\u6DFB\u52A0 entities\uFF08\u5982\u4EBA\u540D\uFF09\u540E\u518D\u8BD5\u3002" : opts && opts.base === "topic" ? "\u5F53\u524D\u4E3B\u9898\u4E0B\u6682\u65E0\u6458\u5F55\u6570\u636E\u3002" : "\u6682\u65E0\u6458\u5F55\u6570\u636E\uFF0C\u65E0\u6CD5\u751F\u6210\u8111\u56FE\u3002";
+  var emptyMsg = opts && opts.lens === "people" ? "\u6682\u65E0\u4EBA\u7269\u3002\u8BF7\u5728\u6574\u7406\u6458\u5F55\u65F6\u586B\u5199\u300C\u4EBA\u7269\u300D\u5B57\u6BB5\u3002" : opts && opts.lens === "ideas" ? "\u6682\u65E0\u89C2\u70B9\u7C7B\u6458\u5F55\u3002\u8BF7\u8BBE\u7F6E\u6458\u5F55\u7C7B\u578B\uFF08\u89C2\u70B9/\u65B9\u6CD5/\u7ED3\u8BBA\u7B49\uFF09\u3002" : opts && opts.base === "entity" ? "\u6682\u65E0\u5B9E\u4F53\u6807\u7B7E\u3002\u8BF7\u5728\u6458\u5F55\u4E2D\u6DFB\u52A0 entities\uFF08\u5982\u4EBA\u540D\uFF09\u540E\u518D\u8BD5\u3002" : opts && opts.base === "topic" ? "\u5F53\u524D\u4E3B\u9898\u4E0B\u6682\u65E0\u6458\u5F55\u6570\u636E\u3002" : "\u6682\u65E0\u6458\u5F55\u6570\u636E\uFF0C\u65E0\u6CD5\u751F\u6210\u8111\u56FE\u3002";
   if (root.ch.length === 0) {
     container.createEl("p", { text: emptyMsg, cls: "readflow-muted" });
     return null;
@@ -3954,6 +3993,8 @@ var QuickCaptureModal = class extends import_obsidian4.Modal {
     this.note = "";
     this.topic = "";
     this.entities = [];
+    this.characters = [];
+    this.hasCharacterField = false;
     this.highlightType = "";
     this.importance = 3;
     this.selectedLinks = [];
@@ -3984,6 +4025,8 @@ var QuickCaptureModal = class extends import_obsidian4.Modal {
     this.entities = [
       ...(_e = h == null ? void 0 : h.entities) != null ? _e : []
     ];
+    this.characters = [...(h == null ? void 0 : h.characters) || []];
+    this.hasCharacterField = h ? Array.isArray(h.characters) : true;
     this.highlightType = (_g = (_f = h == null ? void 0 : h.highlightType) != null ? _f : suggestHighlightType(this.content)) != null ? _g : "";
     this.importance = (_h = h == null ? void 0 : h.importance) != null ? _h : 3;
     this.selectedLinks = [
@@ -4109,12 +4152,21 @@ var QuickCaptureModal = class extends import_obsidian4.Modal {
       }
     });
     new import_obsidian4.Setting(structureSec).setName("\u5B9E\u4F53\u6807\u7B7E\uFF08\u53EF\u9009\uFF09").setDesc(
-      "\u4EBA\u7269\u3001\u5730\u70B9\u3001\u6982\u5FF5\u7B49\uFF0C\u9017\u53F7\u5206\u9694\u3002\u4EBA\u7269\u53EF\u7528\u300C\u89D2\u8272:\u540D\u5B57\u300D\uFF08\u5982\u5BFC\u5E08:\u7EB3\u74E6\u5C14\uFF09\uFF0C\u5173\u7CFB\u5728\u77E5\u8BC6\u7ED3\u6784\u533A\u65B0\u589E\u3002"
+      "\u5730\u70B9\u3001\u6982\u5FF5\u3001\u4E8B\u4EF6\u7B49\uFF0C\u9017\u53F7\u5206\u9694\u3002\u4EBA\u7269\u8BF7\u4F7F\u7528\u4E0B\u65B9\u300C\u4EBA\u7269\u300D\u5B57\u6BB5\uFF0C\u4EE5\u514D\u6DF7\u5165\u4EBA\u7269\u5173\u7CFB\u56FE\u3002"
     ).addText((t) => {
       t.setValue(this.entities.join(", ")).setPlaceholder(
         "\u4F8B\uFF1A\u674E\u514B\u7528, \u592A\u539F, \u664B\u9633\u4E4B\u6218"
       ).onChange((v) => {
         this.entities = v.split(",").map((s) => s.trim()).filter(Boolean);
+      });
+      t.inputEl.style.width = "100%";
+    });
+    new import_obsidian4.Setting(structureSec).setName("\u4EBA\u7269\uFF08\u53EF\u9009\uFF09").setDesc(
+      "\u9017\u53F7\u5206\u9694\u3002\u4FDD\u5B58\u540E\u4F1A\u81EA\u52A8\u51FA\u73B0\u5728\u5F53\u524D\u4E66\u7684\u4EBA\u7269\u540D\u518C\u548C\u5173\u7CFB\u56FE\u8C31\u4E2D\u3002"
+    ).addText((t) => {
+      t.setValue(this.characters.join(", ")).setPlaceholder("\u4F8B\uFF1A\u4F0A\u4E3D\u838E\u767D, \u8FBE\u897F").onChange((v) => {
+        this.hasCharacterField = true;
+        this.characters = import_character_model.normalizeCharacterNames(v);
       });
       t.inputEl.style.width = "100%";
     });
@@ -4369,6 +4421,7 @@ var QuickCaptureModal = class extends import_obsidian4.Modal {
       highlightType: this.highlightType || void 0,
       topic: this.topic.trim() || void 0,
       entities: this.entities.length ? [...this.entities] : void 0,
+      characters: this.hasCharacterField ? import_character_model.normalizeCharacterNames(this.characters) : prev == null ? void 0 : prev.characters,
       links: this.selectedLinks.length ? [...this.selectedLinks] : void 0,
       status: (_d = nextStatus != null ? nextStatus : prev == null ? void 0 : prev.status) != null ? _d : "inbox",
       importance: this.importance,
@@ -4407,7 +4460,7 @@ var QuickCaptureModal = class extends import_obsidian4.Modal {
     }
     this.plugin.persistDisk().then(async function() {
       var savedBook = _self.plugin.diskData.books[book.bookId];
-      if (savedBook && h.entities && h.entities.length) {
+      if (savedBook && import_character_model.characterNamesOfHighlight(h).length) {
         var beforeKeys = Object.keys(getEntityProfiles(savedBook));
         var profResult = ensureEntityProfilesFromBook(savedBook);
         if (profResult.changed) {
@@ -4680,7 +4733,7 @@ var EntityRelationModal = class extends import_obsidian5.Modal {
       (a, b) => chapterSortKey(a) - chapterSortKey(b) || a.createdAt - b.createdAt
     );
     for (const h of sortedHl) {
-      if (!(h.entities || []).length) continue;
+      if (!import_character_model.characterNamesOfHighlight(h).length) continue;
       const opt = anchorSelect.createEl("option");
       opt.value = h.id;
       const ch = chapterLabel(h);
@@ -5073,7 +5126,7 @@ function buildRelationGraphModel(book, scopeBook, opts) {
   if (base === "entity") {
     for (var i = 0; i < highlights.length; i++) {
       var h = highlights[i];
-      var ents = (h.entities || []).map(function(e2) {
+      var ents = import_character_model.characterNamesOfHighlight(h).map(function(e2) {
         return e2.trim();
       }).filter(Boolean);
       if (ents.length === 0) continue;
@@ -5201,8 +5254,8 @@ function buildRelationGraphModel(book, scopeBook, opts) {
         var entityGroups = /* @__PURE__ */ new Map();
         for (var ei2 = 0; ei2 < highlights.length; ei2++) {
           var he = highlights[ei2];
-          for (var ej = 0; ej < (he.entities || []).length; ej++) {
-            var ek = he.entities[ej].toLowerCase().trim();
+          for (var ej = 0; ej < import_character_model.characterNamesOfHighlight(he).length; ej++) {
+            var ek = import_character_model.characterNamesOfHighlight(he)[ej].toLowerCase().trim();
             if (!ek) continue;
             if (!entityGroups.has(ek)) entityGroups.set(ek, []);
             entityGroups.get(ek).push(he);
@@ -5869,7 +5922,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
   _matchesSearch(h) {
     if (!this.searchQuery) return true;
     const q = this.searchQuery.toLowerCase();
-    return (h.content || "").toLowerCase().includes(q) || (h.note || "").toLowerCase().includes(q) || (h.topic || "").toLowerCase().includes(q) || (h.highlightType || "").toLowerCase().includes(q) || (h.chapter || "").toLowerCase().includes(q) || (h.entities || []).some((e) => e.toLowerCase().includes(q));
+    return (h.content || "").toLowerCase().includes(q) || (h.note || "").toLowerCase().includes(q) || (h.topic || "").toLowerCase().includes(q) || (h.highlightType || "").toLowerCase().includes(q) || (h.chapter || "").toLowerCase().includes(q) || (h.entities || []).some((e) => e.toLowerCase().includes(q)) || import_character_model.characterNamesOfHighlight(h).some((name) => name.toLowerCase().includes(q));
   }
   renderTopbar() {
     this.mountTopbar();
@@ -7311,17 +7364,35 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
           text: h.highlightType
         });
       if (h.topic) meta.createSpan({ cls: "readflow-chip", text: h.topic });
+      const characters = import_character_model.characterNamesOfHighlight(h);
+      for (const character of characters.slice(0, 3)) {
+        meta.createSpan({
+          cls: "readflow-chip readflow-chip--character",
+          text: character
+        });
+      }
+      if (characters.length > 3) {
+        meta.createSpan({
+          cls: "readflow-chip readflow-chip--character",
+          text: `+${characters.length - 3}`
+        });
+      }
       if ((_c = h.entities) == null ? void 0 : _c.length) {
-        for (const ent of h.entities.slice(0, 3)) {
+        const nonCharacterEntities = h.entities.filter(
+          (ent) => !characters.some(
+            (character) => entityCanonicalKey(character) === entityCanonicalKey(ent)
+          )
+        );
+        for (const ent of nonCharacterEntities.slice(0, 3)) {
           meta.createSpan({
             cls: "readflow-chip readflow-chip--entity",
             text: resolveEntityDisplayName(ent, [h])
           });
         }
-        if (h.entities.length > 3) {
+        if (nonCharacterEntities.length > 3) {
           meta.createSpan({
             cls: "readflow-chip readflow-chip--entity",
-            text: `+${h.entities.length - 3}`
+            text: `+${nonCharacterEntities.length - 3}`
           });
         }
       }
@@ -8163,7 +8234,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       );
       if (rows.length === 0) {
         listHost.createEl("p", {
-          text: "\u6682\u65E0\u4EBA\u7269\u3002\u53EF\u624B\u52A8\u65B0\u589E\uFF0C\u6216\u5728\u6458\u5F55\u6574\u7406\u4E2D\u6DFB\u52A0\u5B9E\u4F53\u6807\u7B7E\uFF08\u5BFC\u5E08:\u4EBA\u540D\uFF09\u3002",
+          text: "\u6682\u65E0\u4EBA\u7269\u3002\u53EF\u624B\u52A8\u65B0\u589E\uFF0C\u6216\u5728\u6574\u7406\u6458\u5F55\u65F6\u586B\u5199\u300C\u4EBA\u7269\u300D\u5B57\u6BB5\u3002",
           cls: "readflow-muted"
         });
         return;
