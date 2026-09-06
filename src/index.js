@@ -3742,7 +3742,7 @@ function renderMindMapCanvas(container, scopeBook, onCrystallize, opts) {
       : opts && opts.lens === "ideas"
         ? "\u6682\u65E0\u89C2\u70B9\u7C7B\u6458\u5F55\u3002\u8BF7\u8BBE\u7F6E\u6458\u5F55\u7C7B\u578B\uFF08\u89C2\u70B9/\u65B9\u6CD5/\u7ED3\u8BBA\u7B49\uFF09\u3002"
         : opts && opts.base === "entity"
-          ? "\u6682\u65E0\u5B9E\u4F53\u6807\u7B7E\u3002\u8BF7\u5728\u6458\u5F55\u4E2D\u6DFB\u52A0 entities\uFF08\u5982\u4EBA\u540D\uFF09\u540E\u518D\u8BD5\u3002"
+          ? "\u6682\u65E0\u5176\u4ED6\u5B9E\u4F53\u3002\u8BF7\u5728\u6574\u7406\u6458\u5F55\u65F6\u586B\u5199\u5730\u70B9\u3001\u7EC4\u7EC7\u3001\u6982\u5FF5\u6216\u4E8B\u4EF6\u3002"
           : opts && opts.base === "topic"
             ? "\u5F53\u524D\u4E3B\u9898\u4E0B\u6682\u65E0\u6458\u5F55\u6570\u636E\u3002"
             : "\u6682\u65E0\u6458\u5F55\u6570\u636E\uFF0C\u65E0\u6CD5\u751F\u6210\u8111\u56FE\u3002";
@@ -4863,27 +4863,9 @@ var QuickCaptureModal = class extends import_obsidian4.Modal {
         }
       });
     new import_obsidian4.Setting(structureSec)
-      .setName("\u5B9E\u4F53\u6807\u7B7E\uFF08\u53EF\u9009\uFF09")
-      .setDesc(
-        "\u5730\u70B9\u3001\u6982\u5FF5\u3001\u4E8B\u4EF6\u7B49\uFF0C\u9017\u53F7\u5206\u9694\u3002\u4EBA\u7269\u8BF7\u4F7F\u7528\u4E0B\u65B9\u300C\u4EBA\u7269\u300D\u5B57\u6BB5\uFF0C\u4EE5\u514D\u6DF7\u5165\u4EBA\u7269\u5173\u7CFB\u56FE\u3002",
-      )
-      .addText((t) => {
-        t.setValue(this.entities.join(", "))
-          .setPlaceholder(
-            "\u4F8B\uFF1A\u674E\u514B\u7528, \u592A\u539F, \u664B\u9633\u4E4B\u6218",
-          )
-          .onChange((v) => {
-            this.entities = v
-              .split(",")
-              .map((s) => s.trim())
-              .filter(Boolean);
-          });
-        t.inputEl.style.width = "100%";
-      });
-    new import_obsidian4.Setting(structureSec)
       .setName("\u4EBA\u7269\uFF08\u53EF\u9009\uFF09")
       .setDesc(
-        "\u9017\u53F7\u5206\u9694\u3002\u4FDD\u5B58\u540E\u4F1A\u81EA\u52A8\u51FA\u73B0\u5728\u5F53\u524D\u4E66\u7684\u4EBA\u7269\u540D\u518C\u548C\u5173\u7CFB\u56FE\u8C31\u4E2D\u3002",
+        "\u9700\u8981\u6301\u7EED\u8BB0\u5FC6\u6216\u68B3\u7406\u5173\u7CFB\u7684\u4E66\u4E2D\u4EBA\u7269\uFF0C\u9017\u53F7\u5206\u9694\u3002\u4FDD\u5B58\u540E\u4F1A\u8FDB\u5165\u5F53\u524D\u4E66\u7684\u4EBA\u7269\u540D\u518C\u4E0E\u5173\u7CFB\u56FE\u3002",
       )
       .addText((t) => {
         t.setValue(this.characters.join(", "))
@@ -4891,6 +4873,24 @@ var QuickCaptureModal = class extends import_obsidian4.Modal {
           .onChange((v) => {
             this.hasCharacterField = true;
             this.characters = import_character_model.normalizeCharacterNames(v);
+          });
+        t.inputEl.style.width = "100%";
+      });
+    new import_obsidian4.Setting(structureSec)
+      .setName("\u5176\u4ED6\u5B9E\u4F53\uFF08\u53EF\u9009\uFF09")
+      .setDesc(
+        "\u5730\u70B9\u3001\u7EC4\u7EC7\u3001\u6982\u5FF5\u3001\u4E8B\u4EF6\u7B49\u4E0A\u4E0B\u6587\u6807\u7B7E\u3002\u5B83\u4EEC\u4F1A\u7559\u5728\u6458\u5F55\u548C\u641C\u7D22\u4E2D\uFF0C\u4E0D\u4F1A\u8FDB\u5165\u4EBA\u7269\u5173\u7CFB\u56FE\u3002",
+      )
+      .addText((t) => {
+        t.setValue(this.entities.join(", "))
+          .setPlaceholder(
+            "\u4F8B\uFF1A\u5F6D\u4F2F\u91CC\u5E84\u56ED, \u8D35\u65CF\u793E\u4F1A, \u5A5A\u59FB",
+          )
+          .onChange((v) => {
+            this.entities = v
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean);
           });
         t.inputEl.style.width = "100%";
       });
@@ -6119,11 +6119,11 @@ function buildRelationGraphModel(book, scopeBook, opts) {
   }
   var emptyMsg =
     lens === "people"
-      ? "\u6682\u65E0\u4EBA\u7269\u6807\u7B7E\u3002\u8BF7\u7528\u300C\u89D2\u8272:\u540D\u5B57\u300D\u6807\u6CE8\u6458\u5F55\uFF0C\u5E76\u70B9\u300C\u65B0\u589E\u4EBA\u7269\u5173\u7CFB\u300D\u3002"
+      ? "\u6682\u65E0\u4EBA\u7269\u3002\u8BF7\u5728\u6574\u7406\u6458\u5F55\u65F6\u586B\u5199\u300C\u4EBA\u7269\u300D\uFF0C\u6216\u624B\u52A8\u65B0\u589E\u4EBA\u7269\u540E\u518D\u5EFA\u7ACB\u5173\u7CFB\u3002"
       : lens === "ideas"
         ? "\u6682\u65E0\u53EF\u68B3\u7406\u6458\u5F55\u3002\u5207\u6362\u5230\u300C\u5168\u4E66\u7ED3\u6784\u300D\u53EF\u67E5\u770B\u6240\u6709\u5185\u5BB9\u3002"
         : base === "entity"
-          ? "\u6682\u65E0\u5B9E\u4F53\u6807\u7B7E\u3002\u8BF7\u5728\u6458\u5F55\u4E2D\u6DFB\u52A0 entities\uFF08\u5982\u4EBA\u540D\uFF09\u3002"
+          ? "\u6682\u65E0\u5176\u4ED6\u5B9E\u4F53\u3002\u8BF7\u5728\u6574\u7406\u6458\u5F55\u65F6\u586B\u5199\u5730\u70B9\u3001\u7EC4\u7EC7\u3001\u6982\u5FF5\u6216\u4E8B\u4EF6\u3002"
           : "\u9009\u4E2D\u6458\u5F55 \u2192 \u5EFA\u7ACB\u5173\u7CFB\uFF0C\u6216\u8BBE\u7F6E\u76F8\u540C\u4E3B\u9898/\u5B9E\u4F53\u540E\u81EA\u52A8\u751F\u6210";
   return {
     nodes: [...nodeMap.values()],

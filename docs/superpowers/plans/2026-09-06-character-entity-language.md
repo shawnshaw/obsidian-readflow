@@ -22,6 +22,6 @@
 - Modify: `src/index.js`
 - Generated: `main.js`
 
-- [ ] Move the existing 人物 setting above 其他实体, rename 实体标签 to 其他实体, and replace the descriptions and placeholders with their distinct purposes.
-- [ ] Replace stale empty-state messages that describe the old role:name entity workflow.
-- [ ] Run `node --check src/index.js`, `npm run build`, and `git diff --check`.
+- [x] Move the existing 人物 setting above 其他实体, rename 实体标签 to 其他实体, and replace the descriptions and placeholders with their distinct purposes.
+- [x] Replace stale empty-state messages that describe the old role:name entity workflow.
+- [x] Run `node --check src/index.js`, `npm run build`, and `git diff --check`.
