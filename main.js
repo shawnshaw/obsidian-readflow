@@ -45,6 +45,39 @@ var require_character_model = __commonJS({
   }
 });
 
+// src/weread-session.js
+var require_weread_session = __commonJS({
+  "src/weread-session.js"(exports2, module2) {
+    "use strict";
+    function parseCookiePairs(raw) {
+      return String(raw || "").split(";").map((item) => {
+        const index = item.indexOf("=");
+        if (index < 0) return null;
+        return {
+          name: item.slice(0, index).trim(),
+          value: item.slice(index + 1).trim()
+        };
+      }).filter(Boolean);
+    }
+    function sessionFingerprint(raw) {
+      return parseCookiePairs(raw).sort((left, right) => left.name.localeCompare(right.name)).map((pair) => `${pair.name}=${pair.value}`).join(";");
+    }
+    function hasCompleteWereadSession(raw) {
+      const pairs = parseCookiePairs(raw);
+      const values = new Map(pairs.map((pair) => [pair.name, pair.value]));
+      return Boolean(
+        values.get("wr_vid") && (values.get("wr_skey") || values.get("wr_name"))
+      );
+    }
+    function shouldPersistNewWereadSession(initialRaw, candidateRaw) {
+      return hasCompleteWereadSession(candidateRaw) && sessionFingerprint(initialRaw) !== sessionFingerprint(candidateRaw);
+    }
+    module2.exports = {
+      shouldPersistNewWereadSession
+    };
+  }
+});
+
 // src/index.js
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
@@ -73,6 +106,7 @@ __export(main_exports, {
 module.exports = __toCommonJS(main_exports);
 var import_obsidian7 = require("obsidian");
 var import_character_model = require_character_model();
+var import_weread_session = require_weread_session();
 var import_obsidian = require("obsidian");
 var DEFAULT_SETTINGS = {
   wereadCookie: "",
@@ -10078,6 +10112,7 @@ var WereadLoginWindow = class {
       );
       return;
     }
+    const initialSessionCookie = await readSessionCookieString(this.modal) || "";
     wc.setUserAgent(getChromeLikeUA());
     this.modal.once("ready-to-show", () => {
       if (!this.isModalAlive()) return;
@@ -10105,6 +10140,13 @@ var WereadLoginWindow = class {
       if (this.handled || !this.isModalAlive()) return;
       const str = await readSessionCookieString(this.modal);
       if (!str) return;
+      if (import_weread_session.shouldPersistNewWereadSession(
+        initialSessionCookie,
+        str
+      )) {
+        await finishOk(str);
+        return;
+      }
       const ok = await verifyCookieRough(str);
       if (ok) await finishOk(str);
     };
@@ -10132,7 +10174,7 @@ var WereadLoginWindow = class {
           const wrVid = cookieArr.find((c) => c.name === "wr_vid");
           const wrSkey = cookieArr.find((c) => c.name === "wr_skey");
           if (wrName && wrName.value !== "" || wrVid && wrVid.value !== "" || wrSkey && wrSkey.value !== "") {
-            void finishOk(pairsToHeaderString(cookieArr));
+            void trySyncFromSession();
           } else if (this.isModalAlive()) {
             void this.modal.loadURL(WEREAD_LOGIN);
           }
@@ -10153,6 +10195,7 @@ var WereadLoginWindow = class {
       loadErr = `${desc} (${code}) ${url2}`;
       console.warn("[ReadFlow] did-fail-load", loadErr);
     });
+    attachSessionHooks();
     const loadTargets = [WEREAD_HOME, WEREAD_LOGIN];
     let loaded = false;
     for (const target of loadTargets) {
@@ -10179,7 +10222,6 @@ var WereadLoginWindow = class {
       this.dispose();
       return;
     }
-    attachSessionHooks();
     await trySyncFromSession();
   }
 };

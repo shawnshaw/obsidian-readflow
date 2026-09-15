@@ -35,6 +35,7 @@ __export(main_exports, {
 module.exports = __toCommonJS(main_exports);
 var import_obsidian7 = require("obsidian");
 var import_character_model = require("./character-model");
+var import_weread_session = require("./weread-session");
 
 // src/settings.ts
 var import_obsidian = require("obsidian");
@@ -11244,6 +11245,8 @@ var WereadLoginWindow = class {
       );
       return;
     }
+    const initialSessionCookie =
+      (await readSessionCookieString(this.modal)) || "";
     wc.setUserAgent(getChromeLikeUA());
     this.modal.once("ready-to-show", () => {
       if (!this.isModalAlive()) return;
@@ -11271,6 +11274,15 @@ var WereadLoginWindow = class {
       if (this.handled || !this.isModalAlive()) return;
       const str = await readSessionCookieString(this.modal);
       if (!str) return;
+      if (
+        import_weread_session.shouldPersistNewWereadSession(
+          initialSessionCookie,
+          str,
+        )
+      ) {
+        await finishOk(str);
+        return;
+      }
       const ok = await verifyCookieRough(str);
       if (ok) await finishOk(str);
     };
@@ -11303,7 +11315,7 @@ var WereadLoginWindow = class {
             (wrVid && wrVid.value !== "") ||
             (wrSkey && wrSkey.value !== "")
           ) {
-            void finishOk(pairsToHeaderString(cookieArr));
+            void trySyncFromSession();
           } else if (this.isModalAlive()) {
             void this.modal.loadURL(WEREAD_LOGIN);
           }
@@ -11324,6 +11336,7 @@ var WereadLoginWindow = class {
       loadErr = `${desc} (${code}) ${url2}`;
       console.warn("[ReadFlow] did-fail-load", loadErr);
     });
+    attachSessionHooks();
     const loadTargets = [WEREAD_HOME, WEREAD_LOGIN];
     let loaded = false;
     for (const target of loadTargets) {
@@ -11350,7 +11363,6 @@ var WereadLoginWindow = class {
       this.dispose();
       return;
     }
-    attachSessionHooks();
     await trySyncFromSession();
   }
 };
