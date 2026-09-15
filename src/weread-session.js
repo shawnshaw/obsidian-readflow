@@ -12,8 +12,17 @@ function parseCookiePairs(raw) {
     .filter(Boolean);
 }
 
+const SESSION_COOKIE_NAMES = new Set([
+  "wr_vid",
+  "wr_skey",
+  "wr_name",
+  "wr_rt",
+  "wr_fp",
+]);
+
 function sessionFingerprint(raw) {
   return parseCookiePairs(raw)
+    .filter((pair) => SESSION_COOKIE_NAMES.has(pair.name))
     .sort((left, right) => left.name.localeCompare(right.name))
     .map((pair) => `${pair.name}=${pair.value}`)
     .join(";");
@@ -36,5 +45,8 @@ function shouldPersistNewWereadSession(initialRaw, candidateRaw) {
 }
 
 module.exports = {
+  isWereadSessionCookieName(name) {
+    return SESSION_COOKIE_NAMES.has(String(name || ""));
+  },
   shouldPersistNewWereadSession,
 };

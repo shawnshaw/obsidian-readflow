@@ -11321,6 +11321,20 @@ var WereadLoginWindow = class {
           }
         },
       );
+      try {
+        session.cookies.on("changed", (_event, cookie, _cause, removed) => {
+          if (
+            removed ||
+            !cookie ||
+            !import_weread_session.isWereadSessionCookieName(cookie.name)
+          ) {
+            return;
+          }
+          void trySyncFromSession();
+        });
+      } catch (e) {
+        console.warn("[ReadFlow] cannot observe Weread session cookies", e);
+      }
       const nav = () => {
         void trySyncFromSession();
       };

@@ -14,6 +14,23 @@ test("does not treat an unchanged session as a new login", () => {
   assert.equal(shouldPersistNewWereadSession(staleSession, staleSession), false);
 });
 
+test("persists a renewed login token but ignores unrelated cookie changes", () => {
+  assert.equal(
+    shouldPersistNewWereadSession(
+      staleSession,
+      "wr_vid=100; wr_skey=old; wr_name=reader; wr_rt=renewed",
+    ),
+    true,
+  );
+  assert.equal(
+    shouldPersistNewWereadSession(
+      staleSession,
+      "wr_vid=100; wr_skey=old; wr_name=reader; analytics=updated",
+    ),
+    false,
+  );
+});
+
 test("does not persist an incomplete candidate session", () => {
   assert.equal(
     shouldPersistNewWereadSession(staleSession, "wr_vid=100"),

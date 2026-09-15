@@ -59,8 +59,15 @@ var require_weread_session = __commonJS({
         };
       }).filter(Boolean);
     }
+    var SESSION_COOKIE_NAMES = /* @__PURE__ */ new Set([
+      "wr_vid",
+      "wr_skey",
+      "wr_name",
+      "wr_rt",
+      "wr_fp"
+    ]);
     function sessionFingerprint(raw) {
-      return parseCookiePairs(raw).sort((left, right) => left.name.localeCompare(right.name)).map((pair) => `${pair.name}=${pair.value}`).join(";");
+      return parseCookiePairs(raw).filter((pair) => SESSION_COOKIE_NAMES.has(pair.name)).sort((left, right) => left.name.localeCompare(right.name)).map((pair) => `${pair.name}=${pair.value}`).join(";");
     }
     function hasCompleteWereadSession(raw) {
       const pairs = parseCookiePairs(raw);
@@ -73,6 +80,9 @@ var require_weread_session = __commonJS({
       return hasCompleteWereadSession(candidateRaw) && sessionFingerprint(initialRaw) !== sessionFingerprint(candidateRaw);
     }
     module2.exports = {
+      isWereadSessionCookieName(name) {
+        return SESSION_COOKIE_NAMES.has(String(name || ""));
+      },
       shouldPersistNewWereadSession
     };
   }
@@ -10180,6 +10190,16 @@ var WereadLoginWindow = class {
           }
         }
       );
+      try {
+        session.cookies.on("changed", (_event, cookie, _cause, removed) => {
+          if (removed || !cookie || !import_weread_session.isWereadSessionCookieName(cookie.name)) {
+            return;
+          }
+          void trySyncFromSession();
+        });
+      } catch (e) {
+        console.warn("[ReadFlow] cannot observe Weread session cookies", e);
+      }
       const nav = () => {
         void trySyncFromSession();
       };
