@@ -11162,9 +11162,12 @@ var WereadLoginWindow = class {
     this.modal = null;
     this.handled = false;
     this._hooksAttached = false;
+    this._cleanupHooks = null;
   }
   dispose() {
     var _a;
+    this._cleanupHooks?.();
+    this._cleanupHooks = null;
     try {
       (_a = this.modal) == null ? void 0 : _a.close();
     } catch (e) {}
@@ -11190,6 +11193,65 @@ var WereadLoginWindow = class {
     if (!this.isModalAlive()) return null;
     return this.modal.webContents;
   }
+  openEmbeddedLogin() {
+    const modal = new import_obsidian6.Modal(this.plugin.app);
+    const frame = document.createElement("webview");
+    const partition = `readflow-weread-login-${Date.now()}`;
+    let reading = false;
+    let finished = false;
+    let timer = 0;
+    const initialCookie = this.plugin.settings.wereadCookie || "";
+    const finish = async (cookie) => {
+      if (finished) return;
+      finished = true;
+      this.plugin.settings.wereadCookie = cookie;
+      await this.plugin.persistDisk();
+      new import_obsidian6.Notice("微信读书 Cookie 已保存");
+      modal.close();
+    };
+    const readCookie = async () => {
+      if (reading || finished || !frame.executeJavaScript) return;
+      reading = true;
+      try {
+        const raw = await frame.executeJavaScript("document.cookie");
+        const cookie = String(raw || "").trim();
+        if (
+          import_weread_session.shouldPersistNewWereadSession(
+            initialCookie,
+            cookie,
+          ) ||
+          (!initialCookie && (await verifyCookieRough(cookie)))
+        ) {
+          await finish(cookie);
+        }
+      } catch (e) {
+        console.warn("[ReadFlow] embedded login cookie read failed", e);
+      } finally {
+        reading = false;
+      }
+    };
+    modal.onClose = () => {
+      window.clearInterval(timer);
+    };
+    modal.titleEl.setText("登录微信读书（ReadFlow）");
+    modal.contentEl.empty();
+    modal.contentEl.createEl("p", {
+      text: "请在此窗口完成微信读书登录，成功后 Cookie 会自动保存。",
+    });
+    frame.setAttribute("allowpopups", "");
+    frame.setAttribute("partition", partition);
+    frame.partition = partition;
+    frame.style.width = "100%";
+    frame.style.height = "520px";
+    frame.style.border = "0";
+    frame.src = WEREAD_LOGIN;
+    frame.addEventListener("dom-ready", () => void readCookie());
+    frame.addEventListener("did-navigate", () => void readCookie());
+    frame.addEventListener("did-finish-load", () => void readCookie());
+    modal.contentEl.appendChild(frame);
+    modal.open();
+    timer = window.setInterval(() => void readCookie(), 1500);
+  }
   async open() {
     if (!import_obsidian6.Platform.isDesktopApp) {
       new import_obsidian6.Notice(
@@ -11199,14 +11261,13 @@ var WereadLoginWindow = class {
     }
     const remote = getElectronRemote();
     if (!remote) {
-      new import_obsidian6.Notice(
-        "\u5F53\u524D Obsidian/Electron \u65E0\u6CD5\u4F7F\u7528\u5185\u7F6E\u767B\u5F55\uFF0C\u8BF7\u624B\u52A8\u7C98\u8D34 Cookie",
-      );
+      this.openEmbeddedLogin();
       return;
     }
     this.handled = false;
     this._hooksAttached = false;
     const { BrowserWindow, getCurrentWindow } = remote;
+    const partition = `readflow-weread-login-${Date.now()}`;
     let parent;
     try {
       parent = getCurrentWindow();
@@ -11224,6 +11285,7 @@ var WereadLoginWindow = class {
           nodeIntegration: false,
           contextIsolation: true,
           sandbox: false,
+          partition,
         },
       });
     } catch (e) {
@@ -11247,6 +11309,9 @@ var WereadLoginWindow = class {
     }
     const initialSessionCookie =
       (await readSessionCookieString(this.modal)) || "";
+    let sessionPollTimer = null;
+    let pageRecoveryTimer = null;
+    let recoveringPage = false;
     wc.setUserAgent(getChromeLikeUA());
     this.modal.once("ready-to-show", () => {
       if (!this.isModalAlive()) return;
@@ -11256,6 +11321,16 @@ var WereadLoginWindow = class {
       this.modal.show();
     });
     this.modal.on("closed", () => {
+      if (sessionPollTimer) {
+        clearInterval(sessionPollTimer);
+        sessionPollTimer = null;
+      }
+      if (pageRecoveryTimer) {
+        clearInterval(pageRecoveryTimer);
+        pageRecoveryTimer = null;
+      }
+      this._cleanupHooks?.();
+      this._cleanupHooks = null;
       this.modal = null;
       this._hooksAttached = false;
     });
@@ -11270,78 +11345,126 @@ var WereadLoginWindow = class {
       if (this.isModalAlive()) this.modal.close();
       this.modal = null;
     };
+    let syncing = false;
     const trySyncFromSession = async () => {
-      if (this.handled || !this.isModalAlive()) return;
-      const str = await readSessionCookieString(this.modal);
-      if (!str) return;
-      if (
-        import_weread_session.shouldPersistNewWereadSession(
-          initialSessionCookie,
-          str,
-        )
-      ) {
-        await finishOk(str);
-        return;
+      if (syncing || this.handled || !this.isModalAlive()) return;
+      syncing = true;
+      try {
+        const str = await readSessionCookieString(this.modal);
+        if (!str) return;
+        if (
+          import_weread_session.shouldPersistNewWereadSession(
+            initialSessionCookie,
+            str,
+          )
+        ) {
+          await finishOk(str);
+          return;
+        }
+        const ok = await verifyCookieRough(str);
+        if (ok) await finishOk(str);
+      } finally {
+        syncing = false;
       }
-      const ok = await verifyCookieRough(str);
-      if (ok) await finishOk(str);
+    };
+    let handledWechatCode = "";
+    const handleWechatCallback = async (url2) => {
+      try {
+        const url = new URL(url2);
+        if (url.hostname !== "weread.qq.com") return;
+        const code = url.searchParams.get("code");
+        if (!code || code === handledWechatCode) return;
+        handledWechatCode = code;
+        const payload = JSON.stringify({
+          webCode: code,
+          state: url.searchParams.get("state") || "",
+          vid: "",
+          isAutoLogout: false,
+          isFromweb: true,
+        });
+        const result = await wc.executeJavaScript(
+          `fetch("/api/login/wxCode", {method:"POST", headers:{"Content-Type":"application/json"}, body:${JSON.stringify(payload)}}).then((response) => response.json())`,
+        );
+        if (!(result == null ? void 0 : result.succeed)) {
+          console.warn("[ReadFlow] WeChat callback rejected", result);
+          return;
+        }
+        await trySyncFromSession();
+      } catch (e) {
+        console.warn("[ReadFlow] WeChat callback handling failed", e);
+      }
     };
     const attachSessionHooks = () => {
       if (this._hooksAttached || !this.isModalAlive()) return;
       this._hooksAttached = true;
-      const session = this.getWebContents().session;
+      const contents = this.getWebContents();
+      if (!contents) return;
+      const session = contents.session;
+      const onCompleted = (details) => {
+        if (details.statusCode === 200) {
+          void trySyncFromSession();
+        }
+      };
       session.webRequest.onCompleted(
         { urls: ["https://weread.qq.com/api/auth/getLoginInfo?uid=*"] },
-        (details) => {
-          if (details.statusCode === 200 && this.isModalAlive()) {
-            void this.modal.loadURL("https://weread.qq.com/web/shelf");
-            void trySyncFromSession();
-          }
-        },
+        onCompleted,
       );
+      const onSendHeaders = (details) => {
+        const raw =
+          details.requestHeaders["Cookie"] ??
+          details.requestHeaders["cookie"];
+        if (raw === void 0) return;
+        const cookieArr = parseCookieHeader(raw);
+        const wrName = cookieArr.find((c) => c.name === "wr_name");
+        const wrVid = cookieArr.find((c) => c.name === "wr_vid");
+        const wrSkey = cookieArr.find((c) => c.name === "wr_skey");
+        if (
+          (wrName && wrName.value !== "") ||
+          (wrVid && wrVid.value !== "") ||
+          (wrSkey && wrSkey.value !== "")
+        ) {
+          void trySyncFromSession();
+        }
+      };
       session.webRequest.onSendHeaders(
         { urls: ["https://weread.qq.com/web/user?userVid=*"] },
-        (details) => {
-          const raw =
-            details.requestHeaders["Cookie"] ??
-            details.requestHeaders["cookie"];
-          if (raw === void 0) return;
-          const cookieArr = parseCookieHeader(raw);
-          const wrName = cookieArr.find((c) => c.name === "wr_name");
-          const wrVid = cookieArr.find((c) => c.name === "wr_vid");
-          const wrSkey = cookieArr.find((c) => c.name === "wr_skey");
-          if (
-            (wrName && wrName.value !== "") ||
-            (wrVid && wrVid.value !== "") ||
-            (wrSkey && wrSkey.value !== "")
-          ) {
-            void trySyncFromSession();
-          } else if (this.isModalAlive()) {
-            void this.modal.loadURL(WEREAD_LOGIN);
-          }
-        },
+        onSendHeaders,
       );
+      const onCookieChanged = (_event, cookie, _cause, removed) => {
+        if (
+          removed ||
+          !cookie ||
+          !import_weread_session.isWereadSessionCookieName(cookie.name)
+        ) {
+          return;
+        }
+        void trySyncFromSession();
+      };
       try {
-        session.cookies.on("changed", (_event, cookie, _cause, removed) => {
-          if (
-            removed ||
-            !cookie ||
-            !import_weread_session.isWereadSessionCookieName(cookie.name)
-          ) {
-            return;
-          }
-          void trySyncFromSession();
-        });
+        session.cookies.on("changed", onCookieChanged);
       } catch (e) {
         console.warn("[ReadFlow] cannot observe Weread session cookies", e);
       }
       const nav = () => {
+        void handleWechatCallback(contents.getURL());
         void trySyncFromSession();
       };
-      const contents = this.getWebContents();
+      const redirect = (_event, url) => {
+        void handleWechatCallback(url);
+      };
       contents.on("did-navigate", nav);
       contents.on("did-navigate-in-page", nav);
       contents.on("did-finish-load", nav);
+      contents.on("will-redirect", redirect);
+      this._cleanupHooks = () => {
+        session.webRequest.removeListener?.("completed", onCompleted);
+        session.webRequest.removeListener?.("sendHeaders", onSendHeaders);
+        session.cookies.removeListener?.("changed", onCookieChanged);
+        contents.removeListener?.("did-navigate", nav);
+        contents.removeListener?.("did-navigate-in-page", nav);
+        contents.removeListener?.("did-finish-load", nav);
+        contents.removeListener?.("will-redirect", redirect);
+      };
     };
     let loadErr = "";
     wc.on("did-fail-load", (_e, code, desc, url2, isMainFrame) => {
@@ -11351,19 +11474,34 @@ var WereadLoginWindow = class {
       console.warn("[ReadFlow] did-fail-load", loadErr);
     });
     attachSessionHooks();
-    const loadTargets = [WEREAD_HOME, WEREAD_LOGIN];
-    let loaded = false;
-    for (const target of loadTargets) {
-      if (!this.isModalAlive()) break;
+    sessionPollTimer = setInterval(() => {
+      void trySyncFromSession();
+    }, 1000);
+    pageRecoveryTimer = setInterval(async () => {
+      if (recoveringPage || this.handled || !this.isModalAlive()) return;
+      const contents = this.getWebContents();
+      if (!contents) return;
+      recoveringPage = true;
       try {
-        await this.getWebContents().loadURL(target);
+        const text = String(
+          await contents.executeJavaScript("document.body?.innerText || ''"),
+        );
+        if (text.includes("二维码已失效")) {
+          await contents.loadURL(WEREAD_LOGIN);
+        }
       } catch (e) {
-        console.warn("[ReadFlow] loadURL", target, e);
+        console.warn("[ReadFlow] recover expired login page", e);
+      } finally {
+        recoveringPage = false;
       }
-      const url = this.getWebContents()?.getURL?.() || "";
-      if (url.includes("weread.qq.com")) {
-        loaded = true;
-        break;
+    }, 3000);
+    let loaded = false;
+    if (this.isModalAlive()) {
+      try {
+        await this.getWebContents().loadURL(WEREAD_LOGIN);
+        loaded = this.getWebContents()?.getURL?.().includes("weread.qq.com") || false;
+      } catch (e) {
+        console.warn("[ReadFlow] loadURL", WEREAD_LOGIN, e);
       }
     }
     if (!loaded || !this.isModalAlive()) {
@@ -11377,16 +11515,18 @@ var WereadLoginWindow = class {
       this.dispose();
       return;
     }
+    if (this.isModalAlive() && this.modal?.isVisible?.() === false) {
+      this.modal.show();
+    }
     await trySyncFromSession();
   }
 };
 async function readSessionCookieString(win) {
   try {
     const cookieStore = win.webContents.session.cookies;
-    const sessionCookies = [
-      ...(await cookieStore.get({ domain: ".weread.qq.com" })),
-      ...(await cookieStore.get({ domain: "weread.qq.com" })),
-    ];
+    const sessionCookies = await cookieStore.get({
+      url: "https://weread.qq.com/",
+    });
     const unique = /* @__PURE__ */ new Map();
     for (const c of sessionCookies) {
       if (!unique.has(c.name)) {
