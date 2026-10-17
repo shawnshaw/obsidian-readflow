@@ -1,5 +1,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
+const path = require("node:path");
+const { pathToFileURL } = require("node:url");
 
 const {
   collectBookHighlightPaths,
@@ -8,7 +10,7 @@ const {
   resolveKnowledgeAreaMode,
   resolveKnowledgeAreaModeAfterEnable,
   resolveKnowledgeAreaAfterToggle,
-  createEmbeddedTeardown,
+  createEmbeddedLifecycle,
   createMountGuard,
   mountEmbeddedWhenCurrent,
   describeReadFlowSync,
@@ -157,7 +159,7 @@ test("re-enabling always refreshes the pane, even when the user keeps their own 
 });
 
 test("a refresh waits for the pending save to release the board before syncing again", async () => {
-  const teardown = createEmbeddedTeardown();
+  const teardown = createEmbeddedLifecycle();
   const events = [];
   let finishSave;
   const pendingSave = new Promise((resolve) => {
@@ -189,7 +191,7 @@ test("a refresh waits for the pending save to release the board before syncing a
 });
 
 test("a refresh and a close share one teardown instead of destroying the surface twice", async () => {
-  const teardown = createEmbeddedTeardown();
+  const teardown = createEmbeddedLifecycle();
   let destroys = 0;
   teardown.attach({
     destroy: async () => {
@@ -205,7 +207,7 @@ test("a refresh and a close share one teardown instead of destroying the surface
 });
 
 test("a failed teardown keeps the controller and can be retried", async () => {
-  const teardown = createEmbeddedTeardown();
+  const teardown = createEmbeddedLifecycle();
   let attempts = 0;
   const controller = {
     destroy: async () => {
@@ -221,6 +223,148 @@ test("a failed teardown keeps the controller and can be retried", async () => {
   await teardown.dispose();
   assert.equal(attempts, 2);
   assert.equal(teardown.controller, null);
+});
+
+// The real single-writer store lives in the Knowledge Canvas plugin, which owns the
+// `.canvas` files. It is loaded from the sibling plugin (dev worktrees or an installed
+// vault) so this lifecycle is exercised against real writer-token semantics, not a stub.
+const BOARD_STORE_CANDIDATES = [
+  "../../knowledge-canvas-readflow-embed/Plugins/knowledge-canvas/src/board-store.js",
+  "../../knowledge-canvas/src/board-store.js",
+];
+
+async function loadBoardStore() {
+  const misses = [];
+  for (const candidate of BOARD_STORE_CANDIDATES) {
+    const file = path.resolve(__dirname, candidate);
+    try {
+      return (await import(pathToFileURL(file).href)).BoardStore;
+    } catch (error) {
+      misses.push(`${file}: ${error.message}`);
+    }
+  }
+  throw new Error(
+    `Knowledge Canvas BoardStore is required for the lifecycle test:\n${misses.join("\n")}`,
+  );
+}
+
+const tick = () => new Promise((resolve) => setImmediate(resolve));
+
+function createStoreHarness(BoardStore, boardPath) {
+  const files = new Map();
+  const store = new BoardStore({
+    read: async (file) => files.get(file),
+    process: async (file, updater) => files.set(file, updater(files.get(file))),
+  });
+  files.set(boardPath, JSON.stringify({ nodes: [], edges: [] }));
+  return { store, files };
+}
+
+test("a rapid second refresh owns the board while the first mount is still in flight", async () => {
+  const BoardStore = await loadBoardStore();
+  const boardPath = "Canvas/Knowledge Canvas/ReadFlow/rf-race.canvas";
+  const { store } = createStoreHarness(BoardStore, boardPath);
+  await store.load(boardPath);
+
+  const lifecycle = createEmbeddedLifecycle();
+  const mounted = [];
+  let releaseFirstMount;
+  const firstMountGate = new Promise((resolve) => {
+    releaseFirstMount = resolve;
+  });
+
+  const mount = async ({ pause = false } = {}) => {
+    const token = { surface: mounted.length + 1 };
+    const controller = {
+      token,
+      get writerOwned() {
+        return store.isWriter(boardPath, token);
+      },
+      destroy: async () => store.releaseWriter(boardPath, token),
+    };
+    mounted.push(controller);
+    // Exactly what KnowledgeCanvasView.mountBoard does: claim the single writer.
+    controller.acquired = store.acquireWriter(boardPath, token);
+    if (pause) await firstMountGate;
+    return controller;
+  };
+
+  // Refresh 1: the mount claims the board, then blocks before returning/attaching.
+  const first = lifecycle.begin(async () => {
+    const controller = await mount({ pause: true });
+    lifecycle.attach(controller);
+    return controller;
+  });
+  await tick();
+  assert.equal(mounted.length, 1);
+  assert.equal(store.isWriter(boardPath, mounted[0].token), true);
+
+  // Refresh 2 of the same book starts while refresh 1 is still in flight.
+  const second = lifecycle.begin(async () => {
+    const controller = await mount();
+    lifecycle.attach(controller);
+    return controller;
+  });
+  await tick();
+  assert.equal(mounted.length, 1, "the new session must wait for the in-flight mount");
+
+  releaseFirstMount();
+  await first;
+  const fresh = await second;
+
+  assert.equal(fresh.acquired, true, "the fresh controller must claim the board");
+  assert.equal(fresh.writerOwned, true, "the current controller must be writable");
+  assert.equal(lifecycle.controller, fresh);
+  assert.equal(mounted[0].writerOwned, false, "the superseded surface released the board");
+  assert.equal(store.isWriter(boardPath, fresh.token), true);
+});
+
+test("a close waits for an in-flight mount before tearing the surface down", async () => {
+  const lifecycle = createEmbeddedLifecycle();
+  const events = [];
+  let releaseMount;
+  const mountGate = new Promise((resolve) => {
+    releaseMount = resolve;
+  });
+
+  const session = lifecycle.begin(async () => {
+    await mountGate;
+    events.push("mount");
+    lifecycle.attach({
+      destroy: async () => {
+        events.push("destroy");
+      },
+    });
+  });
+  const closing = lifecycle.dispose();
+
+  await tick();
+  assert.deepEqual(events, [], "a surface that is still mounting must not be torn down under it");
+
+  releaseMount();
+  await Promise.all([session, closing]);
+  assert.deepEqual(events, ["mount", "destroy"]);
+  assert.equal(lifecycle.controller, null);
+});
+
+test("a new mount session starts only after the previous surface released the board", async () => {
+  const lifecycle = createEmbeddedLifecycle();
+  const events = [];
+
+  const first = lifecycle.begin(async () => {
+    events.push("mount:first");
+    lifecycle.attach({
+      destroy: async () => {
+        events.push("teardown:first");
+      },
+    });
+  });
+  const second = lifecycle.begin(async () => {
+    events.push("mount:second");
+  });
+
+  await Promise.all([first, second]);
+  assert.deepEqual(events, ["mount:first", "teardown:first", "mount:second"]);
 });
 
 test("mount guard invalidates older tokens as new mounts start", () => {

@@ -123,17 +123,40 @@ function resolveKnowledgeAreaAfterToggle(enabled, mode, wasForcedToMindmap) {
 }
 
 /**
- * Owns the one embedded ReadFlow canvas and its teardown.
+ * Owns the embedded ReadFlow canvas for the whole life of one view: the mount session
+ * (`ensure` + `mount` + attach) as well as the teardown of the mounted controller.
  *
- * Every board replacement, book switch, refresh and close awaits `dispose()`, so a new
- * board is never synced or mounted while the previous surface still owns the write token.
- * Concurrent callers share the same in-flight teardown instead of destroying twice. A
- * failed teardown keeps the controller reference and rejects, so the caller can retry
- * instead of silently losing a surface that still holds listeners and a write token.
+ * Sessions are serialised. A new session first waits for any mount still in flight and
+ * for the previous surface to be fully torn down before it starts, so a newer mount can
+ * never grab a board that an older, not-yet-attached mount already holds as read-only.
+ * Without that ordering the newer surface would stay read-only forever once the older one
+ * released the token, and the board would be left with no writable owner at all.
+ *
+ * `dispose()` also waits for an in-flight session, so a refresh or close cannot observe a
+ * half-mounted surface. A failed teardown keeps the controller reference and rejects, so
+ * the caller can retry instead of silently losing a surface that still holds listeners.
  */
-function createEmbeddedTeardown() {
+function createEmbeddedLifecycle() {
   let controller = null;
-  let pending = null;
+  let pendingTeardown = null;
+  let pendingSession = null;
+  let pendingDispose = null;
+
+  const destroyController = () => {
+    if (pendingTeardown) return pendingTeardown;
+    const current = controller;
+    if (!current) return Promise.resolve();
+    pendingTeardown = (async () => {
+      try {
+        await current.destroy();
+        if (controller === current) controller = null;
+      } finally {
+        pendingTeardown = null;
+      }
+    })();
+    return pendingTeardown;
+  };
+
   return {
     /** The mounted controller, or `null` when nothing is mounted. */
     get controller() {
@@ -145,22 +168,44 @@ function createEmbeddedTeardown() {
       return next;
     },
     /**
-     * Tears the mounted surface down and resolves only once it has flushed and released
-     * the board. Safe to call repeatedly: a disposal that is already running is shared.
+     * Runs one complete mount session. The session receives no arguments and must perform
+     * the ensure, the mount and the `attach` itself; whatever it leaves mounted is torn
+     * down before the next session starts.
+     */
+    begin(task) {
+      const previous = pendingSession ?? Promise.resolve();
+      const current = previous
+        .catch(() => {})
+        .then(() => destroyController())
+        .then(task);
+      const barrier = current.then(
+        () => {},
+        () => {},
+      );
+      pendingSession = barrier;
+      barrier
+        .finally(() => {
+          if (pendingSession === barrier) pendingSession = null;
+        })
+        .catch(() => {});
+      return current;
+    },
+    /**
+     * Waits for any in-flight session, then tears the mounted surface down. Resolves only
+     * once the surface has flushed and released the board. Safe to call repeatedly: a
+     * disposal that is already running is shared.
      */
     dispose() {
-      if (pending) return pending;
-      const current = controller;
-      if (!current) return Promise.resolve();
-      pending = (async () => {
-        try {
-          await current.destroy();
-          if (controller === current) controller = null;
-        } finally {
-          pending = null;
-        }
-      })();
-      return pending;
+      if (pendingDispose) return pendingDispose;
+      const waiting = pendingSession ?? Promise.resolve();
+      const current = waiting.then(() => destroyController());
+      pendingDispose = current;
+      current
+        .finally(() => {
+          if (pendingDispose === current) pendingDispose = null;
+        })
+        .catch(() => {});
+      return current;
     },
   };
 }
@@ -217,7 +262,7 @@ module.exports = {
   resolveKnowledgeAreaMode,
   resolveKnowledgeAreaModeAfterEnable,
   resolveKnowledgeAreaAfterToggle,
-  createEmbeddedTeardown,
+  createEmbeddedLifecycle,
   createMountGuard,
   mountEmbeddedWhenCurrent,
   describeReadFlowSync,

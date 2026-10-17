@@ -160,9 +160,25 @@ var require_knowledge_canvas_embed = __commonJS({
         refresh: true
       };
     }
-    function createEmbeddedTeardown() {
+    function createEmbeddedLifecycle() {
       let controller = null;
-      let pending = null;
+      let pendingTeardown = null;
+      let pendingSession = null;
+      let pendingDispose = null;
+      const destroyController = () => {
+        if (pendingTeardown) return pendingTeardown;
+        const current = controller;
+        if (!current) return Promise.resolve();
+        pendingTeardown = (async () => {
+          try {
+            await current.destroy();
+            if (controller === current) controller = null;
+          } finally {
+            pendingTeardown = null;
+          }
+        })();
+        return pendingTeardown;
+      };
       return {
         /** The mounted controller, or `null` when nothing is mounted. */
         get controller() {
@@ -174,22 +190,42 @@ var require_knowledge_canvas_embed = __commonJS({
           return next;
         },
         /**
-         * Tears the mounted surface down and resolves only once it has flushed and released
-         * the board. Safe to call repeatedly: a disposal that is already running is shared.
+         * Runs one complete mount session. The session receives no arguments and must perform
+         * the ensure, the mount and the `attach` itself; whatever it leaves mounted is torn
+         * down before the next session starts.
+         */
+        begin(task) {
+          const previous = pendingSession != null ? pendingSession : Promise.resolve();
+          const current = previous.catch(() => {
+          }).then(() => destroyController()).then(task);
+          const barrier = current.then(
+            () => {
+            },
+            () => {
+            }
+          );
+          pendingSession = barrier;
+          barrier.finally(() => {
+            if (pendingSession === barrier) pendingSession = null;
+          }).catch(() => {
+          });
+          return current;
+        },
+        /**
+         * Waits for any in-flight session, then tears the mounted surface down. Resolves only
+         * once the surface has flushed and released the board. Safe to call repeatedly: a
+         * disposal that is already running is shared.
          */
         dispose() {
-          if (pending) return pending;
-          const current = controller;
-          if (!current) return Promise.resolve();
-          pending = (async () => {
-            try {
-              await current.destroy();
-              if (controller === current) controller = null;
-            } finally {
-              pending = null;
-            }
-          })();
-          return pending;
+          if (pendingDispose) return pendingDispose;
+          const waiting = pendingSession != null ? pendingSession : Promise.resolve();
+          const current = waiting.then(() => destroyController());
+          pendingDispose = current;
+          current.finally(() => {
+            if (pendingDispose === current) pendingDispose = null;
+          }).catch(() => {
+          });
+          return current;
         }
       };
     }
@@ -228,7 +264,7 @@ var require_knowledge_canvas_embed = __commonJS({
       resolveKnowledgeAreaMode,
       resolveKnowledgeAreaModeAfterEnable,
       resolveKnowledgeAreaAfterToggle,
-      createEmbeddedTeardown,
+      createEmbeddedLifecycle,
       createMountGuard,
       mountEmbeddedWhenCurrent,
       describeReadFlowSync,
@@ -5957,7 +5993,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     this.hoverCardId = null;
     this.shouldRestoreScroll = false;
     this.knowledgeAreaMode = null;
-    this._kcTeardown = import_knowledge_canvas_embed.createEmbeddedTeardown();
+    this._kcLifecycle = import_knowledge_canvas_embed.createEmbeddedLifecycle();
     this._kcMountGuard = import_knowledge_canvas_embed.createMountGuard();
     this._kcIntegrationUnregister = null;
     this._kcMindmapForcedByDisable = false;
@@ -6032,7 +6068,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
   disposeKnowledgeCanvasEmbed() {
     var _a;
     (_a = this._kcMountGuard) == null ? void 0 : _a.next();
-    return this._kcTeardown.dispose();
+    return this._kcLifecycle.dispose();
   }
   render() {
     var _a, _b;
@@ -9395,28 +9431,50 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       "click",
       () => {
         var _a;
-        return (_a = this._kcTeardown.controller) == null ? void 0 : _a.openFullView();
+        return (_a = this._kcLifecycle.controller) == null ? void 0 : _a.openFullView();
       }
     );
     const host = sec.createDiv("readflow-kc-host");
     const guard = this._kcMountGuard;
     const token = guard.next();
+    const lifecycle = this._kcLifecycle;
     try {
-      const highlightPaths = import_knowledge_canvas_embed.collectBookHighlightPaths(
-        this.plugin.settings,
-        book
-      );
-      const ensured = await canvasPlugin.ensureReadFlowBoard({
-        bookId: book.bookId,
-        title: book.title,
-        highlightPaths
+      const result = await lifecycle.begin(async () => {
+        var _a;
+        const highlightPaths = import_knowledge_canvas_embed.collectBookHighlightPaths(
+          this.plugin.settings,
+          book
+        );
+        const ensured = await canvasPlugin.ensureReadFlowBoard({
+          bookId: book.bookId,
+          title: book.title,
+          highlightPaths
+        });
+        if (!guard.isCurrent(token)) return null;
+        const boardPath = ensured == null ? void 0 : ensured.boardPath;
+        if (!boardPath) {
+          throw new Error("\u77E5\u8BC6\u753B\u677F\u8DEF\u5F84\u65E0\u6548");
+        }
+        const controller = await canvasPlugin.mountEmbeddedBoard(host, {
+          boardPath,
+          compact: true
+        });
+        if (!guard.isCurrent(token)) {
+          try {
+            await ((_a = controller == null ? void 0 : controller.destroy) == null ? void 0 : _a.call(controller));
+          } catch (error) {
+            lifecycle.attach(controller);
+            throw error;
+          }
+          return null;
+        }
+        lifecycle.attach(controller);
+        return { controller, ensured };
       });
-      if (!guard.isCurrent(token)) return;
-      const boardPath = ensured == null ? void 0 : ensured.boardPath;
-      if (!boardPath) {
-        throw new Error("\u77E5\u8BC6\u753B\u677F\u8DEF\u5F84\u65E0\u6548");
-      }
-      const syncLabel = import_knowledge_canvas_embed.describeReadFlowSync(ensured);
+      if (!result) return;
+      const syncLabel = import_knowledge_canvas_embed.describeReadFlowSync(
+        result.ensured
+      );
       if (syncLabel) {
         const statusEl = actions.createEl("span", {
           text: syncLabel,
@@ -9424,14 +9482,6 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
         });
         actions.prepend(statusEl);
       }
-      const result = await import_knowledge_canvas_embed.mountEmbeddedWhenCurrent(
-        guard,
-        token,
-        () => canvasPlugin.mountEmbeddedBoard(host, { boardPath, compact: true }),
-        (controller) => controller.destroy()
-      );
-      if (result.stale) return;
-      this._kcTeardown.attach(result.controller);
     } catch (error) {
       console.error("[ReadFlow] knowledge canvas mount failed", error);
       host.createEl("p", {

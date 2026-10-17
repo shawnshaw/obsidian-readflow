@@ -6684,7 +6684,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     this.shouldRestoreScroll = false;
     // Knowledge Canvas embed: defaults to the canvas, falls back to the mindmap.
     this.knowledgeAreaMode = null;
-    this._kcTeardown = import_knowledge_canvas_embed.createEmbeddedTeardown();
+    this._kcLifecycle = import_knowledge_canvas_embed.createEmbeddedLifecycle();
     this._kcMountGuard = import_knowledge_canvas_embed.createMountGuard();
     this._kcIntegrationUnregister = null;
     this._kcMindmapForcedByDisable = false;
@@ -6769,7 +6769,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     // Any mount still in flight is now stale: invalidate before destroying so it can
     // never commit into a surface we already tore down.
     this._kcMountGuard?.next();
-    return this._kcTeardown.dispose();
+    return this._kcLifecycle.dispose();
   }
   render() {
     var _a, _b;
@@ -10345,30 +10345,55 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       "readflow-btn--sm",
     );
     openBtn.addEventListener("click", () =>
-      this._kcTeardown.controller?.openFullView(),
+      this._kcLifecycle.controller?.openFullView(),
     );
     const host = sec.createDiv("readflow-kc-host");
     const guard = this._kcMountGuard;
     const token = guard.next();
+    const lifecycle = this._kcLifecycle;
     try {
-      const highlightPaths =
-        import_knowledge_canvas_embed.collectBookHighlightPaths(
-          this.plugin.settings,
-          book,
-        );
-      const ensured = await canvasPlugin.ensureReadFlowBoard({
-        bookId: book.bookId,
-        title: book.title,
-        highlightPaths,
+      // The whole ensure + mount + attach runs as one lifecycle session. `begin` first
+      // waits for any mount still in flight and for the previous surface to release the
+      // board, so this mount can never end up read-only against a stale writer token.
+      const result = await lifecycle.begin(async () => {
+        const highlightPaths =
+          import_knowledge_canvas_embed.collectBookHighlightPaths(
+            this.plugin.settings,
+            book,
+          );
+        const ensured = await canvasPlugin.ensureReadFlowBoard({
+          bookId: book.bookId,
+          title: book.title,
+          highlightPaths,
+        });
+        // The user switched books while this board was loading; abandon it silently.
+        if (!guard.isCurrent(token)) return null;
+        const boardPath = ensured?.boardPath;
+        if (!boardPath) {
+          throw new Error("知识画板路径无效");
+        }
+        const controller = await canvasPlugin.mountEmbeddedBoard(host, {
+          boardPath,
+          compact: true,
+        });
+        if (!guard.isCurrent(token)) {
+          // A newer session is already queued behind this one; release our board now so
+          // it can take the write token instead of landing read-only.
+          try {
+            await controller?.destroy?.();
+          } catch (error) {
+            lifecycle.attach(controller);
+            throw error;
+          }
+          return null;
+        }
+        lifecycle.attach(controller);
+        return { controller, ensured };
       });
-      // The user switched books while this board was loading; abandon it silently.
-      if (!guard.isCurrent(token)) return;
-      const boardPath = ensured?.boardPath;
-      if (!boardPath) {
-        throw new Error("知识画板路径无效");
-      }
-      const syncLabel =
-        import_knowledge_canvas_embed.describeReadFlowSync(ensured);
+      if (!result) return;
+      const syncLabel = import_knowledge_canvas_embed.describeReadFlowSync(
+        result.ensured,
+      );
       if (syncLabel) {
         const statusEl = actions.createEl("span", {
           text: syncLabel,
@@ -10376,14 +10401,6 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
         });
         actions.prepend(statusEl);
       }
-      const result = await import_knowledge_canvas_embed.mountEmbeddedWhenCurrent(
-        guard,
-        token,
-        () => canvasPlugin.mountEmbeddedBoard(host, { boardPath, compact: true }),
-        (controller) => controller.destroy(),
-      );
-      if (result.stale) return;
-      this._kcTeardown.attach(result.controller);
     } catch (error) {
       console.error("[ReadFlow] knowledge canvas mount failed", error);
       host.createEl("p", {
