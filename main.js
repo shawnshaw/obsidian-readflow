@@ -115,13 +115,22 @@ var require_knowledge_canvas_embed = __commonJS({
       }
       return paths;
     }
+    var REQUIRED_EMBED_API = [
+      "isReadFlowIntegrationEnabled",
+      "ensureReadFlowBoard",
+      "mountEmbeddedBoard",
+      "resolveReadFlowBoardPath",
+      "bindReadFlowBoard",
+      "listCanvasFiles",
+      "registerReadFlowIntegrationListener"
+    ];
     function knowledgeCanvasPlugin(app) {
       var _a, _b;
       const plugin = (_b = (_a = app == null ? void 0 : app.plugins) == null ? void 0 : _a.plugins) == null ? void 0 : _b["knowledge-canvas"];
       if (!plugin) return null;
-      if (typeof plugin.isReadFlowIntegrationEnabled !== "function") return null;
-      if (typeof plugin.ensureReadFlowBoard !== "function") return null;
-      if (typeof plugin.mountEmbeddedBoard !== "function") return null;
+      for (const method of REQUIRED_EMBED_API) {
+        if (typeof plugin[method] !== "function") return null;
+      }
       return plugin;
     }
     function isKnowledgeCanvasAvailable(app) {
@@ -133,11 +142,43 @@ var require_knowledge_canvas_embed = __commonJS({
       if (preference === "canvas" && canvasAvailable) return "canvas";
       return canvasAvailable ? "canvas" : "mindmap";
     }
+    function createMountGuard() {
+      let generation = 0;
+      return {
+        /** Starts a new mount and returns the token it must present to commit. */
+        next() {
+          generation += 1;
+          return generation;
+        },
+        /** True only while `token` is the most recently started mount. */
+        isCurrent(token) {
+          return token === generation;
+        }
+      };
+    }
+    async function mountEmbeddedWhenCurrent(guard, token, mount, onStale) {
+      const controller = await mount();
+      if (!guard.isCurrent(token)) {
+        if (controller && onStale) await onStale(controller);
+        return { controller, stale: true };
+      }
+      return { controller, stale: false };
+    }
+    function describeReadFlowSync(result) {
+      const added = Number(result == null ? void 0 : result.addedCount) || 0;
+      if (result == null ? void 0 : result.created) return `\u5DF2\u521B\u5EFA\u77E5\u8BC6\u753B\u677F\uFF0C\u5BFC\u5165 ${added} \u6761\u6458\u5F55`;
+      if (added > 0) return `\u5DF2\u540C\u6B65 ${added} \u6761\u65B0\u6458\u5F55\u5230\u77E5\u8BC6\u753B\u677F`;
+      return null;
+    }
     module2.exports = {
       collectBookHighlightPaths,
       knowledgeCanvasPlugin,
       isKnowledgeCanvasAvailable,
-      resolveKnowledgeAreaMode
+      resolveKnowledgeAreaMode,
+      createMountGuard,
+      mountEmbeddedWhenCurrent,
+      describeReadFlowSync,
+      REQUIRED_EMBED_API
     };
   }
 });
@@ -5749,6 +5790,77 @@ function renderRelationGraphCanvas(container, book, scopeBook, opts) {
   }
   return controls;
 }
+var KnowledgeCanvasBindingModal = class extends import_obsidian5.Modal {
+  constructor(app, canvasPlugin, bookId, currentPath, onBound) {
+    super(app);
+    this.canvasPlugin = canvasPlugin;
+    this.bookId = bookId;
+    this.currentPath = currentPath;
+    this.onBound = onBound;
+  }
+  onOpen() {
+    const { contentEl } = this;
+    contentEl.addClass("readflow-kc-binding-modal");
+    contentEl.createEl("h3", { text: "\u7ED1\u5B9A\u77E5\u8BC6\u753B\u677F" });
+    contentEl.createEl("p", {
+      text: `\u5F53\u524D\u753B\u677F\uFF1A${this.currentPath || "\uFF08\u9ED8\u8BA4\uFF09"}`,
+      cls: "readflow-muted"
+    });
+    const restoreBtn = contentEl.createEl("button", {
+      text: "\u6062\u590D\u9ED8\u8BA4\u753B\u677F",
+      type: "button"
+    });
+    restoreBtn.classList.add("readflow-btn", "readflow-btn--secondary");
+    restoreBtn.addEventListener("click", async () => {
+      var _a;
+      try {
+        await this.canvasPlugin.bindReadFlowBoard(this.bookId, null);
+        this.close();
+        (_a = this.onBound) == null ? void 0 : _a.call(this, null);
+      } catch (error) {
+        new import_obsidian5.Notice(`\u6062\u590D\u9ED8\u8BA4\u753B\u677F\u5931\u8D25\uFF1A${error.message}`);
+      }
+    });
+    let canvasFiles = [];
+    try {
+      canvasFiles = this.canvasPlugin.listCanvasFiles();
+    } catch (error) {
+      new import_obsidian5.Notice(`\u8BFB\u53D6\u753B\u5E03\u5217\u8868\u5931\u8D25\uFF1A${error.message}`);
+    }
+    const list = contentEl.createDiv("readflow-kc-binding-list");
+    if (canvasFiles.length === 0) {
+      list.createEl("p", {
+        text: "Vault \u4E2D\u8FD8\u6CA1\u6709 .canvas \u6587\u4EF6\u3002",
+        cls: "readflow-muted"
+      });
+      return;
+    }
+    for (const path of canvasFiles) {
+      const row = list.createDiv("readflow-kc-binding-row");
+      row.createEl("span", { text: path, cls: "readflow-kc-binding-path" });
+      const isCurrent = path === this.currentPath;
+      const btn = row.createEl("button", {
+        text: isCurrent ? "\u5DF2\u7ED1\u5B9A" : "\u7ED1\u5B9A",
+        type: "button"
+      });
+      btn.classList.add("readflow-btn", "readflow-btn--ghost", "readflow-btn--sm");
+      if (isCurrent) btn.disabled = true;
+      btn.addEventListener("click", async () => {
+        var _a;
+        try {
+          await this.canvasPlugin.bindReadFlowBoard(this.bookId, path);
+          this.close();
+          (_a = this.onBound) == null ? void 0 : _a.call(this, path);
+        } catch (error) {
+          new import_obsidian5.Notice(`\u7ED1\u5B9A\u753B\u677F\u5931\u8D25\uFF1A${error.message}`);
+        }
+      });
+    }
+  }
+  onClose() {
+    this.contentEl.empty();
+  }
+};
 var HighlightPanelView = class extends import_obsidian5.ItemView {
   constructor(leaf, plugin) {
     super(leaf);
@@ -5792,6 +5904,8 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     this.shouldRestoreScroll = false;
     this.knowledgeAreaMode = null;
     this._kcEmbedController = null;
+    this._kcMountGuard = import_knowledge_canvas_embed.createMountGuard();
+    this._kcIntegrationUnregister = null;
   }
   getViewType() {
     return READFLOW_VIEW_TYPE;
@@ -5806,6 +5920,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     this.contentEl.empty();
     this.contentEl.classList.add("readflow-panel-root");
     this.plugin.linker.rebuildIndexAsync().catch((e) => console.error("[ReadFlow] linker", e));
+    this.registerKnowledgeCanvasIntegrationListener();
     this.render();
   }
   refresh() {
@@ -5816,9 +5931,31 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       this.detachedPanel.remove();
       this.detachedPanel = null;
     }
+    this.unregisterKnowledgeCanvasIntegrationListener();
     this.disposeKnowledgeCanvasEmbed();
   }
+  registerKnowledgeCanvasIntegrationListener() {
+    this.unregisterKnowledgeCanvasIntegrationListener();
+    const canvasPlugin = import_knowledge_canvas_embed.knowledgeCanvasPlugin(
+      this.app
+    );
+    if (!(canvasPlugin == null ? void 0 : canvasPlugin.registerReadFlowIntegrationListener)) return;
+    this._kcIntegrationUnregister = canvasPlugin.registerReadFlowIntegrationListener((enabled) => {
+      if (enabled) return;
+      this.knowledgeAreaMode = "mindmap";
+      this.disposeKnowledgeCanvasEmbed();
+      if (this.currentBook) this.refreshKnowledgePane(this.currentBook);
+    });
+  }
+  unregisterKnowledgeCanvasIntegrationListener() {
+    if (typeof this._kcIntegrationUnregister === "function") {
+      this._kcIntegrationUnregister();
+    }
+    this._kcIntegrationUnregister = null;
+  }
   disposeKnowledgeCanvasEmbed() {
+    var _a;
+    (_a = this._kcMountGuard) == null ? void 0 : _a.next();
     const controller = this._kcEmbedController;
     this._kcEmbedController = null;
     if (controller) {
@@ -9128,6 +9265,28 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       this.knowledgeAreaMode = "mindmap";
       this.refreshKnowledgePane(this.currentBook);
     });
+    const bindBtn = actions.createEl("button", {
+      text: "\u7ED1\u5B9A\u753B\u677F",
+      type: "button"
+    });
+    bindBtn.classList.add(
+      "readflow-btn",
+      "readflow-btn--ghost",
+      "readflow-btn--sm"
+    );
+    bindBtn.addEventListener("click", () => {
+      const currentPath = canvasPlugin.resolveReadFlowBoardPath({
+        bookId: book.bookId,
+        title: book.title
+      });
+      new KnowledgeCanvasBindingModal(
+        this.app,
+        canvasPlugin,
+        book.bookId,
+        currentPath,
+        () => this.refreshKnowledgePane(this.currentBook)
+      ).open();
+    });
     const openBtn = actions.createEl("button", {
       text: "\u6253\u5F00\u5168\u5C4F",
       type: "button"
@@ -9145,6 +9304,8 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       }
     );
     const host = sec.createDiv("readflow-kc-host");
+    const guard = this._kcMountGuard;
+    const token = guard.next();
     try {
       const highlightPaths = import_knowledge_canvas_embed.collectBookHighlightPaths(
         this.plugin.settings,
@@ -9155,15 +9316,27 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
         title: book.title,
         highlightPaths
       });
+      if (!guard.isCurrent(token)) return;
       const boardPath = ensured == null ? void 0 : ensured.boardPath;
       if (!boardPath) {
         throw new Error("\u77E5\u8BC6\u753B\u677F\u8DEF\u5F84\u65E0\u6548");
       }
-      const controller = await canvasPlugin.mountEmbeddedBoard(host, {
-        boardPath,
-        compact: true
-      });
-      this._kcEmbedController = controller;
+      const syncLabel = import_knowledge_canvas_embed.describeReadFlowSync(ensured);
+      if (syncLabel) {
+        const statusEl = actions.createEl("span", {
+          text: syncLabel,
+          cls: "readflow-kc-sync-status"
+        });
+        actions.prepend(statusEl);
+      }
+      const result = await import_knowledge_canvas_embed.mountEmbeddedWhenCurrent(
+        guard,
+        token,
+        () => canvasPlugin.mountEmbeddedBoard(host, { boardPath, compact: true }),
+        (controller) => controller.destroy()
+      );
+      if (result.stale) return;
+      this._kcEmbedController = result.controller;
     } catch (error) {
       console.error("[ReadFlow] knowledge canvas mount failed", error);
       host.createEl("p", {
