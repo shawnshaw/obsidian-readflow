@@ -91,6 +91,16 @@ function resolveKnowledgeAreaMode(preference, canvasAvailable) {
 }
 
 /**
+ * Decides the knowledge-area mode after the integration is re-enabled. A mindmap that was
+ * only forced because the integration was disabled returns to the canvas; a mindmap the
+ * user chose for themselves stays put.
+ */
+function resolveKnowledgeAreaModeAfterEnable(mode, wasForcedToMindmap) {
+  if (wasForcedToMindmap) return "canvas";
+  return resolveKnowledgeAreaMode(mode, true);
+}
+
+/**
  * A generation token that serialises embedded-canvas mounts. A fast book switch issues a
  * newer token before an older, slower mount resolves; the stale mount then sees it is no
  * longer current and is destroyed instead of being committed.
@@ -140,6 +150,7 @@ module.exports = {
   knowledgeCanvasPlugin,
   isKnowledgeCanvasAvailable,
   resolveKnowledgeAreaMode,
+  resolveKnowledgeAreaModeAfterEnable,
   createMountGuard,
   mountEmbeddedWhenCurrent,
   describeReadFlowSync,

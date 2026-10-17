@@ -6687,6 +6687,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     this._kcEmbedController = null;
     this._kcMountGuard = import_knowledge_canvas_embed.createMountGuard();
     this._kcIntegrationUnregister = null;
+    this._kcMindmapForcedByDisable = false;
   }
   getViewType() {
     return READFLOW_VIEW_TYPE;
@@ -6715,7 +6716,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       this.detachedPanel = null;
     }
     this.unregisterKnowledgeCanvasIntegrationListener();
-    this.disposeKnowledgeCanvasEmbed();
+    await this.disposeKnowledgeCanvasEmbed();
   }
   registerKnowledgeCanvasIntegrationListener() {
     this.unregisterKnowledgeCanvasIntegrationListener();
@@ -6725,9 +6726,24 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     if (!canvasPlugin?.registerReadFlowIntegrationListener) return;
     this._kcIntegrationUnregister =
       canvasPlugin.registerReadFlowIntegrationListener((enabled) => {
-        if (enabled) return;
+        if (enabled) {
+          // Knowledge Canvas is back; restore the canvas unless the mindmap was the
+          // user's own choice, and re-render so the switch entry reappears.
+          const mode =
+            import_knowledge_canvas_embed.resolveKnowledgeAreaModeAfterEnable(
+              this.knowledgeAreaMode,
+              this._kcMindmapForcedByDisable,
+            );
+          this._kcMindmapForcedByDisable = false;
+          if (this.knowledgeAreaMode !== mode) {
+            this.knowledgeAreaMode = mode;
+            if (this.currentBook) this.refreshKnowledgePane(this.currentBook);
+          }
+          return;
+        }
         // Knowledge Canvas tore its embedded surfaces down; ReadFlow must fall back to
         // its own knowledge view immediately instead of showing a dead embed.
+        this._kcMindmapForcedByDisable = this.knowledgeAreaMode !== "mindmap";
         this.knowledgeAreaMode = "mindmap";
         this.disposeKnowledgeCanvasEmbed();
         if (this.currentBook) this.refreshKnowledgePane(this.currentBook);
@@ -6746,10 +6762,13 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     const controller = this._kcEmbedController;
     this._kcEmbedController = null;
     if (controller) {
-      void controller.destroy().catch((error) => {
+      // Returns the teardown promise so `onClose` can await a full release of the board's
+      // write token before the view finishes closing.
+      return controller.destroy().catch((error) => {
         console.error("[ReadFlow] knowledge canvas teardown failed", error);
       });
     }
+    return null;
   }
   render() {
     var _a, _b;

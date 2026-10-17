@@ -6,6 +6,7 @@ const {
   knowledgeCanvasPlugin,
   isKnowledgeCanvasAvailable,
   resolveKnowledgeAreaMode,
+  resolveKnowledgeAreaModeAfterEnable,
   createMountGuard,
   mountEmbeddedWhenCurrent,
   describeReadFlowSync,
@@ -117,6 +118,13 @@ test("defaults to the canvas and falls back to the mindmap", () => {
   assert.equal(resolveKnowledgeAreaMode("canvas", false), "mindmap");
   assert.equal(resolveKnowledgeAreaMode("mindmap", true), "mindmap");
   assert.equal(resolveKnowledgeAreaMode("mindmap", false), "mindmap");
+});
+
+test("re-enabling restores the canvas only when the disable forced the mindmap", () => {
+  assert.equal(resolveKnowledgeAreaModeAfterEnable("mindmap", true), "canvas");
+  assert.equal(resolveKnowledgeAreaModeAfterEnable("mindmap", false), "mindmap");
+  assert.equal(resolveKnowledgeAreaModeAfterEnable("canvas", true), "canvas");
+  assert.equal(resolveKnowledgeAreaModeAfterEnable(null, false), "canvas");
 });
 
 test("mount guard invalidates older tokens as new mounts start", () => {

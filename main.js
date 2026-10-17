@@ -142,6 +142,10 @@ var require_knowledge_canvas_embed = __commonJS({
       if (preference === "canvas" && canvasAvailable) return "canvas";
       return canvasAvailable ? "canvas" : "mindmap";
     }
+    function resolveKnowledgeAreaModeAfterEnable(mode, wasForcedToMindmap) {
+      if (wasForcedToMindmap) return "canvas";
+      return resolveKnowledgeAreaMode(mode, true);
+    }
     function createMountGuard() {
       let generation = 0;
       return {
@@ -175,6 +179,7 @@ var require_knowledge_canvas_embed = __commonJS({
       knowledgeCanvasPlugin,
       isKnowledgeCanvasAvailable,
       resolveKnowledgeAreaMode,
+      resolveKnowledgeAreaModeAfterEnable,
       createMountGuard,
       mountEmbeddedWhenCurrent,
       describeReadFlowSync,
@@ -5906,6 +5911,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     this._kcEmbedController = null;
     this._kcMountGuard = import_knowledge_canvas_embed.createMountGuard();
     this._kcIntegrationUnregister = null;
+    this._kcMindmapForcedByDisable = false;
   }
   getViewType() {
     return READFLOW_VIEW_TYPE;
@@ -5932,7 +5938,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       this.detachedPanel = null;
     }
     this.unregisterKnowledgeCanvasIntegrationListener();
-    this.disposeKnowledgeCanvasEmbed();
+    await this.disposeKnowledgeCanvasEmbed();
   }
   registerKnowledgeCanvasIntegrationListener() {
     this.unregisterKnowledgeCanvasIntegrationListener();
@@ -5941,7 +5947,19 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     );
     if (!(canvasPlugin == null ? void 0 : canvasPlugin.registerReadFlowIntegrationListener)) return;
     this._kcIntegrationUnregister = canvasPlugin.registerReadFlowIntegrationListener((enabled) => {
-      if (enabled) return;
+      if (enabled) {
+        const mode = import_knowledge_canvas_embed.resolveKnowledgeAreaModeAfterEnable(
+          this.knowledgeAreaMode,
+          this._kcMindmapForcedByDisable
+        );
+        this._kcMindmapForcedByDisable = false;
+        if (this.knowledgeAreaMode !== mode) {
+          this.knowledgeAreaMode = mode;
+          if (this.currentBook) this.refreshKnowledgePane(this.currentBook);
+        }
+        return;
+      }
+      this._kcMindmapForcedByDisable = this.knowledgeAreaMode !== "mindmap";
       this.knowledgeAreaMode = "mindmap";
       this.disposeKnowledgeCanvasEmbed();
       if (this.currentBook) this.refreshKnowledgePane(this.currentBook);
@@ -5959,10 +5977,11 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     const controller = this._kcEmbedController;
     this._kcEmbedController = null;
     if (controller) {
-      void controller.destroy().catch((error) => {
+      return controller.destroy().catch((error) => {
         console.error("[ReadFlow] knowledge canvas teardown failed", error);
       });
     }
+    return null;
   }
   render() {
     var _a, _b;
