@@ -101,6 +101,71 @@ function resolveKnowledgeAreaModeAfterEnable(mode, wasForcedToMindmap) {
 }
 
 /**
+ * The knowledge area after the integration toggle fires. Re-enabling always asks the pane
+ * to re-render, so the canvas entry reappears even when the user keeps the mindmap they
+ * chose for themselves; only the automatic switch back to the canvas depends on whether
+ * the mindmap was forced by the disable. A repeated disable keeps the original flag, so a
+ * second toggle event cannot erase the fact that the mindmap was not the user's choice.
+ */
+function resolveKnowledgeAreaAfterToggle(enabled, mode, wasForcedToMindmap) {
+  if (!enabled) {
+    return {
+      mode: "mindmap",
+      forcedToMindmap: Boolean(wasForcedToMindmap) || mode !== "mindmap",
+      refresh: true,
+    };
+  }
+  return {
+    mode: resolveKnowledgeAreaModeAfterEnable(mode, wasForcedToMindmap),
+    forcedToMindmap: false,
+    refresh: true,
+  };
+}
+
+/**
+ * Owns the one embedded ReadFlow canvas and its teardown.
+ *
+ * Every board replacement, book switch, refresh and close awaits `dispose()`, so a new
+ * board is never synced or mounted while the previous surface still owns the write token.
+ * Concurrent callers share the same in-flight teardown instead of destroying twice. A
+ * failed teardown keeps the controller reference and rejects, so the caller can retry
+ * instead of silently losing a surface that still holds listeners and a write token.
+ */
+function createEmbeddedTeardown() {
+  let controller = null;
+  let pending = null;
+  return {
+    /** The mounted controller, or `null` when nothing is mounted. */
+    get controller() {
+      return controller;
+    },
+    /** Commits a freshly mounted surface. */
+    attach(next) {
+      controller = next;
+      return next;
+    },
+    /**
+     * Tears the mounted surface down and resolves only once it has flushed and released
+     * the board. Safe to call repeatedly: a disposal that is already running is shared.
+     */
+    dispose() {
+      if (pending) return pending;
+      const current = controller;
+      if (!current) return Promise.resolve();
+      pending = (async () => {
+        try {
+          await current.destroy();
+          if (controller === current) controller = null;
+        } finally {
+          pending = null;
+        }
+      })();
+      return pending;
+    },
+  };
+}
+
+/**
  * A generation token that serialises embedded-canvas mounts. A fast book switch issues a
  * newer token before an older, slower mount resolves; the stale mount then sees it is no
  * longer current and is destroyed instead of being committed.
@@ -151,6 +216,8 @@ module.exports = {
   isKnowledgeCanvasAvailable,
   resolveKnowledgeAreaMode,
   resolveKnowledgeAreaModeAfterEnable,
+  resolveKnowledgeAreaAfterToggle,
+  createEmbeddedTeardown,
   createMountGuard,
   mountEmbeddedWhenCurrent,
   describeReadFlowSync,

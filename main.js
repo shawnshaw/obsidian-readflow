@@ -146,6 +146,53 @@ var require_knowledge_canvas_embed = __commonJS({
       if (wasForcedToMindmap) return "canvas";
       return resolveKnowledgeAreaMode(mode, true);
     }
+    function resolveKnowledgeAreaAfterToggle(enabled, mode, wasForcedToMindmap) {
+      if (!enabled) {
+        return {
+          mode: "mindmap",
+          forcedToMindmap: Boolean(wasForcedToMindmap) || mode !== "mindmap",
+          refresh: true
+        };
+      }
+      return {
+        mode: resolveKnowledgeAreaModeAfterEnable(mode, wasForcedToMindmap),
+        forcedToMindmap: false,
+        refresh: true
+      };
+    }
+    function createEmbeddedTeardown() {
+      let controller = null;
+      let pending = null;
+      return {
+        /** The mounted controller, or `null` when nothing is mounted. */
+        get controller() {
+          return controller;
+        },
+        /** Commits a freshly mounted surface. */
+        attach(next) {
+          controller = next;
+          return next;
+        },
+        /**
+         * Tears the mounted surface down and resolves only once it has flushed and released
+         * the board. Safe to call repeatedly: a disposal that is already running is shared.
+         */
+        dispose() {
+          if (pending) return pending;
+          const current = controller;
+          if (!current) return Promise.resolve();
+          pending = (async () => {
+            try {
+              await current.destroy();
+              if (controller === current) controller = null;
+            } finally {
+              pending = null;
+            }
+          })();
+          return pending;
+        }
+      };
+    }
     function createMountGuard() {
       let generation = 0;
       return {
@@ -180,6 +227,8 @@ var require_knowledge_canvas_embed = __commonJS({
       isKnowledgeCanvasAvailable,
       resolveKnowledgeAreaMode,
       resolveKnowledgeAreaModeAfterEnable,
+      resolveKnowledgeAreaAfterToggle,
+      createEmbeddedTeardown,
       createMountGuard,
       mountEmbeddedWhenCurrent,
       describeReadFlowSync,
@@ -5908,7 +5957,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     this.hoverCardId = null;
     this.shouldRestoreScroll = false;
     this.knowledgeAreaMode = null;
-    this._kcEmbedController = null;
+    this._kcTeardown = import_knowledge_canvas_embed.createEmbeddedTeardown();
     this._kcMountGuard = import_knowledge_canvas_embed.createMountGuard();
     this._kcIntegrationUnregister = null;
     this._kcMindmapForcedByDisable = false;
@@ -5946,22 +5995,25 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       this.app
     );
     if (!(canvasPlugin == null ? void 0 : canvasPlugin.registerReadFlowIntegrationListener)) return;
-    this._kcIntegrationUnregister = canvasPlugin.registerReadFlowIntegrationListener((enabled) => {
-      if (enabled) {
-        const mode = import_knowledge_canvas_embed.resolveKnowledgeAreaModeAfterEnable(
-          this.knowledgeAreaMode,
-          this._kcMindmapForcedByDisable
-        );
-        this._kcMindmapForcedByDisable = false;
-        if (this.knowledgeAreaMode !== mode) {
-          this.knowledgeAreaMode = mode;
-          if (this.currentBook) this.refreshKnowledgePane(this.currentBook);
+    this._kcIntegrationUnregister = canvasPlugin.registerReadFlowIntegrationListener(async (enabled) => {
+      const plan = import_knowledge_canvas_embed.resolveKnowledgeAreaAfterToggle(
+        enabled,
+        this.knowledgeAreaMode,
+        this._kcMindmapForcedByDisable
+      );
+      this._kcMindmapForcedByDisable = plan.forcedToMindmap;
+      this.knowledgeAreaMode = plan.mode;
+      if (!plan.refresh) return;
+      if (!enabled) {
+        try {
+          await this.disposeKnowledgeCanvasEmbed();
+        } catch (error) {
+          console.error(
+            "[ReadFlow] knowledge canvas teardown failed",
+            error
+          );
         }
-        return;
       }
-      this._kcMindmapForcedByDisable = this.knowledgeAreaMode !== "mindmap";
-      this.knowledgeAreaMode = "mindmap";
-      this.disposeKnowledgeCanvasEmbed();
       if (this.currentBook) this.refreshKnowledgePane(this.currentBook);
     });
   }
@@ -5971,17 +6023,16 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     }
     this._kcIntegrationUnregister = null;
   }
+  /**
+   * Tears the embedded canvas down and resolves only once it has flushed and released the
+   * board. Every replacement, book switch, refresh and close awaits this, so a new board is
+   * never synced or mounted while the old surface still owns the write token. A failed
+   * teardown keeps the controller so it can be retried; the rejection is never swallowed.
+   */
   disposeKnowledgeCanvasEmbed() {
     var _a;
     (_a = this._kcMountGuard) == null ? void 0 : _a.next();
-    const controller = this._kcEmbedController;
-    this._kcEmbedController = null;
-    if (controller) {
-      return controller.destroy().catch((error) => {
-        console.error("[ReadFlow] knowledge canvas teardown failed", error);
-      });
-    }
-    return null;
+    return this._kcTeardown.dispose();
   }
   render() {
     var _a, _b;
@@ -5995,7 +6046,9 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       this.detachedPanel.remove();
       this.detachedPanel = null;
     }
-    this.disposeKnowledgeCanvasEmbed();
+    void this.disposeKnowledgeCanvasEmbed().catch((error) => {
+      console.error("[ReadFlow] knowledge canvas teardown failed", error);
+    });
     this.listContainerEl = null;
     this.listSummaryEl = null;
     this.contentEl.empty();
@@ -7818,7 +7871,30 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     if (!(pane instanceof HTMLElement)) {
       return;
     }
-    this.disposeKnowledgeCanvasEmbed();
+    try {
+      await this.disposeKnowledgeCanvasEmbed();
+    } catch (error) {
+      console.error("[ReadFlow] knowledge canvas teardown failed", error);
+      pane.empty();
+      const failure = pane.createDiv("readflow-knowledge-section");
+      failure.createEl("p", {
+        text: "\u77E5\u8BC6\u753B\u677F\u4ECD\u6709\u5185\u5BB9\u672A\u4FDD\u5B58\uFF0C\u6682\u65F6\u65E0\u6CD5\u91CD\u65B0\u6253\u5F00\u3002",
+        cls: "readflow-muted"
+      });
+      const retry = failure.createEl("button", {
+        text: "\u91CD\u8BD5",
+        type: "button"
+      });
+      retry.classList.add(
+        "readflow-btn",
+        "readflow-btn--secondary",
+        "readflow-btn--sm"
+      );
+      retry.addEventListener("click", () => {
+        if (this.currentBook) this.refreshKnowledgePane(this.currentBook);
+      });
+      return;
+    }
     pane.empty();
     const canvasPlugin = import_knowledge_canvas_embed.knowledgeCanvasPlugin(this.app);
     const canvasAvailable = Boolean(
@@ -9319,7 +9395,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       "click",
       () => {
         var _a;
-        return (_a = this._kcEmbedController) == null ? void 0 : _a.openFullView();
+        return (_a = this._kcTeardown.controller) == null ? void 0 : _a.openFullView();
       }
     );
     const host = sec.createDiv("readflow-kc-host");
@@ -9355,7 +9431,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
         (controller) => controller.destroy()
       );
       if (result.stale) return;
-      this._kcEmbedController = result.controller;
+      this._kcTeardown.attach(result.controller);
     } catch (error) {
       console.error("[ReadFlow] knowledge canvas mount failed", error);
       host.createEl("p", {

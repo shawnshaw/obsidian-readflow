@@ -6684,7 +6684,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     this.shouldRestoreScroll = false;
     // Knowledge Canvas embed: defaults to the canvas, falls back to the mindmap.
     this.knowledgeAreaMode = null;
-    this._kcEmbedController = null;
+    this._kcTeardown = import_knowledge_canvas_embed.createEmbeddedTeardown();
     this._kcMountGuard = import_knowledge_canvas_embed.createMountGuard();
     this._kcIntegrationUnregister = null;
     this._kcMindmapForcedByDisable = false;
@@ -6725,27 +6725,31 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     );
     if (!canvasPlugin?.registerReadFlowIntegrationListener) return;
     this._kcIntegrationUnregister =
-      canvasPlugin.registerReadFlowIntegrationListener((enabled) => {
-        if (enabled) {
-          // Knowledge Canvas is back; restore the canvas unless the mindmap was the
-          // user's own choice, and re-render so the switch entry reappears.
-          const mode =
-            import_knowledge_canvas_embed.resolveKnowledgeAreaModeAfterEnable(
-              this.knowledgeAreaMode,
-              this._kcMindmapForcedByDisable,
+      canvasPlugin.registerReadFlowIntegrationListener(async (enabled) => {
+        const plan =
+          import_knowledge_canvas_embed.resolveKnowledgeAreaAfterToggle(
+            enabled,
+            this.knowledgeAreaMode,
+            this._kcMindmapForcedByDisable,
+          );
+        this._kcMindmapForcedByDisable = plan.forcedToMindmap;
+        this.knowledgeAreaMode = plan.mode;
+        if (!plan.refresh) return;
+        if (!enabled) {
+          // Knowledge Canvas tore its embedded surfaces down; ReadFlow must fall back to
+          // its own knowledge view immediately instead of showing a dead embed. Await the
+          // release so the next mount cannot sync against a board still held as read-only.
+          try {
+            await this.disposeKnowledgeCanvasEmbed();
+          } catch (error) {
+            console.error(
+              "[ReadFlow] knowledge canvas teardown failed",
+              error,
             );
-          this._kcMindmapForcedByDisable = false;
-          if (this.knowledgeAreaMode !== mode) {
-            this.knowledgeAreaMode = mode;
-            if (this.currentBook) this.refreshKnowledgePane(this.currentBook);
           }
-          return;
         }
-        // Knowledge Canvas tore its embedded surfaces down; ReadFlow must fall back to
-        // its own knowledge view immediately instead of showing a dead embed.
-        this._kcMindmapForcedByDisable = this.knowledgeAreaMode !== "mindmap";
-        this.knowledgeAreaMode = "mindmap";
-        this.disposeKnowledgeCanvasEmbed();
+        // Always re-render: the canvas entry must reappear after a re-enable even when the
+        // user keeps the mindmap they chose for themselves.
         if (this.currentBook) this.refreshKnowledgePane(this.currentBook);
       });
   }
@@ -6755,20 +6759,17 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     }
     this._kcIntegrationUnregister = null;
   }
+  /**
+   * Tears the embedded canvas down and resolves only once it has flushed and released the
+   * board. Every replacement, book switch, refresh and close awaits this, so a new board is
+   * never synced or mounted while the old surface still owns the write token. A failed
+   * teardown keeps the controller so it can be retried; the rejection is never swallowed.
+   */
   disposeKnowledgeCanvasEmbed() {
     // Any mount still in flight is now stale: invalidate before destroying so it can
     // never commit into a surface we already tore down.
     this._kcMountGuard?.next();
-    const controller = this._kcEmbedController;
-    this._kcEmbedController = null;
-    if (controller) {
-      // Returns the teardown promise so `onClose` can await a full release of the board's
-      // write token before the view finishes closing.
-      return controller.destroy().catch((error) => {
-        console.error("[ReadFlow] knowledge canvas teardown failed", error);
-      });
-    }
-    return null;
+    return this._kcTeardown.dispose();
   }
   render() {
     var _a, _b;
@@ -6782,7 +6783,11 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       this.detachedPanel.remove();
       this.detachedPanel = null;
     }
-    this.disposeKnowledgeCanvasEmbed();
+    // A full re-render cannot await, so start the teardown here and let the async
+    // inspector (which does await it) be the gate before anything is synced or mounted.
+    void this.disposeKnowledgeCanvasEmbed().catch((error) => {
+      console.error("[ReadFlow] knowledge canvas teardown failed", error);
+    });
     this.listContainerEl = null;
     this.listSummaryEl = null;
     this.contentEl.empty();
@@ -8744,7 +8749,32 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     if (!(pane instanceof HTMLElement)) {
       return;
     }
-    this.disposeKnowledgeCanvasEmbed();
+    // A new surface must never sync against a board the old one still owns as read-only,
+    // so a refresh waits for the full teardown (including any pending save) before mounting.
+    try {
+      await this.disposeKnowledgeCanvasEmbed();
+    } catch (error) {
+      console.error("[ReadFlow] knowledge canvas teardown failed", error);
+      pane.empty();
+      const failure = pane.createDiv("readflow-knowledge-section");
+      failure.createEl("p", {
+        text: "知识画板仍有内容未保存，暂时无法重新打开。",
+        cls: "readflow-muted",
+      });
+      const retry = failure.createEl("button", {
+        text: "重试",
+        type: "button",
+      });
+      retry.classList.add(
+        "readflow-btn",
+        "readflow-btn--secondary",
+        "readflow-btn--sm",
+      );
+      retry.addEventListener("click", () => {
+        if (this.currentBook) this.refreshKnowledgePane(this.currentBook);
+      });
+      return;
+    }
     pane.empty();
     const canvasPlugin =
       import_knowledge_canvas_embed.knowledgeCanvasPlugin(this.app);
@@ -10315,7 +10345,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       "readflow-btn--sm",
     );
     openBtn.addEventListener("click", () =>
-      this._kcEmbedController?.openFullView(),
+      this._kcTeardown.controller?.openFullView(),
     );
     const host = sec.createDiv("readflow-kc-host");
     const guard = this._kcMountGuard;
@@ -10353,7 +10383,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
         (controller) => controller.destroy(),
       );
       if (result.stale) return;
-      this._kcEmbedController = result.controller;
+      this._kcTeardown.attach(result.controller);
     } catch (error) {
       console.error("[ReadFlow] knowledge canvas mount failed", error);
       host.createEl("p", {

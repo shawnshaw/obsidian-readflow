@@ -7,6 +7,8 @@ const {
   isKnowledgeCanvasAvailable,
   resolveKnowledgeAreaMode,
   resolveKnowledgeAreaModeAfterEnable,
+  resolveKnowledgeAreaAfterToggle,
+  createEmbeddedTeardown,
   createMountGuard,
   mountEmbeddedWhenCurrent,
   describeReadFlowSync,
@@ -125,6 +127,100 @@ test("re-enabling restores the canvas only when the disable forced the mindmap",
   assert.equal(resolveKnowledgeAreaModeAfterEnable("mindmap", false), "mindmap");
   assert.equal(resolveKnowledgeAreaModeAfterEnable("canvas", true), "canvas");
   assert.equal(resolveKnowledgeAreaModeAfterEnable(null, false), "canvas");
+});
+
+test("re-enabling always refreshes the pane, even when the user keeps their own mindmap", () => {
+  // The user picked the mindmap for themselves: no automatic switch, but the canvas
+  // entry must still come back because the pane is re-rendered.
+  assert.deepEqual(resolveKnowledgeAreaAfterToggle(true, "mindmap", false), {
+    mode: "mindmap",
+    forcedToMindmap: false,
+    refresh: true,
+  });
+  // The mindmap was only forced by the disable: return to the canvas.
+  assert.deepEqual(resolveKnowledgeAreaAfterToggle(true, "mindmap", true), {
+    mode: "canvas",
+    forcedToMindmap: false,
+    refresh: true,
+  });
+  assert.deepEqual(resolveKnowledgeAreaAfterToggle(false, "canvas", false), {
+    mode: "mindmap",
+    forcedToMindmap: true,
+    refresh: true,
+  });
+  // A repeated disable event must not erase the fact that the mindmap was not the user's choice.
+  assert.deepEqual(resolveKnowledgeAreaAfterToggle(false, "mindmap", true), {
+    mode: "mindmap",
+    forcedToMindmap: true,
+    refresh: true,
+  });
+});
+
+test("a refresh waits for the pending save to release the board before syncing again", async () => {
+  const teardown = createEmbeddedTeardown();
+  const events = [];
+  let finishSave;
+  const pendingSave = new Promise((resolve) => {
+    finishSave = resolve;
+  });
+  const first = {
+    destroy: async () => {
+      events.push("teardown:start");
+      await pendingSave;
+      events.push("teardown:end");
+    },
+  };
+  teardown.attach(first);
+
+  const refresh = (async () => {
+    await teardown.dispose();
+    events.push("sync+remount");
+  })();
+
+  // Nothing may be synced or mounted while the old surface still owns the writer.
+  await Promise.resolve();
+  assert.deepEqual(events, ["teardown:start"]);
+  assert.equal(teardown.controller, first);
+
+  finishSave();
+  await refresh;
+  assert.deepEqual(events, ["teardown:start", "teardown:end", "sync+remount"]);
+  assert.equal(teardown.controller, null);
+});
+
+test("a refresh and a close share one teardown instead of destroying the surface twice", async () => {
+  const teardown = createEmbeddedTeardown();
+  let destroys = 0;
+  teardown.attach({
+    destroy: async () => {
+      destroys += 1;
+      await new Promise((resolve) => setImmediate(resolve));
+    },
+  });
+  const refresh = teardown.dispose();
+  const close = teardown.dispose();
+  assert.equal(refresh, close);
+  await Promise.all([refresh, close]);
+  assert.equal(destroys, 1);
+});
+
+test("a failed teardown keeps the controller and can be retried", async () => {
+  const teardown = createEmbeddedTeardown();
+  let attempts = 0;
+  const controller = {
+    destroy: async () => {
+      attempts += 1;
+      if (attempts === 1) throw new Error("flush failed");
+    },
+  };
+  teardown.attach(controller);
+
+  await assert.rejects(teardown.dispose(), /flush failed/);
+  assert.equal(teardown.controller, controller, "a failed close must stay retryable");
+
+  await teardown.dispose();
+  assert.equal(attempts, 2);
+  assert.equal(teardown.controller, null);
 });
 
 test("mount guard invalidates older tokens as new mounts start", () => {
