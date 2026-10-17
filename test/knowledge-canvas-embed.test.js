@@ -1,7 +1,5 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const path = require("node:path");
-const { pathToFileURL } = require("node:url");
 
 const {
   collectBookHighlightPaths,
@@ -225,46 +223,39 @@ test("a failed teardown keeps the controller and can be retried", async () => {
   assert.equal(teardown.controller, null);
 });
 
-// The real single-writer store lives in the Knowledge Canvas plugin, which owns the
-// `.canvas` files. It is loaded from the sibling plugin (dev worktrees or an installed
-// vault) so this lifecycle is exercised against real writer-token semantics, not a stub.
-const BOARD_STORE_CANDIDATES = [
-  "../../knowledge-canvas-readflow-embed/Plugins/knowledge-canvas/src/board-store.js",
-  "../../knowledge-canvas/src/board-store.js",
-];
-
-async function loadBoardStore() {
-  const misses = [];
-  for (const candidate of BOARD_STORE_CANDIDATES) {
-    const file = path.resolve(__dirname, candidate);
-    try {
-      return (await import(pathToFileURL(file).href)).BoardStore;
-    } catch (error) {
-      misses.push(`${file}: ${error.message}`);
-    }
-  }
-  throw new Error(
-    `Knowledge Canvas BoardStore is required for the lifecycle test:\n${misses.join("\n")}`,
-  );
+/**
+ * The single-writer contract this lifecycle depends on, mirrored from Knowledge Canvas so
+ * the public ReadFlow suite stays self-contained. The real cross-plugin run belongs in an
+ * integration environment that has both plugins; this harness keeps the same semantics:
+ * one owner per board, a second claim is refused, and only the owner can release.
+ */
+function createWriterTokenStore() {
+  const owners = new Map();
+  return {
+    acquireWriter(file, token) {
+      if (!token) return false;
+      const owner = owners.get(file);
+      if (owner && owner !== token) return false;
+      owners.set(file, token);
+      return true;
+    },
+    releaseWriter(file, token) {
+      if (owners.get(file) === token) owners.delete(file);
+    },
+    isWriter(file, token) {
+      return Boolean(token) && owners.get(file) === token;
+    },
+    ownerCount() {
+      return owners.size;
+    },
+  };
 }
 
 const tick = () => new Promise((resolve) => setImmediate(resolve));
 
-function createStoreHarness(BoardStore, boardPath) {
-  const files = new Map();
-  const store = new BoardStore({
-    read: async (file) => files.get(file),
-    process: async (file, updater) => files.set(file, updater(files.get(file))),
-  });
-  files.set(boardPath, JSON.stringify({ nodes: [], edges: [] }));
-  return { store, files };
-}
-
 test("a rapid second refresh owns the board while the first mount is still in flight", async () => {
-  const BoardStore = await loadBoardStore();
   const boardPath = "Canvas/Knowledge Canvas/ReadFlow/rf-race.canvas";
-  const { store } = createStoreHarness(BoardStore, boardPath);
-  await store.load(boardPath);
+  const store = createWriterTokenStore();
 
   const lifecycle = createEmbeddedLifecycle();
   const mounted = [];
@@ -317,6 +308,7 @@ test("a rapid second refresh owns the board while the first mount is still in fl
   assert.equal(lifecycle.controller, fresh);
   assert.equal(mounted[0].writerOwned, false, "the superseded surface released the board");
   assert.equal(store.isWriter(boardPath, fresh.token), true);
+  assert.equal(store.ownerCount(), 1, "the board must still have exactly one writable owner");
 });
 
 test("a close waits for an in-flight mount before tearing the surface down", async () => {
