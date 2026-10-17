@@ -36,6 +36,7 @@ module.exports = __toCommonJS(main_exports);
 var import_obsidian7 = require("obsidian");
 var import_character_model = require("./character-model");
 var import_weread_session = require("./weread-session");
+var import_knowledge_canvas_embed = require("./knowledge-canvas-embed");
 
 // src/settings.ts
 var import_obsidian = require("obsidian");
@@ -6612,6 +6613,9 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     this.hoverTimeoutId = null;
     this.hoverCardId = null;
     this.shouldRestoreScroll = false;
+    // Knowledge Canvas embed: defaults to the canvas, falls back to the mindmap.
+    this.knowledgeAreaMode = null;
+    this._kcEmbedController = null;
   }
   getViewType() {
     return READFLOW_VIEW_TYPE;
@@ -6638,6 +6642,16 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       this.detachedPanel.remove();
       this.detachedPanel = null;
     }
+    this.disposeKnowledgeCanvasEmbed();
+  }
+  disposeKnowledgeCanvasEmbed() {
+    const controller = this._kcEmbedController;
+    this._kcEmbedController = null;
+    if (controller) {
+      void controller.destroy().catch((error) => {
+        console.error("[ReadFlow] knowledge canvas teardown failed", error);
+      });
+    }
   }
   render() {
     var _a, _b;
@@ -6651,6 +6665,7 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       this.detachedPanel.remove();
       this.detachedPanel = null;
     }
+    this.disposeKnowledgeCanvasEmbed();
     this.listContainerEl = null;
     this.listSummaryEl = null;
     this.contentEl.empty();
@@ -8612,7 +8627,22 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
     if (!(pane instanceof HTMLElement)) {
       return;
     }
+    this.disposeKnowledgeCanvasEmbed();
     pane.empty();
+    const canvasPlugin =
+      import_knowledge_canvas_embed.knowledgeCanvasPlugin(this.app);
+    const canvasAvailable = Boolean(
+      canvasPlugin && canvasPlugin.isReadFlowIntegrationEnabled() === true,
+    );
+    this.knowledgeAreaMode =
+      import_knowledge_canvas_embed.resolveKnowledgeAreaMode(
+        this.knowledgeAreaMode,
+        canvasAvailable,
+      );
+    if (this.knowledgeAreaMode === "canvas" && canvasPlugin) {
+      await this.renderEmbeddedKnowledgeCanvas(pane, book, canvasPlugin);
+      return;
+    }
     let scopeBook = this.buildKnowledgeScope(book, visible);
     const availableTopics = new Set(
       scopeBook.highlights.map((h) => (h.topic || "").trim()).filter(Boolean),
@@ -9986,6 +10016,8 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
   }
   async renderKnowledgePreviewSection(container, book, scopeBook) {
     const self = this;
+    const canvasAvailable =
+      import_knowledge_canvas_embed.isKnowledgeCanvasAvailable(this.app);
     const mmSec = container.createDiv(
       "readflow-knowledge-section readflow-mm-section",
     );
@@ -9995,6 +10027,21 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
       cls: "readflow-knowledge-title",
     });
     const mmActions = mmHead.createDiv("readflow-inline-actions");
+    if (canvasAvailable) {
+      const canvasBtn = mmActions.createEl("button", {
+        text: "\u5207\u6362\u77E5\u8BC6\u753B\u677F",
+        type: "button",
+      });
+      canvasBtn.classList.add(
+        "readflow-btn",
+        "readflow-btn--secondary",
+        "readflow-btn--sm",
+      );
+      canvasBtn.addEventListener("click", () => {
+        this.knowledgeAreaMode = "canvas";
+        this.refreshKnowledgePane(this.currentBook);
+      });
+    }
     const expandBtn = mmActions.createEl("button", {
       text: "\u2922 \u5C55\u5F00\u5927\u56FE",
       type: "button",
@@ -10095,6 +10142,70 @@ var HighlightPanelView = class extends import_obsidian5.ItemView {
         );
       }
     });
+  }
+  async renderEmbeddedKnowledgeCanvas(container, book, canvasPlugin) {
+    const sec = container.createDiv(
+      "readflow-knowledge-section readflow-kc-section",
+    );
+    const head = sec.createDiv("readflow-section-inline-head");
+    head.createEl("h5", {
+      text: "知识画板",
+      cls: "readflow-knowledge-title",
+    });
+    const actions = head.createDiv("readflow-inline-actions");
+    const mindmapBtn = actions.createEl("button", {
+      text: "切换知识视图",
+      type: "button",
+    });
+    mindmapBtn.classList.add(
+      "readflow-btn",
+      "readflow-btn--secondary",
+      "readflow-btn--sm",
+    );
+    mindmapBtn.addEventListener("click", () => {
+      this.knowledgeAreaMode = "mindmap";
+      this.refreshKnowledgePane(this.currentBook);
+    });
+    const openBtn = actions.createEl("button", {
+      text: "打开全屏",
+      type: "button",
+    });
+    openBtn.classList.add(
+      "readflow-btn",
+      "readflow-btn--ghost",
+      "readflow-btn--sm",
+    );
+    openBtn.addEventListener("click", () =>
+      this._kcEmbedController?.openFullView(),
+    );
+    const host = sec.createDiv("readflow-kc-host");
+    try {
+      const highlightPaths =
+        import_knowledge_canvas_embed.collectBookHighlightPaths(
+          this.plugin.settings,
+          book,
+        );
+      const ensured = await canvasPlugin.ensureReadFlowBoard({
+        bookId: book.bookId,
+        title: book.title,
+        highlightPaths,
+      });
+      const boardPath = ensured?.boardPath;
+      if (!boardPath) {
+        throw new Error("知识画板路径无效");
+      }
+      const controller = await canvasPlugin.mountEmbeddedBoard(host, {
+        boardPath,
+        compact: true,
+      });
+      this._kcEmbedController = controller;
+    } catch (error) {
+      console.error("[ReadFlow] knowledge canvas mount failed", error);
+      host.createEl("p", {
+        text: "知识画板加载失败，可切换回知识视图。",
+        cls: "readflow-muted",
+      });
+    }
   }
   openMindMapExpanded(book, scopeBook) {
     const self = this;

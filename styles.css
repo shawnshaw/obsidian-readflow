@@ -1979,6 +1979,14 @@
 	flex-shrink: 0;
 }
 
+/* 知识画板嵌入：给可编辑画板一个固定高度，KC 的 .knowledge-canvas-view 会填满它 */
+.readflow-knowledge-section .readflow-kc-host {
+	height: 360px;
+	overflow: hidden;
+	border: 1px solid var(--rf-border);
+	border-radius: var(--rf-radius-md);
+}
+
 .readflow-narrative-wrap {
 	width: 100%;
 	border: 1px solid var(--rf-border);
