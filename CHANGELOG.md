@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.0
+
+- Add per-book knowledge canvas embedding with serialized mount/teardown to prevent duplicate boards.
+- Rebuild the WeRead login window with embedded fallback; persist and observe refreshed session cookies.
+- Add explicit character tagging, character workbench and entity-language model.
+- Add simulated reading manager with pipelined sync and automatic re-selection.
+- Refactor the build so `src/index.js` is the single source; remove generated `src/main.js` and stale TypeScript sources.
+- Add tests for character model, canvas embedding and WeRead sessions.
+
 ## 0.3.4
 
 - Phase 2: `entityRelations` supports `sinceHighlightId` / `chapterUid` for relationship evolution; graph shows chapter-aware edge labels and dashed evolution edges.

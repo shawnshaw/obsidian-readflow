@@ -1,5 +1,5 @@
 /*
- * ReadFlow v0.3.4
+ * ReadFlow v0.4.0
  * GENERATED FILE — DO NOT EDIT. Edit src/index.js and run: npm run build
  * Author: Oscar Shao | License: MIT
  */
